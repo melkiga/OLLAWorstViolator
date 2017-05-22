@@ -1,6 +1,6 @@
 /**************************************************************************
- * This file is part of gsvm, a Support Vector Machine solver.
- * Copyright (C) 2012 Robert Strack (strackr@vcu.edu), Vojislav Kecman
+ * This file is part of osvm, a Support Vector Machine solver.
+ * Copyright (C) 2012 Gabriella Melki (melkiga@vcu.edu), Vojislav Kecman
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as

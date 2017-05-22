@@ -104,7 +104,9 @@ struct CacheDimension {
 
 };
 
-
+/*
+Holds the current model. 
+*/
 template<typename Kernel, typename Matrix, typename Strategy>
 class CachedKernelEvaluator {
 
@@ -495,16 +497,17 @@ fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelUV(sample_id u
 	return result;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getTau() {
-	return evaluator->getKernelTau();
-}
-
+/*
+Returns alpha value of input sample id.
+*/
 template<typename Kernel, typename Matrix, typename Strategy>
 inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getVectorWeight(sample_id v) {
 	return alphas[v];
 }
 
+/*
+Returns the current number of support vectors.
+*/
 template<typename Kernel, typename Matrix, typename Strategy>
 inline quantity CachedKernelEvaluator<Kernel, Matrix, Strategy>::getSVNumber() {
 	return svnumber;
@@ -540,8 +543,7 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id u,
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::releaseSupportVectors(
-		fold_id *membership, fold_id fold) {
+void CachedKernelEvaluator<Kernel, Matrix, Strategy>::releaseSupportVectors(fold_id *membership, fold_id fold) {
 	quantity valid = 0;
 	for (sample_id v = 0; v < svnumber; v++) {
 		fvalue beta = alphas[v];
@@ -572,6 +574,10 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setSwapListener(SwapListen
 	this->listener = listener;
 }
 
+/*
+ * Swaps the cache attribute samples when a new support vector is found. The support vectors are
+ * stacked at the top of each of the attribute values.
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::swapSamples(sample_id u, sample_id v) {
 	evaluator->swapSamples(u, v);
@@ -601,6 +607,10 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::swapSamples(sample_id u, s
 	swap(backwardOrder[u], backwardOrder[v]);
 }
 
+/* 
+ * Resets the cache based on the current dimension.
+ * Calls initalize when the cache dimension is found.
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::reset() {
 	CacheDimension dim = findCacheDimension(cacheSize, problemSize);
@@ -610,6 +620,9 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::reset() {
 	initialize();
 }
 
+/* 
+ * Initialize the cache. Allocates memory for the alphas, output values.
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 	// initialize alphas and kernel values
@@ -677,30 +690,13 @@ CacheDimension CachedKernelEvaluator<Kernel, Matrix, Strategy>::findCacheDimensi
 	return dimension;
 }
 
+/*
+ * Sets the current kernel parameters.
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setKernelParams(fvalue c, Kernel gparams) {
 	evaluator->setKernelParams(c, gparams);
 	reset();
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::updateKernelValues(sample_id u, sample_id v, fvalue beta) {
-	fvector &uvector = evalKernelVector(u);
-	fvector &vvector = evalKernelVector(v);
-
-	fvalue *uptr = uvector.data;
-	fvalue *vptr = vvector.data;
-	fvalue *kptr = kernelValues.data();
-	for (sample_id i = 0; i < svnumber; i++) {
-		*kptr++ += beta * (*vptr++ - *uptr++);
-	}
-
-	// TODO remove blas implementation
-//	fbufferView.vector.size = svnumber;
-//	fvector_cpy(&fbufferView.vector, &vvector);
-//	fvector_sub(&fbufferView.vector, &uvector);
-//	fvector_mul_const(&fbufferView.vector, beta);
-//	fvector_add(&kernelValuesView.vector, &fbufferView.vector);
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -735,6 +731,9 @@ inline void CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernel(sample_i
 	evaluator->evalKernel(id, rangeFrom, rangeTo, result);
 }
 
+/*
+ * Returns the current kernel parameters of the evaluator. 
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 inline Kernel CachedKernelEvaluator<Kernel, Matrix, Strategy>::getParams() {
 	return evaluator->getParams();
