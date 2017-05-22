@@ -86,8 +86,7 @@ CrossValidationSolver<GaussKernel, Matrix, Strategy>* ApplicationLauncher::creat
 template<typename Matrix, typename Strategy>
 AbstractSolver<GaussKernel, Matrix, Strategy>* ApplicationLauncher::createSolver() {
 	ifstream input(conf.dataFile.c_str());
-	BaseSolverFactory<Matrix, Strategy> reader(
-			input, conf.trainingParams, conf.stopCriterion, conf.multiclass, false);
+	BaseSolverFactory<Matrix, Strategy> reader(input, conf.trainingParams, conf.stopCriterion, conf.multiclass, false);
 
 	Timer timer(true);
 	AbstractSolver<GaussKernel, Matrix, Strategy> *solver = reader.getSolver();

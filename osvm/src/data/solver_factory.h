@@ -106,11 +106,6 @@ private:
 
 	Matrix* preprocess(Matrix *x, label_id *y);
 
-	/// <summary>createSolver
-	/// <param name = "x">X matrix after being preprocessed and randomly shuffled.</param>
-	/// <param name = "y">Y labels for all classes eg[1,2,3].</param>
-	/// <param name = "params">Epsilon, C, gamma, etc..</param>
-	/// <param name = "strategy">....</param></summary>
 	AbstractSolver<GaussKernel, Matrix, Strategy>* createSolver(
 			MulticlassApproach type, map<label_id,string> labels,
 			Matrix* x, label_id* y, TrainParams& params,
@@ -152,18 +147,14 @@ AbstractSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strateg
 		Matrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy) {
 	AbstractSolver<GaussKernel, Matrix, Strategy> *solver = NULL;
 	if (type == PAIRWISE) {
-		solver = new PairwiseSolver<GaussKernel, Matrix, Strategy>(
-					labels, x, y, params, strategy);
+		solver = new PairwiseSolver<GaussKernel, Matrix, Strategy>(labels, x, y, params, strategy);
 	} else {
-		solver = new UniversalSolver<GaussKernel, Matrix, Strategy>(
-					labels, x, y, params, strategy);
+		solver = new UniversalSolver<GaussKernel, Matrix, Strategy>(labels, x, y, params, strategy);
 	}
 	return solver;
 }
 
 
-/// <summary>getSolver
-/// Created the dataset, created the X and Y matrices, preprocesses X.</summary>
 template<typename Matrix, typename Strategy>
 AbstractSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getSolver() {
 	SparseFormatDataSetFactory dataSetFactory(input);
