@@ -152,7 +152,6 @@ protected:
 	CacheEntry& initializeEntry(sample_id v);
 	void refreshEntry(sample_id v);
 
-	void updateKernelValues(sample_id u, sample_id v, fvalue beta);
 	fvector& evalKernelVector(sample_id v);
 
 	void resizeCache();
@@ -168,7 +167,6 @@ public:
 	fvalue evalKernelAXV(sample_id v);
 	bool checkViolation(sample_id v, fvalue threshold);
 
-	fvalue getTau();
 	fvalue getVectorWeight(sample_id v);
 	quantity getSVNumber();
 
@@ -215,12 +213,12 @@ CachedKernelEvaluator<Kernel, Matrix, Strategy>::CachedKernelEvaluator(
 	cacheLines = dim.lines;
 	cache = new fvalue[cacheSize];
 
-	// initialize alphas and kernel values
+	// initialize alphas and output vector
 	svnumber = 1;
 	alphas = vector<fvalue>(problemSize);
 	alphasView = fvectorv_array(alphas.data(), svnumber);
 	output = vector<fvalue>(problemSize);
-	outputView = fvectorv_array(output.data(), svnumber);
+	outputView = fvectorv_array(output.data(), problemSize);
 
 	fbuffer = fvector_alloc(problemSize);
 	fbufferView = fvector_subv(fbuffer, 0, svnumber);
@@ -634,7 +632,7 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 	svnumber = 1;
 	psvnumber = 1;
 	alphasView = fvectorv_array(alphas.data(), svnumber);
-	outputView = fvectorv_array(output.data(), svnumber);
+	outputView = fvectorv_array(output.data(), problemSize);
 
 	// initialize buffer
 	fbufferView = fvector_subv(fbuffer, 0, svnumber);

@@ -198,6 +198,10 @@ AbstractSolver<Kernel, Matrix, Strategy>::~AbstractSolver() {
 	delete stopStrategy;
 }
 
+/*
+ * Sets the kernel parameters for the current model. If the cache is not set,
+ * initialize the cache as well.
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::setKernelParams(
 		fvalue c, Kernel &gparams) {
@@ -209,6 +213,14 @@ void AbstractSolver<Kernel, Matrix, Strategy>::setKernelParams(
 	}
 }
 
+template<typename Kernel, typename Matrix, typename Strategy>
+void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
+	cache->reportStatistics();
+}
+
+/*
+ * Find the worst violator.
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 ViolatorSearch AbstractSolver<Kernel, Matrix, Strategy>::findMinNormViolator(
 		fvalue threshold) {
@@ -226,18 +238,31 @@ ViolatorSearch AbstractSolver<Kernel, Matrix, Strategy>::findMinNormViolator(
 	return result;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
-	cache->reportStatistics();
-}
-
+/*
+ * Begin training. 
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) {
-	ViolatorSearch mnviol(INVALID_SAMPLE_ID, 0);
-	sample_id kktviol = 0;
-	cache->performUpdate(kktviol, mnviol.violator);
-	cache->performSvUpdate();
+	sample_id viol = 0;
+	fvalue yo = 0.0;
+	fvalue margin = 0.1*cache->getC();
+	quantity iter = 0;
+	fvalue bias = 0.0;
+	fvalue eta = 0.0;
+	quantity max_iter = ceil(0.5*currentSize);
+
+	do {
+
+	} while (iter < max_iter && yo < margin);
+
+
+
+	//cache->performUpdate(kktviol, mnviol.violator);
+	//cache->performSvUpdate();
+
+
+
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
