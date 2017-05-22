@@ -235,34 +235,9 @@ template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) {
 	ViolatorSearch mnviol(INVALID_SAMPLE_ID, 0);
-	fvalue tau = cache->getTau();
-	fvalue finalEpsilon = params.epsilon;
-	if (finalEpsilon <= 0) {
-		finalEpsilon = stopStrategy->getEpsilon();
-	}
-	fvalue epsilon = STARTING_EPSILON;
-	do {
-		epsilon /= EPSILON_SHRINKING_FACTOR;
-		if (epsilon < finalEpsilon) {
-			epsilon = finalEpsilon;
-		}
-
-		do {
-			// main update
-			fvalue threshold = stopStrategy->getThreshold(epsilon,cache->getC());
-			mnviol = findMinNormViolator(threshold);
-			if (mnviol.violator != INVALID_ID) {
-				sample_id kktviol = cache->findMaxSVKernelVal(mnviol.violator);
-
-				cache->performUpdate(kktviol, mnviol.violator);
-			}
-
-			// additional tuning (in order to increase cache usage ratio)
-			for (int i = 0; i < CACHE_USAGE_RATIO * mnviol.attempt; i++) {
-				cache->performSvUpdate();
-			}
-		} while (mnviol.violator != INVALID_ID);
-	} while (epsilon > finalEpsilon);
+	sample_id kktviol = 0;
+	cache->performUpdate(kktviol, mnviol.violator);
+	cache->performSvUpdate();
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>

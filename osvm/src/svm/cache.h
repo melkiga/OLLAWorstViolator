@@ -108,8 +108,8 @@ struct CacheDimension {
 template<typename Kernel, typename Matrix, typename Strategy>
 class CachedKernelEvaluator {
 
-	vector<fvalue> kernelValues;
-	fvectorv kernelValuesView;
+	vector<fvalue> output;
+	fvectorv outputView;
 
 	vector<fvalue> alphas;
 	fvectorv alphasView;
@@ -164,15 +164,11 @@ public:
 
 	fvalue evalKernelUV(sample_id u, sample_id v);
 	fvalue evalKernelAXV(sample_id v);
-	fvalue evalKernelAXVCached(sample_id v);
 	bool checkViolation(sample_id v, fvalue threshold);
 
 	fvalue getTau();
 	fvalue getVectorWeight(sample_id v);
 	quantity getSVNumber();
-
-	sample_id findMaxSVKernelVal(sample_id v);
-	sample_id findMinSVKernelVal();
 
 	void performUpdate(sample_id u, sample_id v);
 	fvalue getWNorm();
@@ -221,8 +217,8 @@ CachedKernelEvaluator<Kernel, Matrix, Strategy>::CachedKernelEvaluator(
 	svnumber = 1;
 	alphas = vector<fvalue>(problemSize);
 	alphasView = fvectorv_array(alphas.data(), svnumber);
-	kernelValues = vector<fvalue>(problemSize);
-	kernelValuesView = fvectorv_array(kernelValues.data(), svnumber);
+	output = vector<fvalue>(problemSize);
+	outputView = fvectorv_array(output.data(), svnumber);
 
 	fbuffer = fvector_alloc(problemSize);
 	fbufferView = fvector_subv(fbuffer, 0, svnumber);
@@ -260,10 +256,10 @@ fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXV(sample_id 
 		fvector &vector = evalKernelVector(v);
 		fvector_dot(&alphasView.vector, &vector, &result);
 		// save current result (valid until alpha values stay unchanged)
-		kernelValues[v] = result;
+		//kernelValues[v] = result;
 	} else {
 		// get precomputed kernel value
-		result = kernelValues[v];
+		//result = kernelValues[v];
 		refreshEntry(v);
 	}
 	return result;
@@ -272,11 +268,6 @@ fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXV(sample_id 
 template<typename Kernel, typename Matrix, typename Strategy>
 bool CachedKernelEvaluator<Kernel, Matrix, Strategy>::checkViolation(sample_id v, fvalue threshold) {
 	return evalKernelAXV(v) < threshold;
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXVCached(sample_id v) {
-	return kernelValues[v];
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -483,7 +474,7 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::shrink() {
 		svnumber -= nonsvnumber;
 		psvnumber = svnumber;
 		alphasView.vector.size -= nonsvnumber;
-		kernelValuesView.vector.size -= nonsvnumber;
+		outputView.vector.size -= nonsvnumber;
 	}
 	delete [] nonsvnumbers;
 }
@@ -521,13 +512,7 @@ inline quantity CachedKernelEvaluator<Kernel, Matrix, Strategy>::getSVNumber() {
 
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id u, sample_id v) {
-	fvalue uw = evalKernelAXVCached(u);
-	fvalue vw = evalKernelAXVCached(v);
-	fvalue uv = evalKernelUV(u, v);
-
-	fvalue tau = evaluator->getKernelTau();
-
-	fvalue beta = 0.5 * (uw - vw) / (tau - uv);
+	// get kernel
 
 	if (v >= svnumber) {
 		if (svnumber >= cacheDepth) {
@@ -541,26 +526,13 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id u,
 		// update cache entries
 		fvectorv &vview = views[entries[mappings[v].cacheEntry].vector];
 		vview.vector.size++;
-		fvector_set(&vview.vector, svnumber, tau);
 
 		// adjust sv number
 		svnumber++;
 		psvnumber++;
 		alphasView.vector.size++;
-		kernelValuesView.vector.size++;
+		outputView.vector.size++;
 	}
-
-	fvalue au = alphas[u];
-	if (beta > au) {
-		beta = au;
-		psvnumber--;
-	}
-
-	updateKernelValues(u, v, beta);
-	w2 += 2.0 * beta * (vw - uw + beta * (tau - uv));
-
-	alphas[v] += beta;
-	alphas[u] -= beta;
 
 	if (svnumber - psvnumber > CACHE_DENSITY_RATIO * svnumber) {
 		shrink();
@@ -581,22 +553,7 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::releaseSupportVectors(
 		for (sample_id v = 0; v < svnumber; v++) {
 			fvalue beta = alphas[v];
 			if (membership[v] == fold && beta > 0) {
-				fvalue rbeta = 1 / (1 - beta);
-
-				// update w2
-				fvalue rbeta2 = pow2(rbeta);
-				fvalue vw = kernelValues[v];
-				fvalue v2 = evaluator->getKernelTau();
-				w2 = rbeta2 * w2 - 2 * beta * rbeta2 * vw + pow2(beta) * rbeta2 * v2;
-
-				// update kernel values
-				fvector &vvector = evalKernelVector(v);
-				fvector_mul_const(&kernelValuesView.vector, 1 / beta);
-				fvector_sub(&kernelValuesView.vector, &vvector);
-				fvector_mul_const(&kernelValuesView.vector, beta * rbeta);
-
 				// update alphas
-				fvector_mul_const(&alphasView.vector, rbeta);
 				alphas[v] = 0.0;
 			}
 		}
@@ -619,7 +576,7 @@ template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::swapSamples(sample_id u, sample_id v) {
 	evaluator->swapSamples(u, v);
 	swap(alphas[u], alphas[v]);
-	swap(kernelValues[u], kernelValues[v]);
+	swap(output[u], output[v]);
 
 	strategy->notifyExchange(u, v);
 	if (listener) {
@@ -658,14 +615,13 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 	// initialize alphas and kernel values
 	for (sample_id i = 0; i < problemSize; i++) {
 		alphas[i] = 0.0;
-		kernelValues[i] = 0.0;
+		output[i] = 0.0;
 	}
-	alphas[0] = 1.0;
-	kernelValues[0] = evaluator->getKernelTau();
+
 	svnumber = 1;
 	psvnumber = 1;
 	alphasView = fvectorv_array(alphas.data(), svnumber);
-	kernelValuesView = fvectorv_array(kernelValues.data(), svnumber);
+	outputView = fvectorv_array(output.data(), svnumber);
 
 	// initialize buffer
 	fbufferView = fvector_subv(fbuffer, 0, svnumber);
@@ -759,71 +715,7 @@ inline vector<fvalue>& CachedKernelEvaluator<Kernel, Matrix, Strategy>::getKerne
 
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate() {
-	fvalue minKernel = MAX_FVALUE;
-	sample_id minIdx = INVALID_SAMPLE_ID;
-	fvalue maxKernel = -MAX_FVALUE;
-	sample_id maxIdx = INVALID_SAMPLE_ID;
 
-	fvalue *kptr = kernelValues.data();
-	for (sample_id i = 0; i < svnumber; i++) {
-		fvalue kernel = *kptr++;
-		if (kernel > maxKernel) {
-			if (alphas[i] > 0) {
-				maxKernel = kernel;
-				maxIdx = i;
-			}
-		}
-		if (kernel < minKernel) {
-			minKernel = kernel;
-			minIdx = i;
-		}
-	}
-	if (minIdx != maxIdx) {
-		performUpdate(maxIdx, minIdx);
-	}
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-sample_id CachedKernelEvaluator<Kernel, Matrix, Strategy>::findMaxSVKernelVal(sample_id v) {
-	sample_id violator;
-	fvalue maxGoodness = -MAX_FVALUE;
-	fvalue *aptr = alphas.data();
-
-	fvalue vw = kernelValues[v];
-	fvalue av = alphas[v];
-	fvalue *kv = evalKernelVector(v).data;
-	fvalue tau = evaluator->getKernelTau();
-
-	for (sample_id i = 0; i < svnumber; i++) {
-		fvalue uw = kernelValues[i];
-		if (uw > vw) {
-			fvalue au = alphas[i];
-			fvalue uv = kv[i];
-
-			fvalue goodness = 0.0;//strategy->evaluateGoodness(au, av, uv, uw, vw, tau);
-			if (goodness > maxGoodness && aptr[i] > 0) {
-				maxGoodness = goodness;
-				violator = i;
-			}
-		}
-	}
-	return violator;
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-sample_id CachedKernelEvaluator<Kernel, Matrix, Strategy>::findMinSVKernelVal() {
-	sample_id violator;
-	fvalue minKernel = MAX_FVALUE;
-	fvalue *kptr = kernelValues.data();
-	for (sample_id i = 0; i < svnumber; i++) {
-		fvalue kernel = *kptr++;
-		if (kernel < minKernel) {
-			minKernel = kernel;
-			violator = i;
-		}
-	}
-	return violator;
-//	return fvector_min(&kernelValuesView.vector);
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
