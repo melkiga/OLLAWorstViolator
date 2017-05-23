@@ -262,7 +262,6 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		cache->performUpdate(viol.violator, lambda);
 		viol = findWorstViolator();
 		cache->performSvUpdate(viol.violator);
-		viol.violator++;
 
 	} while (iter < max_iter && viol.yo < margin);
 }
