@@ -252,29 +252,25 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 	for (it = state.models.begin(); it != state.models.end(); it++) {
 		pair<label_id, label_id> trainPair = it->trainingLabels;
 		quantity size = reorderSamples(this->labels, totalSize, trainPair);
+		this->cache->setLabel(trainPair);
 		this->setCurrentSize(size);
 		this->reset();
 		this->trainForCache(this->cache);
 
 		vector<fvalue>& cacheAlphas = this->cache->getAlphas();
 		vector<sample_id>& cacheSamples = this->cache->getBackwardOrder();
-		quantity svNumber  = this->cache->getSVNumber();
+		quantity svNumber  = this->cache->getSVNumber() - 1;
 		sample_id currentSv = 0;
 		for (quantity i = 0; i < svNumber; i++) {
-			fvalue alpha = cacheAlphas[i];
-			if (alpha != 0.0) {
-				fvalue yy = this->labels[i] == trainPair.first ? 1.0 : -1.0;
-				it->yalphas[currentSv] = yy * alpha;
-				it->samples[currentSv] = cacheSamples[i];
-				currentSv++;
-			}
+			it->yalphas[i] = cacheAlphas[i];
+			it->samples[i] = cacheSamples[i];
 		}
 
-		// TODO: avoid copying labels
-		vector<label_id> labels(this->labels, this->labels + svNumber);
-		it->bias = strategy->getBinaryBias(labels, this->cache->getAlphas(),
-				svNumber, trainPair.first, this->cache->getWNorm(), evaluator->getC());
-		it->size = currentSv;
+		// TODO: avoid copying labels AND set up my bias strategy
+		//vector<label_id> labels(this->labels, this->labels + svNumber);
+		//it->bias = strategy->getBinaryBias(labels, this->cache->getAlphas(), svNumber, trainPair.first, this->cache->getWNorm(), evaluator->getC());
+		it->bias = 0.0;
+		it->size = svNumber - 1;
 	}
 
 	id freeOffset = 0;

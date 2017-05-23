@@ -170,6 +170,7 @@ public:
 	fvalue checkViolation(sample_id v);
 	
 	fvalue getLabel(sample_id v);
+	void setLabel(pair<label_id, label_id> trainPair);
 
 	fvalue getVectorWeight(sample_id v);
 	quantity getSVNumber();
@@ -281,6 +282,14 @@ fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::checkViolation(sample_id
 }
 
 /*
+* Sets model label to be (+1 or -1) depending on which is the first training pair
+*/
+template<typename Kernel, typename Matrix, typename Strategy>
+inline void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setLabel(pair<label_id, label_id> trainPair) {
+	evaluator->setLabel(trainPair.second);
+}
+
+/*
  * Returns the label (+1 or -1)
  */
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -290,11 +299,6 @@ inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getLabel(sample_i
 
 template<typename Kernel, typename Matrix, typename Strategy>
 fvector& CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelVector(sample_id v) {
-	// TODO: maybe we dont need this views vector, we just need a single vector for G to live in
-	//entry_id mappedEntry = mappings[v].cacheEntry;
-	//CacheEntry &entry = entries[mappedEntry];
-	//fvector &vector = views[entry.vector].vector;
-	//fvector *vector = kernelVector; //TODO: test this
 	evalKernel(v, 0, problemSize, kernelVector);
 	return *kernelVector;
 }
@@ -602,7 +606,7 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 
 	// initialize cache mappings
 	fvector *initialVector = &views[INITIAL_ID].vector;
-	initialVector->size = problemSize; //TODO: initialize kernel vector here, so we don't have to in the train()
+	initialVector->size = 1; //TODO: initialize kernel vector here, so we don't have to in the train()
 	//fvector_set(initialVector, 0, evaluator->getKernelTau());
 	mappings[INITIAL_ID].cacheEntry = INITIAL_ID;
 
@@ -673,10 +677,6 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate(sample_id&
 		// swap rows
 		swapSamples(v, svnumber);
 		v = svnumber;
-
-		// update cache entries
-		fvectorv &vview = views[entries[mappings[v].cacheEntry].vector]; //TODO: remove this, use only one G vector
-		vview.vector.size++;
 
 		// adjust sv number
 		svnumber++;

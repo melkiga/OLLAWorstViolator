@@ -225,7 +225,7 @@ void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
 template<typename Kernel, typename Matrix, typename Strategy>
 ViolatorSearch AbstractSolver<Kernel, Matrix, Strategy>::findWorstViolator() {
 	ViolatorSearch worst_viol(INVALID_SAMPLE_ID, 0);
-	fvalue min_val = 0;
+	fvalue min_val = INT_MAX;
 	fvalue ksi = 0.0;
 	quantity svnumber = cache->getSVNumber();
 	for (sample_id i = svnumber; i < currentSize; i++) {
@@ -261,7 +261,7 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		lambda = eta*C*cache->getLabel(viol.violator);
 		cache->performUpdate(viol.violator, lambda);
 		viol = findWorstViolator();
-		cache->performSvUpdate(viol.violator);
+		cache->performSvUpdate(viol.violator); //TODO: make it so that svnumber is svnumber - 1
 
 	} while (iter < max_iter && viol.yo < margin);
 }

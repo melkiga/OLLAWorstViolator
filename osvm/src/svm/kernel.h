@@ -81,7 +81,7 @@ public:
 	fvalue getC();
 
 	fvalue getLabel(sample_id v);
-
+	void setLabel(sample_id v);
 };
 
 template<class Kernel, class Matrix>
@@ -104,12 +104,20 @@ RbfKernelEvaluator<Kernel, Matrix>::~RbfKernelEvaluator() {
 }
 
 /*
+* Sets the training pair comparison value to be the second. TODO: explain more.
+*/
+template<typename Kernel, typename Matrix>
+inline void RbfKernelEvaluator<Kernel, Matrix>::setLabel(sample_id v) {
+	yyNeg = v;
+}
+
+/*
 * Returns the label (+1 or -1)
 */
 template<typename Kernel, typename Matrix>
 inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getLabel(sample_id v) {
-	fvalue vals[] = { yyNeg, 1.0 };
-	fvalue label = vals[labels[v] == 1];
+	fvalue vals[] = { 1.0, -1.0 };
+	fvalue label = vals[labels[v] == yyNeg];
 	return label;
 }
 
