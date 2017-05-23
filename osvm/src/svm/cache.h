@@ -165,7 +165,7 @@ public:
 
 	fvalue evalKernelUV(sample_id u, sample_id v);
 	fvalue evalKernelAXV(sample_id v);
-	bool checkViolation(sample_id v, fvalue threshold);
+	fvalue checkViolation(sample_id v);
 	
 	fvalue getLabel(sample_id v);
 
@@ -175,7 +175,7 @@ public:
 	void performUpdate(sample_id v, fvalue lambda);
 	fvalue getWNorm();
 	vector<fvalue>& getKernelValues();
-	void performSvUpdate();
+	void performSvUpdate(sample_id v);
 
 	void setSwapListener(SwapListener *listener);
 	void swapSamples(sample_id u, sample_id v);
@@ -271,18 +271,16 @@ fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXV(sample_id 
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
-bool CachedKernelEvaluator<Kernel, Matrix, Strategy>::checkViolation(sample_id v, fvalue threshold) {
-	return evalKernelAXV(v) < threshold;
+fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::checkViolation(sample_id v) {
+	return output[v]*getLabel(v);
 }
 
 /*
  * Returns the label (+1 or -1)
  */
 template<typename Kernel, typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getLabel(sample_id v)
-{
-	fvalue label = evaluator->getLabel(v) == 0 ? -1 : 1;
-	return label;
+inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getLabel(sample_id v) {
+	return evaluator->getLabel(v);
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -532,36 +530,12 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id v,
 	fvector &vector = evalKernelVector(v);
 	fvector_mul_const(&vector, lambda);
 	fvector_add(&outputView.vector, &vector);
-
+	// TODO: check where the violator is.
 	// update alphas
 	fvector_add_const(&alphasView.vector, lambda);
 
 	svnumber++;
 	alphasView.vector.size++;
-
-	if (v >= svnumber) {
-		if (svnumber >= cacheDepth) {
-			resizeCache();
-		}
-
-		// swap rows
-		swapSamples(v, svnumber);
-		v = svnumber;
-
-		// update cache entries
-		fvectorv &vview = views[entries[mappings[v].cacheEntry].vector];
-		vview.vector.size++;
-
-		// adjust sv number
-		svnumber++;
-		psvnumber++;
-		alphasView.vector.size++;
-		outputView.vector.size++;
-	}
-
-	if (svnumber - psvnumber > CACHE_DENSITY_RATIO * svnumber) {
-		shrink();
-	}
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -732,8 +706,25 @@ inline vector<fvalue>& CachedKernelEvaluator<Kernel, Matrix, Strategy>::getKerne
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate() {
+void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate(sample_id v) {
+	
+	if (v >= svnumber) {
+		if (svnumber >= cacheDepth) {
+			resizeCache();
+		}
 
+		// swap rows
+		swapSamples(v, svnumber);
+		v = svnumber;
+
+		// update cache entries
+		fvectorv &vview = views[entries[mappings[v].cacheEntry].vector];
+		vview.vector.size++;
+
+		// adjust sv number
+		svnumber++;
+		alphasView.vector.size++;
+	}
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>

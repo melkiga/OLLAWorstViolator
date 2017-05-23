@@ -92,7 +92,7 @@ label_id UniversalClassifier<Kernel, Matrix>::classify(sample_id sample) {
 		label_id svl = lptr[svi];
 		lbufptr[svl] += yy * kbufptr[svi];
 	}
-	return fvector_max(labelBuffer);
+	return (label_id) fvector_max(labelBuffer);
 }
 
 template<typename Kernel, typename Matrix>
@@ -140,11 +140,11 @@ Classifier<Kernel, Matrix>* UniversalSolver<Kernel, Matrix, Strategy>::getClassi
 	// TODO avoid copying labels
 	vector<label_id> labels(this->labels, this->labels + svNumber);
 	vector<fvalue> bias = strategy->getBias(labels, this->cache->getAlphas(),
-			this->labelNames.size(), svNumber,
+			(quantity) this->labelNames.size(), svNumber,
 			this->cache->getWNorm(), evaluator->getC());
 
 	return new UniversalClassifier<Kernel, Matrix>(evaluator,
-			this->cache->getAlphasView(), this->labels, buffer, this->labelNames.size(),
+			this->cache->getAlphasView(), this->labels, buffer, (quantity) this->labelNames.size(),
 			svNumber, bias);
 }
 

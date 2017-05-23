@@ -122,13 +122,13 @@ label_id PairwiseClassifier<Kernel, Matrix>::classify(sample_id sample) {
 
 	label_id maxLabelId = 0;
 	quantity maxVotes = 0;
-	quantity maxEvidence = 0.0;
+	quantity maxEvidence = (quantity) 0.0;
 	for (label_id i = 0; i < state->labelNumber; i++) {
 		if (votes[i] > maxVotes
 			|| (votes[i] == maxVotes && evidence[i] > maxEvidence)) {
 			maxLabelId = i;
 			maxVotes = votes[i];
-			maxEvidence = evidence[i];
+			maxEvidence = (quantity) evidence[i];
 		}
 	}
 
@@ -205,7 +205,7 @@ PairwiseSolver<Kernel, Matrix, Strategy>::PairwiseSolver(
 		AbstractSolver<Kernel, Matrix, Strategy>(labelNames,
 				samples, labels, params, stopStrategy),
 		state(PairwiseTrainingState()) {
-	label_id maxLabel = labelNames.size();
+	label_id maxLabel = (label_id) labelNames.size();
 	vector<quantity> classSizes(maxLabel, 0);
 	for (sample_id sample = 0; sample < this->size; sample++) {
 		classSizes[this->labels[sample]]++;
