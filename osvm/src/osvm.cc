@@ -94,6 +94,5 @@ int main(int argc, char *argv[]) {
 		cerr << desc;
 	}
 
-	/// <returns>Returns zero.</returns>
 	return 0;
 }

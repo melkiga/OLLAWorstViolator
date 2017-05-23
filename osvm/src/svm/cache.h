@@ -233,7 +233,7 @@ CachedKernelEvaluator<Kernel, Matrix, Strategy>::CachedKernelEvaluator(
 	}
 
 	// initialize cache entries
-	views = new fvectorv[cacheLines];
+	views = new fvectorv[cacheLines]; // views is a vector of vectors (holds the kernel)
 	mappings = new EntryMapping[problemSize];
 	entries = new CacheEntry[cacheLines];
 
@@ -257,7 +257,7 @@ fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXV(sample_id 
 	if (v >= svnumber) {
 		fvector &vector = evalKernelVector(v);
 		fvector_sum(&outputView.vector);
-
+		// TODO: check what's going on here.
 
 		fvector_dot(&alphasView.vector, &vector, &result);
 		// save current result (valid until alpha values stay unchanged)
@@ -285,55 +285,14 @@ inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getLabel(sample_i
 
 template<typename Kernel, typename Matrix, typename Strategy>
 fvector& CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelVector(sample_id v) {
+	
 	entry_id mappedEntry = mappings[v].cacheEntry;
 	// if not support vector then search the cache
 	if (mappedEntry != INVALID_ENTRY_ID) {
 		// entry exists in the cache
 		CacheEntry &entry = entries[mappedEntry];
 		fvector &vector = views[entry.vector].vector;
-		fvalue *vdata = vector.data;
-		if (vector.size < svnumber) {
-			sample_id from = (quantity) vector.size;
-			vector.size = svnumber;
-
-			if (v < svnumber) {
-				// TODO remove condition 'final != INVALID_ENTRY_ID'
-				sample_id final = svnumber - 1;
-				bool updated = true;
-				while (final >= from && updated && final != INVALID_ENTRY_ID) {
-					updated = false;
-					if (final == v) {
-						vdata[final] = evaluator->getKernelTau();
-						updated = true;
-						final--;
-					} else {
-						entry_id entry = mappings[final].cacheEntry;
-						if (entry != INVALID_ENTRY_ID) {
-							fvectorv &buf = views[entries[entry].vector];
-							if (buf.vector.size > v) {
-								vdata[final] = fvector_get(&buf.vector, v);
-								updated = true;
-								final--;
-							}
-						}
-					}
-				}
-
-				if (final >= from && final != INVALID_ENTRY_ID) {
-					evalKernel(v, from, final + 1, &vector);
-				}
-			} else {
-				evalKernel(v, from, svnumber, &vector);
-			}
-		}
-		refreshEntry(v);
-		return vector;
-	} else {
-		CacheEntry entry = initializeEntry(v);
-		fvector &vector = views[entry.vector].vector;
-		vector.size = svnumber;
-
-		evalKernel(v, 0, svnumber, &vector);
+		evalKernel(v, 0, problemSize, &vector);
 		return vector;
 	}
 }
@@ -529,7 +488,7 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id v,
 	// update output
 	fvector &vector = evalKernelVector(v);
 	fvector_mul_const(&vector, lambda);
-	fvector_add(&outputView.vector, &vector);
+	fvector_add(&outputView.vector, &vector); // TODO: I don't think the kernel calculation is correct. Need to check.
 	// TODO: check where the violator is.
 	// update alphas
 	fvector_add_const(&alphasView.vector, lambda);
@@ -645,8 +604,8 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 
 	// initialize cache mappings
 	fvector *initialVector = &views[INITIAL_ID].vector;
-	initialVector->size = 1;
-	fvector_set(initialVector, 0, evaluator->getKernelTau());
+	initialVector->size = problemSize;
+	//fvector_set(initialVector, 0, evaluator->getKernelTau());
 	mappings[INITIAL_ID].cacheEntry = INITIAL_ID;
 
 	// initialize cache entries

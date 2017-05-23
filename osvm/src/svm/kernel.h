@@ -107,9 +107,9 @@ RbfKernelEvaluator<Kernel, Matrix>::~RbfKernelEvaluator() {
 * Returns the label (+1 or -1)
 */
 template<typename Kernel, typename Matrix>
-inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getLabel(sample_id v)
-{
-	fvalue label = labels[v] == 0 ? -1 : 1;
+inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getLabel(sample_id v) {
+	fvalue vals[] = { yyNeg, 1.0 };
+	fvalue label = vals[labels[v] == 1];
 	return label;
 }
 
@@ -147,9 +147,12 @@ void RbfKernelEvaluator<Kernel, Matrix>::evalInnerKernel(sample_id id,
 	}
 }
 
+/*
+ * Evaluates the RBF kernel between 2 samples.
+ */
+// TODO: change evalKernel(id1,id2) to remove yyNeg and tau
 template<class Kernel, class Matrix>
-fvalue RbfKernelEvaluator<Kernel, Matrix>::evalKernel(
-		sample_id uid, sample_id vid) {
+fvalue RbfKernelEvaluator<Kernel, Matrix>::evalKernel(sample_id uid, sample_id vid) {
 	label_id ulabel = labels[uid];
 	label_id vlabel = labels[vid];
 	fvalue result;
@@ -171,23 +174,14 @@ void RbfKernelEvaluator<Kernel, Matrix>::evalKernel(sample_id id,
 	eval.dist(id, rangeFrom, rangeTo, result);
 
 	fvalue* rptr = fvector_ptr(result);
-	label_id* lptr = labels;
-	label_id label = lptr[id];
-	fvalue vals[] = { yyNeg, 1.0 };
 	for (sample_id iid = rangeFrom; iid < rangeTo; iid++) {
-		// trick to remove low branch prediction rate, equivalent to:
-		// fvalue yy = lptr[iid] == label ? 1.0 : yyNeg;
-		fvalue yy = vals[lptr[iid] == label];
-		rptr[iid] = yy * (rbf(rptr[iid]) + bias);
-	}
-	if (id >= rangeFrom && id < rangeTo) {
-		rptr[id] += d1dc;
+		rptr[iid] = rbf(rptr[iid]);
 	}
 }
 
 template<class Kernel, class Matrix>
 inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getKernelTau() {
-	return tau;
+	return tau; //TODO: remove tau
 }
 
 template<class Kernel, class Matrix>
@@ -201,7 +195,7 @@ void RbfKernelEvaluator<Kernel, Matrix>::setKernelParams(fvalue c, Kernel &param
 	this->c = c;
 	this->params = params;
 
-	d1dc = 1.0 / c;
+	d1dc = 1.0 / c; // TODO: remove d1dc
 	tau = 1.0 + bias + 1.0 / c;
 }
 

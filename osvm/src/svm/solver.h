@@ -246,8 +246,8 @@ template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) {
 	ViolatorSearch viol(0, 0.0);
-	fvalue margin = 0.1*cache->getC();
 	fvalue C = cache->getC();
+	fvalue margin = 0.1*C;
 	quantity iter = 0;
 	fvalue bias = 0.0;
 	fvalue eta = 0.0;

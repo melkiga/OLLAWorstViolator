@@ -270,7 +270,7 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 			}
 		}
 
-		// TODO avoid copying labels
+		// TODO: avoid copying labels
 		vector<label_id> labels(this->labels, this->labels + svNumber);
 		it->bias = strategy->getBinaryBias(labels, this->cache->getAlphas(),
 				svNumber, trainPair.first, this->cache->getWNorm(), evaluator->getC());
