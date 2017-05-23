@@ -166,11 +166,13 @@ public:
 	fvalue evalKernelUV(sample_id u, sample_id v);
 	fvalue evalKernelAXV(sample_id v);
 	bool checkViolation(sample_id v, fvalue threshold);
+	
+	fvalue getLabel(sample_id v);
 
 	fvalue getVectorWeight(sample_id v);
 	quantity getSVNumber();
 
-	void performUpdate(sample_id u, sample_id v);
+	void performUpdate(sample_id v, fvalue lambda);
 	fvalue getWNorm();
 	vector<fvalue>& getKernelValues();
 	void performSvUpdate();
@@ -254,6 +256,9 @@ fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXV(sample_id 
 	fvalue result;
 	if (v >= svnumber) {
 		fvector &vector = evalKernelVector(v);
+		fvector_sum(&outputView.vector);
+
+
 		fvector_dot(&alphasView.vector, &vector, &result);
 		// save current result (valid until alpha values stay unchanged)
 		//kernelValues[v] = result;
@@ -268,6 +273,16 @@ fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXV(sample_id 
 template<typename Kernel, typename Matrix, typename Strategy>
 bool CachedKernelEvaluator<Kernel, Matrix, Strategy>::checkViolation(sample_id v, fvalue threshold) {
 	return evalKernelAXV(v) < threshold;
+}
+
+/*
+ * Returns the label (+1 or -1)
+ */
+template<typename Kernel, typename Matrix, typename Strategy>
+inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getLabel(sample_id v)
+{
+	fvalue label = evaluator->getLabel(v) == 0 ? -1 : 1;
+	return label;
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -512,8 +527,17 @@ inline quantity CachedKernelEvaluator<Kernel, Matrix, Strategy>::getSVNumber() {
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id u, sample_id v) {
-	// get kernel
+void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id v, fvalue lambda) {
+	// update output
+	fvector &vector = evalKernelVector(v);
+	fvector_mul_const(&vector, lambda);
+	fvector_add(&outputView.vector, &vector);
+
+	// update alphas
+	fvector_add_const(&alphasView.vector, lambda);
+
+	svnumber++;
+	alphasView.vector.size++;
 
 	if (v >= svnumber) {
 		if (svnumber >= cacheDepth) {

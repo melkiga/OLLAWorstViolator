@@ -97,11 +97,11 @@ public:
 struct ViolatorSearch {
 
 	sample_id violator;
-	quantity attempt;
+	fvalue yo;
 
-	ViolatorSearch(sample_id violator, quantity attempt) :
+	ViolatorSearch(sample_id violator, fvalue yo) :
 		violator(violator),
-		attempt(attempt) {
+		yo(yo) {
 	}
 
 };
@@ -129,7 +129,7 @@ protected:
 	CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache;
 
 protected:
-	ViolatorSearch findMinNormViolator(fvalue threshold);
+	ViolatorSearch findWorstViolator(fvalue threshold);
 
 	virtual CachedKernelEvaluator<Kernel, Matrix, Strategy>* buildCache(
 			fvalue c, Kernel &gparams);
@@ -222,19 +222,16 @@ void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
  * Find the worst violator.
  */
 template<typename Kernel, typename Matrix, typename Strategy>
-ViolatorSearch AbstractSolver<Kernel, Matrix, Strategy>::findMinNormViolator(
-		fvalue threshold) {
+ViolatorSearch AbstractSolver<Kernel, Matrix, Strategy>::findWorstViolator(fvalue threshold) {
 	ViolatorSearch result(INVALID_SAMPLE_ID, 0);
-	while (result.attempt < params.drawNumber) {
-		sample_id violator = strategy.generateNextId();
-		if (cache->checkViolation(violator, threshold)) {
-			strategy.markGeneratedIdAsCorrect();
-			result.violator = violator;
-			return result;
-		}
-		strategy.markGeneratedIdAsFailed();
-		result.attempt++;
+	sample_id violator = strategy.generateNextId();
+	if (cache->checkViolation(violator, threshold)) {
+		strategy.markGeneratedIdAsCorrect();
+		result.violator = violator;
+		return result;
 	}
+	strategy.markGeneratedIdAsFailed();
+	result.attempt++;
 	return result;
 }
 
@@ -244,17 +241,22 @@ ViolatorSearch AbstractSolver<Kernel, Matrix, Strategy>::findMinNormViolator(
 template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) {
-	sample_id viol = 0;
-	fvalue yo = 0.0;
+	ViolatorSearch viol(0, 0.0);
 	fvalue margin = 0.1*cache->getC();
+	fvalue C = cache->getC();
 	quantity iter = 0;
 	fvalue bias = 0.0;
 	fvalue eta = 0.0;
 	quantity max_iter = ceil(0.5*currentSize);
+	fvalue lambda = 0.0;
 
 	do {
+		iter += 1;
+		eta = 2.0 / sqrt(iter);
+		lambda = eta*C*cache->getLabel(viol.violator);
+		cache->performUpdate(viol.violator, lambda);
 
-	} while (iter < max_iter && yo < margin);
+	} while (iter < max_iter && viol.yo < margin);
 
 
 

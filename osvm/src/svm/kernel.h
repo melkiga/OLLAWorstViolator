@@ -80,6 +80,8 @@ public:
 	Kernel getParams();
 	fvalue getC();
 
+	fvalue getLabel(sample_id v);
+
 };
 
 template<class Kernel, class Matrix>
@@ -99,6 +101,16 @@ RbfKernelEvaluator<Kernel, Matrix>::RbfKernelEvaluator(
 
 template<class Kernel, class Matrix>
 RbfKernelEvaluator<Kernel, Matrix>::~RbfKernelEvaluator() {
+}
+
+/*
+* Returns the label (+1 or -1)
+*/
+template<typename Kernel, typename Matrix>
+inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getLabel(sample_id v)
+{
+	fvalue label = labels[v] == 0 ? -1 : 1;
+	return label;
 }
 
 template<class Kernel, class Matrix>
