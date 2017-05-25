@@ -266,7 +266,7 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 			it->samples[i] = cacheSamples[i];
 		}
 
-		// TODO: avoid copying labels AND set up my bias strategy
+		// TODO: set up my bias strategy
 		//vector<label_id> labels(this->labels, this->labels + svNumber);
 		//it->bias = strategy->getBinaryBias(labels, this->cache->getAlphas(), svNumber, trainPair.first, this->cache->getWNorm(), evaluator->getC());
 		it->bias = 0.0;
