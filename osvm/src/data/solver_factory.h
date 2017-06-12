@@ -164,7 +164,7 @@ AbstractSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strateg
 	Matrix *x = matrixBuilder->getFeatureMatrix(dataSet.features, mappings);
 	label_id *y = getLabelVector(dataSet.labels);
 
-	//x = preprocess(x, y); //TODO: I removed preprocessing for kernel comparison in Matlab, remove the comment.
+	x = preprocess(x, y); 
 
 	StopCriterionStrategy *strategy = getStopCriterion();
 
