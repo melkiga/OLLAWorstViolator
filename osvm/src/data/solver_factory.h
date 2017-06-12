@@ -85,7 +85,7 @@ inline Matrix* FeatureMatrixBuilder<Matrix>::getFeatureMatrix(
 }
 
 
-template<typename Matrix = sfmatrix, typename Strategy = SolverStrategy<MDM, FAIR> >
+template<typename Matrix = sfmatrix, typename Strategy = SolverStrategy<L1SVM, FAIR> >
 class BaseSolverFactory {
 
 private:

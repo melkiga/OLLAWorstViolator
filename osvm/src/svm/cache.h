@@ -177,7 +177,6 @@ public:
 
 	void performUpdate(sample_id v, fvalue lambda);
 	fvalue getWNorm();
-	vector<fvalue>& getKernelValues();
 	void performSvUpdate(sample_id& v);
 
 	void setSwapListener(SwapListener *listener);
@@ -260,19 +259,6 @@ CachedKernelEvaluator<Kernel, Matrix, Strategy>::~CachedKernelEvaluator() {
 template<typename Kernel, typename Matrix, typename Strategy>
 fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXV(sample_id v) {
 	fvalue result;
-	if (v >= svnumber) {
-		fvector &vector = evalKernelVector(v);
-		fvector_sum(&outputView.vector);
-		// TODO: check what's going on here.
-
-		fvector_dot(&alphasView.vector, &vector, &result);
-		// save current result (valid until alpha values stay unchanged)
-		//kernelValues[v] = result;
-	} else {
-		// get precomputed kernel value
-		//result = kernelValues[v];
-		refreshEntry(v);
-	}
 	return result;
 }
 
@@ -662,11 +648,6 @@ inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getWNorm() {
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
-inline vector<fvalue>& CachedKernelEvaluator<Kernel, Matrix, Strategy>::getKernelValues() {
-	return kernelValues;
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate(sample_id& v) {
 	
 	if (v >= svnumber) {
@@ -785,34 +766,6 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::structureCheck() {
 
 		if (fabs(fvector_sum(&alphasView.vector) - 1.0) > 0.0001) {
 			throw runtime_error("invalid alphas");
-		}
-
-		entry_id entryId = lruEntry;
-		for (entry_id e = 0; e < cacheLines; e++) {
-			CacheEntry &entry = entries[entryId];
-			fvectorv vect = views[entry.vector];
-			for (size_t i = 0; i < vect.vector.size; i++) {
-				fvalue kern = evalKernel(entry.mapping, i);
-				fvalue buff = fvector_get(&vect.vector, i);
-				if (fabs(kern - buff) > 0.0001) {
-					throw runtime_error("invalid kernel value");
-				}
-			}
-			if (vect.vector.size == svnumber && entry.mapping < svnumber) {
-				fvalue kern;
-				fvector_dot(&vect.vector, &alphasView.vector, &kern);
-				fvalue buff = kernelValues[entry.mapping];
-				if (fabs(kern - buff) > 0.0001) {
-					throw runtime_error("invalid buffered kernel value");
-				}
-			}
-			entryId = entry.next;
-		}
-
-		fvalue w2ex;
-		fvector_dot(&kernelValuesView.vector, &alphasView.vector, &w2ex);
-		if (fabs(w2ex - w2) > 0.0001) {
-			throw runtime_error("invalid w2");
 		}
 	} catch (runtime_error const& ex) {
 		cerr << ex.what() << endl;

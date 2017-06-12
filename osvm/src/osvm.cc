@@ -42,7 +42,9 @@ ostream& operator<< (ostream& os, variables_map& vars) {
 	return os;
 }
 
-
+// TODO: implement bias strategy as command line argument
+// TODO: use epoch number as a command line argument
+// TODO: use tolerance as command line argument 
 int main(int argc, char *argv[]) {
 	string usage = (format("Usage: %s [OPTION]... [FILE]\n") % PACKAGE).str();
 	string descr = "Perform SVM training for the given data set [FILE].\n";
