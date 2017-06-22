@@ -50,6 +50,7 @@ private:
 	fvalue yyNeg;
 	fvalue d1dc;
 
+	fvalue betta;
 	fvalue bias;
 	fvalue tau;
 
@@ -79,6 +80,9 @@ public:
 
 	Kernel getParams();
 	fvalue getC();
+	fvalue getBias();
+	fvalue getBetta();
+	void updateBias(fvalue LB);
 
 	fvalue getLabel(sample_id v);
 	void setLabel(sample_id v);
@@ -87,13 +91,14 @@ public:
 template<class Kernel, class Matrix>
 RbfKernelEvaluator<Kernel, Matrix>::RbfKernelEvaluator(
 		Matrix* samples, label_id* labels, quantity classNumber,
-		fvalue bias, fvalue c, Kernel &params) :
+		fvalue betta, fvalue c, Kernel &params) :
 		samples(samples),
 		labels(labels),
 		c(c),
-		bias(bias),
+		betta(betta),
 		params(params),
 		eval(samples) {
+	bias = 0.0;
 	yyNeg = -1.0 / (classNumber - 1);
 	d1dc = 1.0 / c;
 	tau = 1.0 + bias + 1.0 / c;
@@ -101,6 +106,11 @@ RbfKernelEvaluator<Kernel, Matrix>::RbfKernelEvaluator(
 
 template<class Kernel, class Matrix>
 RbfKernelEvaluator<Kernel, Matrix>::~RbfKernelEvaluator() {
+}
+
+template<typename Kernel, typename Matrix>
+inline void RbfKernelEvaluator<Kernel, Matrix>::updateBias(fvalue LB) {
+	bias = bias + LB;
 }
 
 /*
@@ -215,6 +225,16 @@ inline Kernel RbfKernelEvaluator<Kernel, Matrix>::getParams() {
 template<class Kernel, class Matrix>
 inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getC() {
 	return c;
+}
+
+template<class Kernel, class Matrix>
+inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getBias() {
+	return bias;
+}
+
+template<class Kernel, class Matrix>
+inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getBetta() {
+	return betta;
 }
 
 #endif

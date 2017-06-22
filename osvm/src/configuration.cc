@@ -68,10 +68,8 @@ Configuration ParametersParser::getConfiguration() {
 	string biasEvaluation = vars[PR_KEY_BIAS].as<string>();
 	if (BIAS_CALCULATION_NO == biasEvaluation) {
 		bias = NO;
-	} else if (BIAS_CALCULATION_THEORETIC == biasEvaluation) {
-		bias = THEORETIC;
-	} else if (BIAS_CALCULATION_AVERAGE == biasEvaluation) {
-		bias = AVERAGE;
+	} else if (BIAS_CALCULATION_YES == biasEvaluation) {
+		bias = YES;
 	} else {
 		throw invalid_configuration("invalid bias evaluation strategy: " + biasEvaluation);
 	}

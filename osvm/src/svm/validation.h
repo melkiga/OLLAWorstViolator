@@ -26,7 +26,7 @@
 #include "../math/random.h"
 
 // comment to disable support vector reuse
-#define SUPPORT_VECTOR_REUSE
+//#define SUPPORT_VECTOR_REUSE
 
 
 struct TestingResult {
@@ -289,7 +289,7 @@ template<typename Kernel, typename Matrix, typename Strategy>
 inline TestingResult CrossValidationSolver<Kernel, Matrix, Strategy>::testOuter() {
 	return test(this->outerFoldSizes[outerFold], solver->getSize());
 }
-/// <summary>DoCrossValidation - where train() gets called!</summary>
+
 template<typename Kernel, typename Matrix, typename Strategy>
 TestingResult CrossValidationSolver<Kernel, Matrix, Strategy>::doCrossValidation() {
 	TestingResult result;

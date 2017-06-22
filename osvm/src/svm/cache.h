@@ -175,7 +175,7 @@ public:
 	fvalue getVectorWeight(sample_id v);
 	quantity getSVNumber();
 
-	void performUpdate(sample_id v, fvalue lambda);
+	void performUpdate(sample_id v, fvalue lambda, fvalue LB);
 	fvalue getWNorm();
 	vector<fvalue>& getKernelValues();
 	void performSvUpdate(sample_id& v);
@@ -195,6 +195,9 @@ public:
 	fvector* getBuffer();
 	vector<sample_id>& getBackwardOrder();
 	vector<sample_id>& getForwardOrder();
+
+	void updateBias(fvalue LB);
+	fvalue getBias();
 
 	void structureCheck();
 	void reportStatistics();
@@ -490,13 +493,15 @@ inline quantity CachedKernelEvaluator<Kernel, Matrix, Strategy>::getSVNumber() {
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id v, fvalue lambda) {
+void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id v, fvalue lambda, fvalue LB) {
 	// update output
 	fvector &vector = evalKernelVector(v);
 	fvector_mul_const(&vector, lambda);
 	fvector_add(&outputView.vector, &vector);
+	fvector_add_const(&outputView.vector, LB);
 	// update alphas
 	alphas[v] += lambda;
+	updateBias(LB);
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -818,6 +823,16 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::structureCheck() {
 		cerr << ex.what() << endl;
 		throw ex;
 	}
+}
+
+template<typename Kernel, typename Matrix, typename Strategy>
+void CachedKernelEvaluator<Kernel, Matrix, Strategy>::updateBias(fvalue LB) {
+	evaluator->updateBias(LB);
+}
+
+template<typename Kernel, typename Matrix, typename Strategy>
+fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getBias() {
+	return evaluator->getBias();
 }
 
 #endif
