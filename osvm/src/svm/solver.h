@@ -247,21 +247,24 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) {
 	ViolatorSearch viol(0, 0.0);
 	fvalue C = cache->getC();
+	fvalue betta = cache->getEvaluator()->getBetta();
 	fvalue margin = 0.1*C;
 	quantity iter = 0;
 	fvalue bias = 0.0;
 	fvalue eta = 0.0;
 	quantity max_iter = (quantity) ceil(0.5*currentSize);
 	fvalue lambda = 0.0;
+	fvalue LB = 0.0;
 
 	do {
 		iter += 1;
 		eta = 2.0 / sqrt(iter);
 
 		lambda = eta*C*cache->getLabel(viol.violator);
-		cache->performUpdate(viol.violator, lambda);
+		LB = (lambda*betta) / currentSize;
+		cache->performUpdate(viol.violator, lambda, LB);
 		viol = findWorstViolator();
-		cache->performSvUpdate(viol.violator); //TODO: make it so that svnumber is svnumber - 1
+		cache->performSvUpdate(viol.violator);
 
 	} while (iter < max_iter && viol.yo < margin);
 }

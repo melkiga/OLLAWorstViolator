@@ -358,7 +358,7 @@ ModelSelectionResults PatternGaussianModelSelector<Matrix, Strategy>::selectPara
       }
       trnCoords = findStartingPoint(range);
     }
-    //	printTrainingMatrix(range);
+    //printTrainingMatrix(range);
     return globalRes;
 }
 

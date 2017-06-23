@@ -96,9 +96,8 @@ using namespace boost::program_options;
 #define MULTICLASS_ALL_AT_ONCE "allatonce"
 #define MULTICLASS_PAIRWISE "pairwise"
 
-#define BIAS_CALCULATION_THEORETIC "theoretic"
-#define BIAS_CALCULATION_AVERAGE "average"
 #define BIAS_CALCULATION_NO "nobias"
+#define BIAS_CALCULATION_YES "yesbias"
 
 class invalid_configuration: public exception {
 

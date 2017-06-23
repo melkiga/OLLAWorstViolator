@@ -259,18 +259,10 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 
 		vector<fvalue>& cacheAlphas = this->cache->getAlphas();
 		vector<sample_id>& cacheSamples = this->cache->getBackwardOrder();
-		quantity svNumber  = this->cache->getSVNumber() - 1;
-		sample_id currentSv = 0;
-		for (quantity i = 0; i < svNumber; i++) {
-			it->yalphas[i] = cacheAlphas[i];
-			it->samples[i] = cacheSamples[i];
-		}
-
-		// TODO: set up my bias strategy
-		//vector<label_id> labels(this->labels, this->labels + svNumber);
-		//it->bias = strategy->getBinaryBias(labels, this->cache->getAlphas(), svNumber, trainPair.first, this->cache->getWNorm(), evaluator->getC());
-		it->bias = 0.0;
-		it->size = svNumber - 1;
+		it->yalphas = cacheAlphas;
+		it->samples = cacheSamples;
+		it->bias = this->cache->getBias();
+		it->size = this->cache->getSVNumber() - 1;
 	}
 
 	id freeOffset = 0;

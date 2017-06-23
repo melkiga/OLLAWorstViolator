@@ -33,8 +33,7 @@
 
 enum BiasType {
 	NO,
-	THEORETIC,
-	AVERAGE
+	YES
 };
 
 struct TrainParams {

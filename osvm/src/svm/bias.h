@@ -241,10 +241,8 @@ template<typename Kernel, typename Matrix>
 BiasEvaluationStrategy<Kernel, Matrix>* BiasEvaluatorFactory<Kernel, Matrix>::createEvaluator(
 		BiasType type, RbfKernelEvaluator<Kernel, Matrix>* evaluator) {
 	BiasEvaluationStrategy<Kernel, Matrix>* eval = NULL;
-	if (type == THEORETIC) {
+	if (type == YES) {
 		eval = new TheoreticBiasStrategy<Kernel, Matrix>();
-	} else if (type == AVERAGE) {
-		eval = new AverageBiasStrategy<Kernel, Matrix>(evaluator);
 	} else {
 		eval = new NoBiasStrategy<Kernel, Matrix>();
 	}
