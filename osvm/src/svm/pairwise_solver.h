@@ -263,8 +263,6 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 		it->samples = cacheSamples;
 		it->bias = this->cache->getBias();
 		it->size = this->cache->getSVNumber() - 1;
-		logger << format("DEBUG: bias=%.4f, svnumber=%.2f\n")
-			% it->bias % it->size;
 	}
 
 	id freeOffset = 0;
