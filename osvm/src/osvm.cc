@@ -42,7 +42,9 @@ ostream& operator<< (ostream& os, variables_map& vars) {
 	return os;
 }
 
-
+// TODO: implement bias strategy as command line argument
+// TODO: use epoch number as a command line argument
+// TODO: use tolerance as command line argument 
 int main(int argc, char *argv[]) {
 	string usage = (format("Usage: %s [OPTION]... [FILE]\n") % PACKAGE).str();
 	string descr = "Perform SVM training for the given data set [FILE].\n";
@@ -52,8 +54,8 @@ int main(int argc, char *argv[]) {
 		(PR_HELP, "produce help message")
 		(PR_C_LOW, value<fvalue>()->default_value(0.001), "C value (lower bound)")
 		(PR_C_HIGH, value<fvalue>()->default_value(10000.0), "C value (upper bound)")
-		(PR_G_LOW, value<fvalue>()->default_value(0.02), "gamma value (lower bound)")
-		(PR_G_HIGH, value<fvalue>()->default_value(200.0), "gamma value (upper bound)")
+		(PR_G_LOW, value<fvalue>()->default_value(0.0009765625), "gamma value (lower bound)")
+		(PR_G_HIGH, value<fvalue>()->default_value(16.0), "gamma value (upper bound)")
 		(PR_RES, value<int>()->default_value(8), "resolution (for C and gamma)")
 		(PR_OUTER_FLD, value<int>()->default_value(1), "outer folds")
 		(PR_INNER_FLD, value<int>()->default_value(10), "inner folds")

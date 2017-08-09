@@ -85,7 +85,7 @@ inline Matrix* FeatureMatrixBuilder<Matrix>::getFeatureMatrix(
 }
 
 
-template<typename Matrix = sfmatrix, typename Strategy = SolverStrategy<MDM, FAIR> >
+template<typename Matrix = sfmatrix, typename Strategy = SolverStrategy<L1SVM, FAIR> >
 class BaseSolverFactory {
 
 private:
@@ -164,7 +164,7 @@ AbstractSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strateg
 	Matrix *x = matrixBuilder->getFeatureMatrix(dataSet.features, mappings);
 	label_id *y = getLabelVector(dataSet.labels);
 
-	x = preprocess(x, y); 
+	x = preprocess(x, y);
 
 	StopCriterionStrategy *strategy = getStopCriterion();
 
