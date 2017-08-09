@@ -636,6 +636,7 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 	lruEntry = cacheLines - 1;
 
 	w2 = evaluator->getKernelTau();
+	evaluator->resetBias();
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>

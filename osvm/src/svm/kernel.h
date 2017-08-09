@@ -83,6 +83,7 @@ public:
 	fvalue getBias();
 	fvalue getBetta();
 	void updateBias(fvalue LB);
+	void resetBias();
 
 	fvalue getLabel(sample_id v);
 	void setLabel(sample_id v);
@@ -111,6 +112,11 @@ RbfKernelEvaluator<Kernel, Matrix>::~RbfKernelEvaluator() {
 template<typename Kernel, typename Matrix>
 inline void RbfKernelEvaluator<Kernel, Matrix>::updateBias(fvalue LB) {
 	bias = bias + LB;
+}
+
+template<typename Kernel, typename Matrix>
+inline void RbfKernelEvaluator<Kernel, Matrix>::resetBias() {
+	bias = 0.0;
 }
 
 /*
