@@ -24,4 +24,6 @@ TrainParams::TrainParams() {
 	cache.size = DEFAULT_CACHE_SIZE;
 	stopping.k = DEFAULT_STOPPING_L1SVM_K;
 	generator.bucketNumber = DEFAULT_GENERATOR_BUCKET_NUMBER;
+	epochs = DEFAULT_EPOCHS;
+	margin = DEFAULT_MARGIN;
 }

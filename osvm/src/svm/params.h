@@ -24,6 +24,8 @@
 #define DEFAULT_EPSILON 0.1
 #define DEFAULT_ETA 1.0
 #define DEFAULT_DRAW_NUMBER 590
+#define DEFAULT_EPOCHS 0.5
+#define DEFAULT_MARGIN 0.1
 
 #define DEFAULT_CACHE_SIZE 200
 
@@ -41,6 +43,8 @@ struct TrainParams {
 	quantity drawNumber;
 
 	BiasType bias;
+	fvalue epochs;
+	fvalue margin;
 
 	struct {
 		quantity size;

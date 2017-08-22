@@ -55,6 +55,7 @@ using namespace boost::program_options;
 #define PR_CACHE_SIZE "cache-size,S"
 #define PR_BIAS_CALCULATION "bias,b"
 #define PR_EPOCH "epochs,P"
+#define PR_MARGIN "margin,M"
 
 #define PR_KEY_HELP "help"
 #define PR_KEY_C_LOW "c-low"
@@ -76,6 +77,7 @@ using namespace boost::program_options;
 #define PR_KEY_CACHE_SIZE "cache-size"
 #define PR_KEY_BIAS "bias"
 #define PR_KEY_EPOCH "epochs"
+#define PR_KEY_MARGIN "margin"
 
 #define SEL_TYPE_GRID "grid"
 #define SEL_TYPE_PATTERN "pattern"

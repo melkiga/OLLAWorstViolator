@@ -74,11 +74,16 @@ Configuration ParametersParser::getConfiguration() {
 		throw invalid_configuration("invalid bias evaluation strategy: " + biasEvaluation);
 	}
 
+	fvalue epochs = vars[PR_KEY_EPOCH].as<fvalue>();
+	fvalue margin = vars[PR_KEY_MARGIN].as<fvalue>();
+
 	TrainParams params;
 	params.epsilon = epsilon;
 	params.bias = bias;
 	params.drawNumber = drawNumber;
 	params.cache.size = cacheSize;
+	params.epochs = epochs;
+	params.margin = margin;
 	conf.trainingParams = params;
 
 	string stopStr = vars[PR_KEY_STOP_CRIT].as<string>();

@@ -70,6 +70,7 @@ int main(int argc, char *argv[]) {
 		(PR_ID_RANDOMIZER, value<string>()->default_value(ID_RANDOMIZER_FAIR), "id generator (simple, fair or determ)")
 		(PR_CACHE_SIZE, value<int>()->default_value(DEFAULT_CACHE_SIZE), "cache size (in MB)")
 		(PR_EPOCH, value<fvalue>()->default_value(0.5), "epochs number")
+		(PR_MARGIN, value<fvalue>()->default_value(0.1), "margin")
 		(PR_INPUT, value<string>(), "input file");
 
 	positional_options_description opt;
