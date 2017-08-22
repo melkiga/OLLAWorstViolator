@@ -224,10 +224,10 @@ void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
  */
 template<typename Kernel, typename Matrix, typename Strategy>
 ViolatorSearch AbstractSolver<Kernel, Matrix, Strategy>::findWorstViolator() {
-	ViolatorSearch worst_viol(INVALID_SAMPLE_ID, 0);
 	fvalue min_val = INT_MAX;
 	fvalue ksi = 0.0;
 	quantity svnumber = cache->getSVNumber();
+	ViolatorSearch worst_viol(svnumber, 0);
 	for (sample_id i = svnumber; i < currentSize; i++) {
 		ksi = cache->checkViolation(i);
 		if (ksi < min_val) {
