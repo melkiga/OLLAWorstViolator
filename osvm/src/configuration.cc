@@ -64,7 +64,7 @@ Configuration ParametersParser::getConfiguration() {
 
 	quantity drawNumber = vars[PR_KEY_DRAW_NUM].as<int>();
 	quantity cacheSize = vars[PR_KEY_CACHE_SIZE].as<int>();
-	BiasType bias = NO;
+	BiasType bias = YES;
 	string biasEvaluation = vars[PR_KEY_BIAS].as<string>();
 	if (BIAS_CALCULATION_NO == biasEvaluation) {
 		bias = NO;
