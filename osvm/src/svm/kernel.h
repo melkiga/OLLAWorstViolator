@@ -120,7 +120,7 @@ inline void RbfKernelEvaluator<Kernel, Matrix>::resetBias() {
 }
 
 /*
-* Sets the training pair comparison value to be the second. TODO: explain more.
+* Sets the training pair comparison value to be the second.
 */
 template<typename Kernel, typename Matrix>
 inline void RbfKernelEvaluator<Kernel, Matrix>::setLabel(sample_id v) {
@@ -174,7 +174,6 @@ void RbfKernelEvaluator<Kernel, Matrix>::evalInnerKernel(sample_id id,
 /*
  * Evaluates the RBF kernel between 2 samples.
  */
-// TODO: change evalKernel(id1,id2) to remove yyNeg and tau
 template<class Kernel, class Matrix>
 fvalue RbfKernelEvaluator<Kernel, Matrix>::evalKernel(sample_id uid, sample_id vid) {
 	label_id ulabel = labels[uid];
@@ -182,12 +181,12 @@ fvalue RbfKernelEvaluator<Kernel, Matrix>::evalKernel(sample_id uid, sample_id v
 	fvalue result;
 	if (ulabel == vlabel) {
 		if (uid == vid) {
-			result = tau;
+			result = 1.0;
 		} else {
 			result = evalInnerKernel(uid, vid) + bias;
 		}
 	} else {
-		result = yyNeg * (evalInnerKernel(uid, vid) + bias);
+		result = evalInnerKernel(uid, vid) + bias;
 	}
 	return result;
 }
