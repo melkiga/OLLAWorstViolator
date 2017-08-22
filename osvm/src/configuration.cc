@@ -57,11 +57,6 @@ Configuration ParametersParser::getConfiguration() {
 	range.gammaHigh = vars[PR_KEY_G_HIGH].as<fvalue>();
 	conf.searchRange = range;
 
-	fvalue epsilon = DEFAULT_EPSILON;
-	if (vars[PR_KEY_EPSILON].as<string>() != EPSILON_DEFAULT) {
-		istringstream(vars[PR_KEY_EPSILON].as<string>()) >> epsilon;
-	}
-
 	quantity drawNumber = vars[PR_KEY_DRAW_NUM].as<int>();
 	quantity cacheSize = vars[PR_KEY_CACHE_SIZE].as<int>();
 	BiasType bias = YES;
@@ -78,7 +73,6 @@ Configuration ParametersParser::getConfiguration() {
 	fvalue margin = vars[PR_KEY_MARGIN].as<fvalue>();
 
 	TrainParams params;
-	params.epsilon = epsilon;
 	params.bias = bias;
 	params.drawNumber = drawNumber;
 	params.cache.size = cacheSize;

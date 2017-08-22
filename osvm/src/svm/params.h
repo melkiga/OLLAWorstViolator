@@ -21,7 +21,6 @@
 
 #include "../math/numeric.h"
 
-#define DEFAULT_EPSILON 0.1
 #define DEFAULT_ETA 1.0
 #define DEFAULT_DRAW_NUMBER 590
 #define DEFAULT_EPOCHS 0.5
@@ -39,7 +38,6 @@ enum BiasType {
 };
 
 struct TrainParams {
-	fvalue epsilon;
 	quantity drawNumber;
 
 	BiasType bias;

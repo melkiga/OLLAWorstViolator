@@ -19,7 +19,6 @@
 #include "params.h"
 
 TrainParams::TrainParams() {
-	epsilon = DEFAULT_EPSILON;
 	drawNumber = DEFAULT_DRAW_NUMBER;
 	cache.size = DEFAULT_CACHE_SIZE;
 	stopping.k = DEFAULT_STOPPING_L1SVM_K;
