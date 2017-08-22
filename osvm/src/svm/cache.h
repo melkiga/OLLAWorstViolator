@@ -138,8 +138,6 @@ class CachedKernelEvaluator {
 
 	entry_id lruEntry;
 
-	fvalue w2;
-
 	RbfKernelEvaluator<Kernel, Matrix> *evaluator;
 	Strategy *strategy;
 
@@ -176,7 +174,6 @@ public:
 	quantity getSVNumber();
 
 	void performUpdate(sample_id v, fvalue lambda, fvalue LB);
-	fvalue getWNorm();
 	void performSvUpdate(sample_id& v);
 
 	void setSwapListener(SwapListener *listener);
@@ -600,8 +597,7 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 
 	// initialize cache mappings
 	fvector *initialVector = &views[INITIAL_ID].vector;
-	initialVector->size = 1; //TODO: initialize kernel vector here, so we don't have to in the train()
-	//fvector_set(initialVector, 0, evaluator->getKernelTau());
+	initialVector->size = 1;
 	mappings[INITIAL_ID].cacheEntry = INITIAL_ID;
 
 	// initialize cache entries
@@ -624,7 +620,6 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 
 	lruEntry = cacheLines - 1;
 
-	w2 = evaluator->getKernelTau();
 	evaluator->resetBias();
 }
 
@@ -649,11 +644,6 @@ template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setKernelParams(fvalue c, Kernel gparams) {
 	evaluator->setKernelParams(c, gparams);
 	reset();
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getWNorm() {
-	return w2;
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>

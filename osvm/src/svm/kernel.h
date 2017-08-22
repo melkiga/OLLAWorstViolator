@@ -48,11 +48,9 @@ private:
 	fvalue c;
 
 	fvalue yyNeg;
-	fvalue d1dc;
 
 	fvalue betta;
 	fvalue bias;
-	fvalue tau;
 
 	fvalue epochs;
 	fvalue margin;
@@ -75,7 +73,6 @@ public:
 
 	fvalue evalKernel(sample_id uid, sample_id vid);
 	void evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result);
-	fvalue getKernelTau();
 
 	void swapSamples(sample_id uid, sample_id vid);
 	void setKernelParams(fvalue c, Kernel &params);
@@ -106,8 +103,6 @@ RbfKernelEvaluator<Kernel, Matrix>::RbfKernelEvaluator(Matrix* samples, label_id
 		margin(margin) {
 	bias = 0.0;
 	yyNeg = -1.0 / (classNumber - 1);
-	d1dc = 1.0 / c;
-	tau = 1.0 + bias + 1.0 / c;
 }
 
 template<class Kernel, class Matrix>
@@ -209,11 +204,6 @@ void RbfKernelEvaluator<Kernel, Matrix>::evalKernel(sample_id id,
 }
 
 template<class Kernel, class Matrix>
-inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getKernelTau() {
-	return tau; //TODO: remove tau
-}
-
-template<class Kernel, class Matrix>
 inline void RbfKernelEvaluator<Kernel, Matrix>::swapSamples(sample_id uid, sample_id vid) {
 	swap(labels[uid], labels[vid]);
 	eval.swapSamples(uid, vid);
@@ -223,9 +213,6 @@ template<class Kernel, class Matrix>
 void RbfKernelEvaluator<Kernel, Matrix>::setKernelParams(fvalue c, Kernel &params) {
 	this->c = c;
 	this->params = params;
-
-	d1dc = 1.0 / c; // TODO: remove d1dc
-	tau = 1.0 + bias + 1.0 / c;
 }
 
 template<class Kernel, class Matrix>

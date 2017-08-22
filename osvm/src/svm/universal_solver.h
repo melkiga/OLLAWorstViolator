@@ -141,7 +141,7 @@ Classifier<Kernel, Matrix>* UniversalSolver<Kernel, Matrix, Strategy>::getClassi
 	vector<label_id> labels(this->labels, this->labels + svNumber);
 	vector<fvalue> bias = strategy->getBias(labels, this->cache->getAlphas(),
 			(quantity) this->labelNames.size(), svNumber,
-			this->cache->getWNorm(), evaluator->getC());
+			0.0, evaluator->getC());
 
 	return new UniversalClassifier<Kernel, Matrix>(evaluator,
 			this->cache->getAlphasView(), this->labels, buffer, (quantity) this->labelNames.size(),
