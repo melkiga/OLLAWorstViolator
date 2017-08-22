@@ -197,6 +197,9 @@ public:
 
 	void updateBias(fvalue LB);
 	fvalue getBias();
+	fvalue getBetta();
+	fvalue getEpochs();
+	fvalue getMargin();
 
 	void structureCheck();
 	void reportStatistics();
@@ -699,6 +702,21 @@ inline Kernel CachedKernelEvaluator<Kernel, Matrix, Strategy>::getParams() {
 template<typename Kernel, typename Matrix, typename Strategy>
 inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getC() {
 	return evaluator->getC();
+}
+
+template<typename Kernel, typename Matrix, typename Strategy>
+inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getMargin() {
+	return evaluator->getMargin();
+}
+
+template<typename Kernel, typename Matrix, typename Strategy>
+inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getEpochs() {
+	return evaluator->getEpochs();
+}
+
+template<typename Kernel, typename Matrix, typename Strategy>
+inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getBetta() {
+	return evaluator->getBetta();
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>

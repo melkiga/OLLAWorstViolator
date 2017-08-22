@@ -247,12 +247,12 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) {
 	ViolatorSearch viol(0, 0.0);
 	fvalue C = cache->getC();
-	fvalue betta = cache->getEvaluator()->getBetta();
-	fvalue margin = 0.1*C;
+	fvalue betta = cache->getBetta();
+	fvalue margin = cache->getMargin()*C;
 	quantity iter = 0;
 	fvalue bias = 0.0;
 	fvalue eta = 0.0;
-	quantity max_iter = (quantity) ceil(0.5*currentSize);
+	quantity max_iter = (quantity) ceil(cache->getEpochs()*currentSize);
 	fvalue lambda = 0.0;
 	fvalue LB = 0.0;
 
@@ -273,7 +273,7 @@ template<typename Kernel, typename Matrix, typename Strategy>
 CachedKernelEvaluator<Kernel, Matrix, Strategy>* AbstractSolver<Kernel, Matrix, Strategy>::buildCache(fvalue c, Kernel &gparams) {
 	fvalue bias = (params.bias == NO) ? 0.0 : 1.0;
 	RbfKernelEvaluator<GaussKernel, Matrix> *rbf = new RbfKernelEvaluator<GaussKernel, Matrix>(
-			this->samples, this->labels, (quantity) labelNames.size(), bias, c, gparams);
+			this->samples, this->labels, (quantity) labelNames.size(), bias, c, gparams, params.epochs, params.margin);
 	return new CachedKernelEvaluator<GaussKernel, Matrix, Strategy>(
 			rbf, &strategy, size, params.cache.size, NULL);
 }

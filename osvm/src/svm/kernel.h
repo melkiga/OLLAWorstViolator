@@ -54,6 +54,9 @@ private:
 	fvalue bias;
 	fvalue tau;
 
+	fvalue epochs;
+	fvalue margin;
+
 protected:
 	Kernel params;
 	MatrixEvaluator<Matrix> eval;
@@ -61,8 +64,7 @@ protected:
 	fvalue rbf(fvalue dist2);
 
 public:
-	RbfKernelEvaluator(Matrix* samples, label_id* labels, quantity classNumber,
-			fvalue bias, fvalue c, Kernel &params);
+	RbfKernelEvaluator(Matrix* samples, label_id* labels, quantity classNumber, fvalue bias, fvalue c, Kernel &params, fvalue epochs, fvalue margin);
 	~RbfKernelEvaluator();
 
 	fvalue evalInnerKernel(sample_id uid, sample_id vid);
@@ -82,6 +84,8 @@ public:
 	fvalue getC();
 	fvalue getBias();
 	fvalue getBetta();
+	fvalue getEpochs();
+	fvalue getMargin();
 	void updateBias(fvalue LB);
 	void resetBias();
 
@@ -90,15 +94,16 @@ public:
 };
 
 template<class Kernel, class Matrix>
-RbfKernelEvaluator<Kernel, Matrix>::RbfKernelEvaluator(
-		Matrix* samples, label_id* labels, quantity classNumber,
-		fvalue betta, fvalue c, Kernel &params) :
+RbfKernelEvaluator<Kernel, Matrix>::RbfKernelEvaluator(Matrix* samples, label_id* labels, quantity classNumber,
+		fvalue betta, fvalue c, Kernel &params, fvalue epochs, fvalue margin) :
 		samples(samples),
 		labels(labels),
 		c(c),
 		betta(betta),
 		params(params),
-		eval(samples) {
+		eval(samples),
+		epochs(epochs),
+		margin(margin) {
 	bias = 0.0;
 	yyNeg = -1.0 / (classNumber - 1);
 	d1dc = 1.0 / c;
@@ -241,6 +246,16 @@ inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getBias() {
 template<class Kernel, class Matrix>
 inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getBetta() {
 	return betta;
+}
+
+template<class Kernel, class Matrix>
+inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getEpochs () {
+	return epochs;
+}
+
+template<class Kernel, class Matrix>
+inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getMargin() {
+	return margin;
 }
 
 #endif
