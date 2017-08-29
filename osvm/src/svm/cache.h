@@ -124,6 +124,8 @@ class CachedKernelEvaluator {
 	fvectorv fbufferView;
 
 	quantity problemSize;
+	quantity currentSize;
+
 	quantity cacheSize;
 	quantity cacheLines;
 	quantity cacheDepth;
@@ -169,6 +171,7 @@ public:
 	
 	fvalue getLabel(sample_id v);
 	void setLabel(pair<label_id, label_id> trainPair);
+	void setCurrentSize(quantity size);
 
 	fvalue getVectorWeight(sample_id v);
 	quantity getSVNumber();
@@ -210,6 +213,7 @@ CachedKernelEvaluator<Kernel, Matrix, Strategy>::CachedKernelEvaluator(
 		strategy(strategy),
 		listener(listener) {
 	problemSize = probSize;
+	currentSize = problemSize;
 	quantity fvaluePerMb = 1024 * 1024 / sizeof(fvalue);
 	cacheSize = max(cchSize * fvaluePerMb, 2 * probSize);
 	if (cacheSize / probSize > probSize) {
@@ -288,7 +292,7 @@ inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getLabel(sample_i
 
 template<typename Kernel, typename Matrix, typename Strategy>
 fvector& CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelVector(sample_id v) {
-	evalKernel(v, 0, problemSize, kernelVector);
+	evalKernel(v, 0, currentSize, kernelVector);
 	return *kernelVector;
 }
 
@@ -795,6 +799,11 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::updateBias(fvalue LB) {
 template<typename Kernel, typename Matrix, typename Strategy>
 fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getBias() {
 	return evaluator->getBias();
+}
+
+template<typename Kernel, typename Matrix, typename Strategy>
+void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setCurrentSize(quantity size) {
+	currentSize = size;
 }
 
 #endif

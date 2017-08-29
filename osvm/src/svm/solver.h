@@ -332,6 +332,7 @@ void AbstractSolver<Kernel, Matrix, Strategy>::releaseSupportVectors(
 template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::setCurrentSize(quantity size) {
 	currentSize = size;
+	cache->setCurrentSize(size);
 	refreshDistr();
 }
 
