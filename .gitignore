@@ -243,3 +243,4 @@ ModelManifest.xml
 
 # GABBIE
 .DS_Store
+*.json
