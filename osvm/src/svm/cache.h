@@ -538,7 +538,6 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setSwapListener(SwapListen
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::swapSamples(sample_id u, sample_id v) {
 	evaluator->swapSamples(u, v);
-	swap(alphas[u], alphas[v]);
 	swap(output[u], output[v]);
 
 	strategy->notifyExchange(u, v);
@@ -657,20 +656,18 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setKernelParams(fvalue c, 
 
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate(sample_id& v) {
-	
-	if (v >= svnumber) {
-		if (svnumber >= cacheDepth) {
-			resizeCache();
-		}
 
-		// swap rows
-		swapSamples(v, svnumber);
-		v = svnumber;
-
-		// adjust sv number
-		svnumber++;
-		alphasView.vector.size++;
+	if (svnumber >= cacheDepth) {
+		resizeCache();
 	}
+
+	// swap rows
+	swapSamples(v, svnumber);
+	v = svnumber;
+
+	// adjust sv number
+	svnumber++;
+	alphasView.vector.size++;
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
