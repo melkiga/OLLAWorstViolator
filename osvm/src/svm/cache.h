@@ -292,7 +292,7 @@ inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getLabel(sample_i
 
 template<typename Kernel, typename Matrix, typename Strategy>
 fvector& CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelVector(sample_id v) {
-	evalKernel(v, 0, currentSize, kernelVector);
+	evalKernel(v, svnumber, currentSize, kernelVector);
 	return *kernelVector;
 }
 
@@ -486,9 +486,14 @@ template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id v, fvalue lambda, fvalue LB) {
 	// update output
 	fvector &vector = evalKernelVector(v);
-	fvector_mul_const(&vector, lambda);
-	fvector_add(&outputView.vector, &vector);
-	fvector_add_const(&outputView.vector, LB);
+
+	for (int i = svnumber; i < currentSize; i++) {
+		output[i] = output[i] + vector.data[i] * lambda + LB;
+	}
+
+	//fvector_mul_const(&vector, lambda);
+	//fvector_add(&outputView.vector, &vector);
+	//fvector_add_const(&outputView.vector, LB);
 	// update alphas
 	alphas[v] += lambda;
 	updateBias(LB);
