@@ -257,10 +257,8 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 		this->reset();
 		this->trainForCache(this->cache);
 
-		vector<fvalue>& cacheAlphas = this->cache->getAlphas();
-		vector<sample_id>& cacheSamples = this->cache->getBackwardOrder();
-		it->yalphas = cacheAlphas;
-		it->samples = cacheSamples;
+		it->yalphas = this->cache->getAlphas();
+		it->samples = this->cache->getBackwardOrder();
 		it->bias = this->cache->getBias();
 		it->size = this->cache->getSVNumber() - 1;
 	}
