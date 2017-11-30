@@ -244,3 +244,23 @@ ModelManifest.xml
 # GABBIE
 .DS_Store
 *.json
+*.Po
+*.Tpo
+*.m4
+*.0
+*.1
+osvm/autom4te.cache/requests
+osvm/compile
+*.in
+osvm/config.status
+*.o
+osvm/configure
+osvm/depcomp
+osvm/INSTALL
+*.spec
+osvm/install-sh
+osvm/Makefile
+osvm/missing
+*.swp
+osvm/stamp-h1
+osvm/test-driver
