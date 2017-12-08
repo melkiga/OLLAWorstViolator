@@ -252,7 +252,7 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 	quantity iter = 0;
 	fvalue bias = 0.0;
 	fvalue eta = 0.0;
-	quantity max_iter = (quantity) ceil(cache->getEpochs()*currentSize);
+	quantity max_iter = (quantity) ceil(cache->getEpochs()*currentSize) - 1;
 	fvalue lambda = 0.0;
 	fvalue LB = 0.0;
 
