@@ -29,14 +29,14 @@ class ExpMovingAverage {
 	fvalue exp;
 
 public:
-	ExpMovingAverage(fvalue value, fvalue exp);
+	ExpMovingAverage(fvalue value = 0, fvalue exp = DEFAULT_EXP);
 
 	void addObservation(fvalue obs);
 	fvalue getValue();
 
 };
 
-inline ExpMovingAverage::ExpMovingAverage(fvalue value = 0, fvalue exp = DEFAULT_EXP) :
+inline ExpMovingAverage::ExpMovingAverage(fvalue value, fvalue exp) :
 		value(value),
 		exp(exp) {
 }

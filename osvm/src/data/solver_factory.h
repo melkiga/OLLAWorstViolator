@@ -112,8 +112,8 @@ private:
 			StopCriterionStrategy* strategy);
 
 public:
-	BaseSolverFactory(istream& input, TrainParams& params,
-			StopCriterion strategy, MulticlassApproach multiclass, bool reduceDim);
+	BaseSolverFactory(istream& input, TrainParams params = TrainParams(),
+			StopCriterion strategy = YOC, MulticlassApproach multiclass = ALL_AT_ONCE, bool reduceDim = false);
 	virtual ~BaseSolverFactory();
 
 	AbstractSolver<GaussKernel, Matrix, Strategy>* getSolver();
@@ -124,10 +124,10 @@ public:
 
 template<typename Matrix, typename Strategy>
 BaseSolverFactory<Matrix, Strategy>::BaseSolverFactory(istream& input,
-		TrainParams& params= TrainParams(),
-		StopCriterion strategy = YOC,
-		MulticlassApproach multiclass = ALL_AT_ONCE,
-		bool reduceDim = false) :
+		TrainParams params,
+		StopCriterion strategy,
+		MulticlassApproach multiclass,
+		bool reduceDim) :
 		input(input),
 		params(params),
 		strategy(strategy),
