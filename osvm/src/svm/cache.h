@@ -55,6 +55,17 @@ struct EntryMapping {
 
 };
 
+struct ViolatorSearch {
+
+	sample_id violator;
+	fvalue yo;
+
+	ViolatorSearch(sample_id violator, fvalue yo) :
+		violator(violator),
+		yo(yo) {
+	}
+
+};
 
 struct CacheEntry {
 
@@ -168,6 +179,7 @@ public:
 	fvalue evalKernelUV(sample_id u, sample_id v);
 	fvalue evalKernelAXV(sample_id v);
 	fvalue checkViolation(sample_id v);
+	ViolatorSearch findWorstViolator();
 	
 	fvalue getLabel(sample_id v);
 	void setLabel(pair<label_id, label_id> trainPair);
@@ -480,6 +492,32 @@ Returns the current number of support vectors.
 template<typename Kernel, typename Matrix, typename Strategy>
 inline quantity CachedKernelEvaluator<Kernel, Matrix, Strategy>::getSVNumber() {
 	return svnumber;
+}
+
+/* Returns the index of the worst violator (yo > tolC), excluding the current support vectors. */
+template<typename Kernel, typename Matrix, typename Strategy>
+ViolatorSearch CachedKernelEvaluator<Kernel, Matrix, Strategy>::findWorstViolator() {
+	double min_val = INT_MAX;
+	int min_ind = INT_MAX;
+	double ksi = 0.0;
+	int svnumber = getSVNumber();
+	ViolatorSearch worst_viol(svnumber, min_val);
+	for (int i = svnumber; i < currentSize; i++) {
+		ksi = output[i] * getLabel(i);
+		if (ksi < min_val) {
+			worst_viol.violator = i;
+			worst_viol.yo = ksi;
+			min_val = ksi;
+			min_ind = backwardOrder[i];
+		}
+		else if (ksi == min_val && backwardOrder[i] < min_ind) {
+			worst_viol.violator = i;
+			worst_viol.yo = ksi;
+			min_val = ksi;
+			min_ind = backwardOrder[i];
+		}
+	}
+	return worst_viol;
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
