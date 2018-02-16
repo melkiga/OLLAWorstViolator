@@ -94,18 +94,6 @@ public:
 };
 
 
-struct ViolatorSearch {
-
-	sample_id violator;
-	fvalue yo;
-
-	ViolatorSearch(sample_id violator, fvalue yo) :
-		violator(violator),
-		yo(yo) {
-	}
-
-};
-
 template<typename Kernel, typename Matrix, typename Strategy>
 class AbstractSolver: public Solver<Kernel, Matrix>, public StateHolder<Matrix> {
 
@@ -129,7 +117,7 @@ protected:
 	CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache;
 
 protected:
-	ViolatorSearch findWorstViolator();
+	//ViolatorSearch findWorstViolator();
 
 	virtual CachedKernelEvaluator<Kernel, Matrix, Strategy>* buildCache(
 			fvalue c, Kernel &gparams);
@@ -218,26 +206,6 @@ void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
 	cache->reportStatistics();
 }
 
-/*
- * Find the worst violator. Since the violators are stacked at the top, iterate only
- * over the non-support vectors to find the next worst violator.
- */
-template<typename Kernel, typename Matrix, typename Strategy>
-ViolatorSearch AbstractSolver<Kernel, Matrix, Strategy>::findWorstViolator() {
-	fvalue min_val = INT_MAX;
-	fvalue ksi = 0.0;
-	quantity svnumber = cache->getSVNumber();
-	ViolatorSearch worst_viol(svnumber, 0);
-	for (sample_id i = svnumber; i < currentSize; i++) {
-		ksi = cache->checkViolation(i);
-		if (ksi < min_val) {
-			worst_viol.violator = i;
-			worst_viol.yo = ksi;
-			min_val = ksi;
-		}
-	}
-	return worst_viol;
-}
 
 /*
  * Begin training. 
@@ -262,7 +230,7 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
 		lambda = eta*C*cache->getLabel(viol.violator);
 		LB = (lambda*betta) / currentSize;
 		cache->performUpdate(viol.violator, lambda, LB);
-		viol = findWorstViolator();
+		viol = cache->findWorstViolator();
 		cache->performSvUpdate(viol.violator);
 
 	} while (iter < max_iter && viol.yo < margin);
