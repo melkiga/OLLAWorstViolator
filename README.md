@@ -13,11 +13,11 @@ two external libraries: boost and gsl. The input data format that it takes is LI
     * Restart VS if it is currently running.
 * The VS project configuration will not need to be modified, but notable settings are:
     * C/C++ - Additional Include Directories - 
-      - ($OLLAWV_GSL)\x64\include\
-      - ($OLLAWV_BOOST)\x64\
+      - $(OLLAWV_GSL)\x64\include\
+      - $(OLLAWV_BOOST)\x64\
     * Linker - Additional Library Directories -
-      - ($OLLAWV_GSL)\x64\lib
-      - ($OLLAWV_BOOST)\x64\stage\lib
+      - $(OLLAWV_GSL)\x64\lib
+      - $(OLLAWV_BOOST)\x64\stage\lib
     * Linker - Input - 
       - cblas.lib
       - gsl.lib
