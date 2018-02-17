@@ -510,28 +510,26 @@ ViolatorSearch CachedKernelEvaluator<Kernel, Matrix, Strategy>::findWorstViolato
 			min_val = ksi;
 			min_ind = backwardOrder[i];
 		}
-		else if (ksi == min_val && backwardOrder[i] < min_ind) {
-			worst_viol.violator = i;
-			worst_viol.yo = ksi;
-			min_val = ksi;
-			min_ind = backwardOrder[i];
-		}
+		//else if (ksi == min_val && backwardOrder[i] < min_ind) {
+		//	worst_viol.violator = i;
+		//	worst_viol.yo = ksi;
+		//	min_val = ksi;
+		//	min_ind = backwardOrder[i];
+		//}
 	}
 	return worst_viol;
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id v, fvalue lambda, fvalue LB) {
-	// update output
-	fvector &vector = evalKernelVector(v);
+	// get kernel vector with respect to v
+	evalKernel(v, svnumber, currentSize, kernelVector);
 
+	// update output
 	for (int i = svnumber; i < currentSize; i++) {
-		output[i] = output[i] + vector.data[i] * lambda + LB;
+		output[i] = output[i] + kernelVector->data[i] * lambda + LB;
 	}
 
-	//fvector_mul_const(&vector, lambda);
-	//fvector_add(&outputView.vector, &vector);
-	//fvector_add_const(&outputView.vector, LB);
 	// update alphas
 	alphas[v] += lambda;
 	updateBias(LB);
