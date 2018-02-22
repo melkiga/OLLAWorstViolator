@@ -90,12 +90,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OLLAWV_BOOST)\x64</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OLLAWV_GSL)\x64\include;$(OLLAWV_BOOST)\x64;..\osvm\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OLLAWV_BOOST)\x64\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OLLAWV_GSL)\x64\lib;$(OLLAWV_BOOST)\x64\stage\lib;E:\code\licklicklick\Code\OpenSource\OLLAWorstViolator\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OLLAWV.lib;gsl.lib;cblas.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -162,11 +163,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OLLAWV\OLLAWV.vcxproj">
-      <Project>{2c032e6f-7a0d-4295-ac04-fff3d8e26c4f}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

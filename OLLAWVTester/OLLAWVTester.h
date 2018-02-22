@@ -1,5 +1,9 @@
 #include <iostream>
 
+//#include "../osvm/config.h"
+//#include "../osvm/src/configuration.h"
+#include "configuration.h"
+#include "../config.h"
 
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/parsers.hpp>
