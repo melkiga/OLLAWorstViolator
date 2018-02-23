@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Testing">
+      <UniqueIdentifier>{b61c7a6a-f241-4f1a-93c7-22df05b24536}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\osvm\src\configuration.cc">
@@ -68,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="..\osvm\src\time\timer.cc">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\TestCases.cpp">
+      <Filter>Testing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +160,12 @@
     </ClInclude>
     <ClInclude Include="..\osvm\src\time\timer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Testing\TestHelpers.h">
+      <Filter>Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Testing\TestCases.h">
+      <Filter>Testing</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

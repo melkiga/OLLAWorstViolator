@@ -1,3 +1,6 @@
+#ifndef TEST_HELPERS_H
+#define TEST_HELPERS_H
+
 #include <iostream>
 
 
@@ -77,3 +80,5 @@ char* CreateArgBuffer()
 void CleanupCommandArgs(const char** args, int count)
 {
 }
+
+#endif
