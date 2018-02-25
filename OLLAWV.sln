@@ -1,18 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OLLAWV", "OLLAWV\OLLAWV.vcxproj", "{2C032E6F-7A0D-4295-AC04-FFF3D8E26C4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_TestRunner|x64 = Debug_TestRunner|x64
+		Debug_TestRunner|x86 = Debug_TestRunner|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C032E6F-7A0D-4295-AC04-FFF3D8E26C4F}.Debug_TestRunner|x64.ActiveCfg = Debug_TestRunner|x64
+		{2C032E6F-7A0D-4295-AC04-FFF3D8E26C4F}.Debug_TestRunner|x64.Build.0 = Debug_TestRunner|x64
+		{2C032E6F-7A0D-4295-AC04-FFF3D8E26C4F}.Debug_TestRunner|x86.ActiveCfg = Debug_TestRunner|Win32
+		{2C032E6F-7A0D-4295-AC04-FFF3D8E26C4F}.Debug_TestRunner|x86.Build.0 = Debug_TestRunner|Win32
 		{2C032E6F-7A0D-4295-AC04-FFF3D8E26C4F}.Debug|x64.ActiveCfg = Debug|x64
 		{2C032E6F-7A0D-4295-AC04-FFF3D8E26C4F}.Debug|x64.Build.0 = Debug|x64
 		{2C032E6F-7A0D-4295-AC04-FFF3D8E26C4F}.Debug|x86.ActiveCfg = Debug|Win32
@@ -24,5 +30,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F024F779-1B69-4504-BAF0-817F0BE9F655}
 	EndGlobalSection
 EndGlobal
