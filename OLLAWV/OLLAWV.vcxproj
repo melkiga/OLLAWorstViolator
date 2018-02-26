@@ -199,6 +199,7 @@
     <ClCompile Include="..\osvm\src\svm\stop.cc" />
     <ClCompile Include="..\osvm\src\time\timer.cc" />
     <ClCompile Include="Testing\TestCases.cpp" />
+    <ClCompile Include="Testing\TestHelpers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\osvm\src\configuration.h" />
