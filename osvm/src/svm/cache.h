@@ -176,16 +176,12 @@ public:
 	CachedKernelEvaluator(RbfKernelEvaluator<Kernel, Matrix> *evaluator, Strategy *strategy, quantity probSize, quantity cchSize, SwapListener *listener);
 	~CachedKernelEvaluator();
 
-	fvalue evalKernelUV(sample_id u, sample_id v);
-	fvalue evalKernelAXV(sample_id v);
 	fvalue checkViolation(sample_id v);
 	CWorstViolator findWorstViolator();
 	
 	fvalue getLabel(sample_id v);
 	void setLabel(pair<label_id, label_id> trainPair);
 	void setCurrentSize(quantity size);
-
-	fvalue getVectorWeight(sample_id v);
 	quantity getSVNumber();
 
 	void performSGDUpdate(sample_id worstViolator, fvalue gradient, fvalue biasGradient);
@@ -194,7 +190,6 @@ public:
 	void setSwapListener(SwapListener *listener);
 	void swapSamples(sample_id u, sample_id v);
 	void reset();
-	void shrink();
 	void setKernelParams(fvalue c, Kernel params);
 
 	Kernel getParams();
@@ -272,12 +267,6 @@ CachedKernelEvaluator<Kernel, Matrix, Strategy>::~CachedKernelEvaluator() {
 	delete [] entries;
 	fvector_free(fbuffer);
 	fvector_free(kernelVector);
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelAXV(sample_id v) {
-	fvalue result;
-	return result;
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -405,84 +394,6 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::resizeCache() {
 	delete [] cache;
 	cache = newCache;
 	cacheDepth = newCacheDepth;
-
-	//	shrink();
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::shrink() {
-	// removing non-support vectors
-	quantity *nonsvnumbers = new quantity[svnumber + 1];
-	quantity nonsvnumber = 0;
-	sample_id firstViol = 0;
-	nonsvnumbers[0] = 0;
-	for (quantity i = 1; i <= svnumber; i++) {
-		if (alphas[i - 1] <= 0) {
-			nonsvnumbers[i] = nonsvnumbers[i - 1] + 1;
-			nonsvnumber++;
-			if (!firstViol) {
-				firstViol = i;
-			}
-		} else {
-			nonsvnumbers[i] = nonsvnumbers[i - 1];
-		}
-	}
-	if (nonsvnumber > 0) {
-		// update vector lengths
-		for (sample_id i = 0; i < svnumber; i++) {
-			if (mappings[i].cacheEntry != INVALID_ENTRY_ID) {
-				CacheEntry &entry = entries[mappings[i].cacheEntry];
-				fvectorv &vector = views[entry.vector];
-				fvalue *data = vector.vector.data;
-				for (quantity j = firstViol; j <= vector.vector.size; j++) {
-					data[j - nonsvnumbers[j]] = data[j];
-				}
-				vector.vector.size -= nonsvnumbers[vector.vector.size];
-			}
-			if (nonsvnumbers[i] > 0) {
-				sample_id svid = i - nonsvnumbers[i];
-				swapSamples(i, svid);
-			}
-		}
-
-		for (sample_id i = svnumber; i < problemSize; i++) {
-			if (mappings[i].cacheEntry != INVALID_ENTRY_ID) {
-				CacheEntry &entry = entries[mappings[i].cacheEntry];
-				fvectorv &vector = views[entry.vector];
-				vector.vector.size = 0;
-			}
-		}
-
-		svnumber -= nonsvnumber;
-		psvnumber = svnumber;
-		alphasView.vector.size -= nonsvnumber;
-		outputView.vector.size -= nonsvnumber;
-	}
-	delete [] nonsvnumbers;
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelUV(sample_id u, sample_id v) {
-	fvalue result;
-	if (mappings[v].cacheEntry != INVALID_ENTRY_ID
-			&& views[mappings[v].cacheEntry].vector.size > u) {
-		result = fvector_get(&views[mappings[v].cacheEntry].vector, u);
-	} else if (mappings[u].cacheEntry != INVALID_ENTRY_ID
-			&& views[mappings[u].cacheEntry].vector.size > v) {
-		result = fvector_get(&views[mappings[u].cacheEntry].vector, v);
-	} else {
-		// calculate the kernel, do not cache the value
-		result = evalKernel(u, v);
-	}
-	return result;
-}
-
-/*
-Returns alpha value of input sample id.
-*/
-template<typename Kernel, typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getVectorWeight(sample_id v) {
-	return alphas[v];
 }
 
 /*

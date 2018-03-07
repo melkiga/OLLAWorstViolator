@@ -78,7 +78,6 @@ public:
 
 	virtual void setSwapListener(SwapListener *listener) = 0;
 	virtual void swapSamples(sample_id u, sample_id v) = 0;
-	virtual void shrink() = 0;
 	virtual void setCurrentSize(quantity size) = 0;
 	virtual quantity getCurrentSize() = 0;
 	virtual void reset() = 0;
@@ -121,9 +120,7 @@ protected:
 	void refreshDistr();
 
 public:
-	AbstractSolver(map<label_id, string> labelNames, Matrix *samples,
-			label_id *labels, TrainParams &params,
-			StopCriterionStrategy *stopStrategy);
+	AbstractSolver(map<label_id, string> labelNames, Matrix *samples, label_id *labels, TrainParams &params, StopCriterionStrategy *stopStrategy);
 	virtual ~AbstractSolver();
 
 	void setKernelParams(fvalue c, Kernel &params);
@@ -132,7 +129,6 @@ public:
 
 	void setSwapListener(SwapListener *listener);
 	void swapSamples(sample_id u, sample_id v);
-	void shrink();
 	void setCurrentSize(quantity size);
 	quantity getCurrentSize();
 	void reset();
@@ -279,11 +275,6 @@ void AbstractSolver<Kernel, Matrix, Strategy>::swapSamples(
 template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::reset() {
 	cache->reset();
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::shrink() {
-	cache->shrink();
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>

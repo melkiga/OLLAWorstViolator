@@ -40,7 +40,7 @@
 
 using namespace std;
 
-
+//TODO: since i deleted the universal solver class, i need to make sure that the run-options reflect that it doesnt exist anymore
 enum StopCriterion {
 	YOC
 };
@@ -148,8 +148,6 @@ AbstractSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strateg
 	AbstractSolver<GaussKernel, Matrix, Strategy> *solver = NULL;
 	if (type == PAIRWISE) {
 		solver = new PairwiseSolver<GaussKernel, Matrix, Strategy>(labels, x, y, params, strategy);
-	} else {
-		solver = new UniversalSolver<GaussKernel, Matrix, Strategy>(labels, x, y, params, strategy);
 	}
 	return solver;
 }

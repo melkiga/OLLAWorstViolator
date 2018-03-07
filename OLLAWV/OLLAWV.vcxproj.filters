@@ -149,9 +149,6 @@
     <ClInclude Include="..\osvm\src\svm\strategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\osvm\src\svm\universal_solver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\osvm\src\svm\validation.h">
       <Filter>Header Files</Filter>
     </ClInclude>

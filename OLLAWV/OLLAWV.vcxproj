@@ -225,7 +225,6 @@
     <ClInclude Include="..\osvm\src\svm\solver.h" />
     <ClInclude Include="..\osvm\src\svm\stop.h" />
     <ClInclude Include="..\osvm\src\svm\strategy.h" />
-    <ClInclude Include="..\osvm\src\svm\universal_solver.h" />
     <ClInclude Include="..\osvm\src\svm\validation.h" />
     <ClInclude Include="..\osvm\src\svm\violation.h" />
     <ClInclude Include="..\osvm\src\time\timer.h" />
