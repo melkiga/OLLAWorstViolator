@@ -132,7 +132,7 @@ inline void RbfKernelEvaluator<Kernel, Matrix>::setLabel(sample_id v) {
 */
 template<typename Kernel, typename Matrix>
 inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getLabel(sample_id v) {
-	fvalue vals[] = { 1.0, -1.0 };
+	fvalue vals[] = { 1.0, -1.0 }; //TODO: fix this to be the following: 2*label[v] - 1
 	fvalue label = vals[labels[v] == yyNeg];
 	return label;
 }

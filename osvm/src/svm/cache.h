@@ -188,14 +188,13 @@ public:
 	fvalue getVectorWeight(sample_id v);
 	quantity getSVNumber();
 
-	void performUpdate(sample_id v, fvalue lambda, fvalue LB);
+	void performSGDUpdate(sample_id worstViolator, fvalue gradient, fvalue biasGradient);
 	void performSvUpdate(sample_id& v);
 
 	void setSwapListener(SwapListener *listener);
 	void swapSamples(sample_id u, sample_id v);
 	void reset();
 	void shrink();
-	void releaseSupportVectors(fold_id *membership, fold_id fold);
 	void setKernelParams(fvalue c, Kernel params);
 
 	Kernel getParams();
@@ -494,21 +493,23 @@ inline quantity CachedKernelEvaluator<Kernel, Matrix, Strategy>::getSVNumber() {
 	return svnumber;
 }
 
-/* Returns the index of the worst violator (yo > tolC), excluding the current support vectors. */
+/* Returns the worst violator (index and corresponding error), 
+	i.e. the sample with the largest error, excluding the current support vectors. 
+*/
 template<typename Kernel, typename Matrix, typename Strategy>
 ViolatorSearch CachedKernelEvaluator<Kernel, Matrix, Strategy>::findWorstViolator() {
-	double min_val = INT_MAX;
-	int min_ind = INT_MAX;
-	double ksi = 0.0;
-	int svnumber = getSVNumber();
-	ViolatorSearch worst_viol(svnumber, min_val);
-	for (int i = svnumber; i < currentSize; i++) {
-		ksi = output[i] * getLabel(i);
-		if (ksi < min_val) {
+	fvalue currentWorstError = INT_MAX;
+	sample_id currentWorstErrorIndex = INT_MAX;
+	fvalue error = 0.0;
+	quantity svnumber = getSVNumber();
+	ViolatorSearch worst_viol(svnumber, currentWorstError);
+	for (sample_id i = svnumber; i < currentSize; i++) {
+		error = output[i] * getLabel(i);
+		if (error < currentWorstError) {
 			worst_viol.violator = i;
-			worst_viol.yo = ksi;
-			min_val = ksi;
-			min_ind = backwardOrder[i];
+			worst_viol.yo = error;
+			currentWorstError = error;
+			currentWorstErrorIndex = backwardOrder[i];
 		}
 		//else if (ksi == min_val && backwardOrder[i] < min_ind) {
 		//	worst_viol.violator = i;
@@ -520,47 +521,27 @@ ViolatorSearch CachedKernelEvaluator<Kernel, Matrix, Strategy>::findWorstViolato
 	return worst_viol;
 }
 
+/*
+ * Updates the output vector, worst violator (WV) alpha value, and bias. This is the SGD update step of the L1SVM for OLLAWV. 
+ * First, the WV's kernel vector with respect to samples that are non-support vectors is calculated. Next, the kernel vector is multiplied 
+ * by the gradient, added to the output vector, as well as the bias update. (output = output + update*K + biasUpdate). Finally, the 
+ * WV alpha is updated and the bias too.
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performUpdate(sample_id v, fvalue lambda, fvalue LB) {
+void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSGDUpdate(sample_id worstViolator, fvalue gradient, fvalue biasGradient) {
 	// get kernel vector with respect to v
-	evalKernel(v, svnumber, currentSize, kernelVector);
+	evalKernel(worstViolator, svnumber, currentSize, kernelVector);
 
 	// update output
 	for (int i = svnumber; i < currentSize; i++) {
-		output[i] = output[i] + kernelVector->data[i] * lambda + LB;
+		output[i] = output[i] + kernelVector->data[i] * gradient + biasGradient;
 	}
 
 	// update alphas
-	alphas[v] += lambda;
-	updateBias(LB);
+	alphas[worstViolator] += gradient;
+	updateBias(biasGradient);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::releaseSupportVectors(fold_id *membership, fold_id fold) {
-	quantity valid = 0;
-	for (sample_id v = 0; v < svnumber; v++) {
-		fvalue beta = alphas[v];
-		if (membership[v] != fold && beta > 0) {
-			valid++;
-		}
-	}
-	if (valid > 0) {
-		for (sample_id v = 0; v < svnumber; v++) {
-			fvalue beta = alphas[v];
-			if (membership[v] == fold && beta > 0) {
-				// update alphas
-				alphas[v] = 0.0;
-			}
-		}
-	} else {
-		sample_id proper = svnumber;
-		while (membership[proper] == fold) {
-			proper++;
-		}
-		swapSamples(0, proper);
-		reset();
-	}
-}
 
 template<typename Kernel, typename Matrix, typename Strategy>
 void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setSwapListener(SwapListener *listener) {
@@ -690,16 +671,20 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setKernelParams(fvalue c, 
 	reset();
 }
 
+/*
+ * Update the location of the current worst-violator, aka: support vector (SV). Swap the current SV with the first non-SV,
+ * update it's location (which is now svnumber). Increment the number of support vectors and the alphas view size.
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate(sample_id& v) {
-
+void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate(sample_id& worstViolator) {
+	// TODO: have a look at what's going on here.
 	if (svnumber >= cacheDepth) {
 		resizeCache();
 	}
 
 	// swap rows
-	swapSamples(v, svnumber);
-	v = svnumber;
+	swapSamples(worstViolator, svnumber);
+	worstViolator = svnumber;
 
 	// adjust sv number
 	svnumber++;

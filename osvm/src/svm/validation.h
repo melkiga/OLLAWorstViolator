@@ -224,7 +224,6 @@ template<typename Kernel, typename Matrix, typename Strategy>
 void CrossValidationSolver<Kernel, Matrix, Strategy>::resetInnerFold(
 		fold_id fold) {
 #ifdef SUPPORT_VECTOR_REUSE
-	solver->releaseSupportVectors(this->innerFoldsMembership, fold);
 	solver->shrink();
 	sortVectors(this->innerFoldsMembership, fold, outerFoldSizes[outerFold]);
 #else
