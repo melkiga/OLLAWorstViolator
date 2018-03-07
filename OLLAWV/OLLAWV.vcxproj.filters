@@ -119,9 +119,6 @@
     <ClInclude Include="..\osvm\src\model\selection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\osvm\src\svm\bias.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\osvm\src\svm\cache.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -72,12 +72,7 @@ public:
 	RbfKernelEvaluator(Matrix* samples, label_id* labels, quantity classNumber, fvalue bias, fvalue c, Kernel &params, fvalue epochs, fvalue margin);
 	~RbfKernelEvaluator();
 
-	fvalue evalInnerKernel(sample_id uid, sample_id vid);
-	void evalInnerKernel(sample_id id, sample_id rangeFrom,
-			sample_id rangeTo, fvector* result);
-	void evalInnerKernel(sample_id id, sample_id rangeFrom,
-			sample_id rangeTo, sample_id* mappings, fvector* result);
-
+	void evalInnerKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result);
 	void evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result);
 
 	void swapSamples(sample_id uid, sample_id vid);
@@ -115,11 +110,17 @@ template<class Kernel, class Matrix>
 RbfKernelEvaluator<Kernel, Matrix>::~RbfKernelEvaluator() {
 }
 
+/*
+ * Updates the current model's bias with the appropriate gradient value (learning rate * C * label / currentSize)
+ */
 template<typename Kernel, typename Matrix>
-inline void RbfKernelEvaluator<Kernel, Matrix>::updateBias(fvalue LB) {
-	bias = bias + LB;
+inline void RbfKernelEvaluator<Kernel, Matrix>::updateBias(fvalue biasGradient) {
+	bias = bias + biasGradient;
 }
 
+/*
+ * Reset's the evaluators bias value to 0. This is needed when creating a new pairwise model.
+ */
 template<typename Kernel, typename Matrix>
 inline void RbfKernelEvaluator<Kernel, Matrix>::resetBias() {
 	bias = 0.0;
@@ -143,33 +144,18 @@ inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getLabel(sample_id v) {
 	return label;
 }
 
+/*
+ * Calculated the Gaussian RBF kernel value given a euclidean distance squared between two samples.
+ */
 template<class Kernel, class Matrix>
-inline fvalue RbfKernelEvaluator<Kernel, Matrix>::rbf(fvalue dist2) {
-	return params.m_evaluateKernel(dist2);
-}
-
-template<class Kernel, class Matrix>
-inline fvalue RbfKernelEvaluator<Kernel, Matrix>::evalInnerKernel(
-		sample_id uid, sample_id vid) {
-	return rbf(eval.dist(uid, vid));
+inline fvalue RbfKernelEvaluator<Kernel, Matrix>::rbf(fvalue euclideanDistanceSquared) {
+	return params.m_evaluateKernel(euclideanDistanceSquared);
 }
 
 template<class Kernel, class Matrix>
 void RbfKernelEvaluator<Kernel, Matrix>::evalInnerKernel(sample_id id,
 		sample_id rangeFrom, sample_id rangeTo, fvector* result) {
 	eval.dist(id, rangeFrom, rangeTo, result);
-
-	fvalue* ptr = fvector_ptr(result);
-	for (sample_id iid = rangeFrom; iid < rangeTo; iid++) {
-		ptr[iid] = rbf(ptr[iid]);
-	}
-}
-
-template<class Kernel, class Matrix>
-void RbfKernelEvaluator<Kernel, Matrix>::evalInnerKernel(sample_id id,
-		sample_id rangeFrom, sample_id rangeTo,
-		sample_id* mappings, fvector* result) {
-	eval.dist(id, rangeFrom, rangeTo, mappings, result);
 
 	fvalue* ptr = fvector_ptr(result);
 	for (sample_id iid = rangeFrom; iid < rangeTo; iid++) {

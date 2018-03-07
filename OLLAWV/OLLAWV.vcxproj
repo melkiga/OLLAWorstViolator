@@ -215,7 +215,6 @@
     <ClInclude Include="..\osvm\src\math\random.h" />
     <ClInclude Include="..\osvm\src\model\selection.h" />
     <ClInclude Include="..\osvm\src\osvm.h" />
-    <ClInclude Include="..\osvm\src\svm\bias.h" />
     <ClInclude Include="..\osvm\src\svm\cache.h" />
     <ClInclude Include="..\osvm\src\svm\classify.h" />
     <ClInclude Include="..\osvm\src\svm\generator.h" />
