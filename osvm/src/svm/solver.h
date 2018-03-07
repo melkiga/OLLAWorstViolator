@@ -116,13 +116,8 @@ protected:
 	CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache;
 
 protected:
-	//ViolatorSearch findWorstViolator();
-
-	virtual CachedKernelEvaluator<Kernel, Matrix, Strategy>* buildCache(
-			fvalue c, Kernel &gparams);
-
+	virtual CachedKernelEvaluator<Kernel, Matrix, Strategy>* buildCache(fvalue c, Kernel &gparams);
 	void trainForCache(CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache);
-
 	void refreshDistr();
 
 public:
@@ -214,7 +209,7 @@ void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
 template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) 
 {
-	ViolatorSearch worstViolator(0, 0.0);
+	CWorstViolator worstViolator(0, 0.0);
 	fvalue svmPenaltyParameterC = cache->getC();
 	fvalue useBias = cache->getBetta(); //TODO: change this to a bool
 	fvalue margin = cache->getMargin()*svmPenaltyParameterC;
@@ -228,13 +223,13 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(CachedKernelEvaluat
 		currentIteration += 1;
 		learningRate = 2.0 / sqrt(currentIteration);
 
-		alphasGradient = learningRate * svmPenaltyParameterC * cache->getLabel(worstViolator.violator);
+		alphasGradient = learningRate * svmPenaltyParameterC * cache->getLabel(worstViolator.m_violatorID);
 		biasGradient = (alphasGradient * useBias) / currentSize;
-		cache->performSGDUpdate(worstViolator.violator, alphasGradient, biasGradient);
+		cache->performSGDUpdate(worstViolator.m_violatorID, alphasGradient, biasGradient);
 		worstViolator = cache->findWorstViolator();
-		cache->performSvUpdate(worstViolator.violator);
+		cache->performSvUpdate(worstViolator.m_violatorID);
 
-	} while (currentIteration < maxNumberOfIterations && worstViolator.yo < margin);
+	} while (currentIteration < maxNumberOfIterations && worstViolator.m_error < margin);
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>

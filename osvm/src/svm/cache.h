@@ -55,14 +55,14 @@ struct EntryMapping {
 
 };
 
-struct ViolatorSearch {
+struct CWorstViolator {
 
-	sample_id violator;
-	fvalue yo;
+	sample_id m_violatorID;
+	fvalue m_error;
 
-	ViolatorSearch(sample_id violator, fvalue yo) :
-		violator(violator),
-		yo(yo) {
+	CWorstViolator(sample_id violatorID, fvalue error) :
+		m_violatorID(violatorID),
+		m_error(error) {
 	}
 
 };
@@ -179,7 +179,7 @@ public:
 	fvalue evalKernelUV(sample_id u, sample_id v);
 	fvalue evalKernelAXV(sample_id v);
 	fvalue checkViolation(sample_id v);
-	ViolatorSearch findWorstViolator();
+	CWorstViolator findWorstViolator();
 	
 	fvalue getLabel(sample_id v);
 	void setLabel(pair<label_id, label_id> trainPair);
@@ -497,17 +497,17 @@ inline quantity CachedKernelEvaluator<Kernel, Matrix, Strategy>::getSVNumber() {
 	i.e. the sample with the largest error, excluding the current support vectors. 
 */
 template<typename Kernel, typename Matrix, typename Strategy>
-ViolatorSearch CachedKernelEvaluator<Kernel, Matrix, Strategy>::findWorstViolator() {
+CWorstViolator CachedKernelEvaluator<Kernel, Matrix, Strategy>::findWorstViolator() {
 	fvalue currentWorstError = INT_MAX;
 	sample_id currentWorstErrorIndex = INT_MAX;
 	fvalue error = 0.0;
 	quantity svnumber = getSVNumber();
-	ViolatorSearch worst_viol(svnumber, currentWorstError);
+	CWorstViolator worstViolator(svnumber, currentWorstError);
 	for (sample_id i = svnumber; i < currentSize; i++) {
 		error = output[i] * getLabel(i);
 		if (error < currentWorstError) {
-			worst_viol.violator = i;
-			worst_viol.yo = error;
+			worstViolator.m_violatorID = i;
+			worstViolator.m_error = error;
 			currentWorstError = error;
 			currentWorstErrorIndex = backwardOrder[i];
 		}
@@ -518,7 +518,7 @@ ViolatorSearch CachedKernelEvaluator<Kernel, Matrix, Strategy>::findWorstViolato
 		//	min_ind = backwardOrder[i];
 		//}
 	}
-	return worst_viol;
+	return worstViolator;
 }
 
 /*
