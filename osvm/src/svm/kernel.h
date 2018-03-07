@@ -25,17 +25,24 @@
 #define YY_POS 1.0
 #define YY_NEG(cl) (-1.0 / (cl - 1))
 
-struct GaussKernel {
-	fvalue ngamma;
+/*
+ * Gaussian RBF Kernel. negativeGamma is the parameter associated with the Gaussian curves broadness. 
+ * Gaussian kernel matrix = e^(-gamma * ||X - C||^2) where ||o|| is the euclidean distance
+ */
+struct CGaussKernel {
+	fvalue m_negativeGamma;
 
-	GaussKernel(fvalue gamma);
+	CGaussKernel(fvalue gamma);
 
-	fvalue eval(fvalue dist2);
+	fvalue m_evaluateKernel(fvalue euclideanDistanceSquared);
 
 };
 
-inline fvalue GaussKernel::eval(fvalue dist2) {
-	return exp(ngamma * dist2);
+/*
+ * Evaluate the gaussian kernel given a euclidean distance squared. (||x - c||^2)
+ */
+inline fvalue CGaussKernel::m_evaluateKernel(fvalue euclideanDistanceSquared) {
+	return exp(m_negativeGamma * euclideanDistanceSquared);
 }
 
 
@@ -71,7 +78,6 @@ public:
 	void evalInnerKernel(sample_id id, sample_id rangeFrom,
 			sample_id rangeTo, sample_id* mappings, fvector* result);
 
-	fvalue evalKernel(sample_id uid, sample_id vid);
 	void evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result);
 
 	void swapSamples(sample_id uid, sample_id vid);
@@ -139,7 +145,7 @@ inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getLabel(sample_id v) {
 
 template<class Kernel, class Matrix>
 inline fvalue RbfKernelEvaluator<Kernel, Matrix>::rbf(fvalue dist2) {
-	return params.eval(dist2);
+	return params.m_evaluateKernel(dist2);
 }
 
 template<class Kernel, class Matrix>
@@ -171,29 +177,9 @@ void RbfKernelEvaluator<Kernel, Matrix>::evalInnerKernel(sample_id id,
 	}
 }
 
-/*
- * Evaluates the RBF kernel between 2 samples.
- */
 template<class Kernel, class Matrix>
-fvalue RbfKernelEvaluator<Kernel, Matrix>::evalKernel(sample_id uid, sample_id vid) {
-	label_id ulabel = labels[uid];
-	label_id vlabel = labels[vid];
-	fvalue result;
-	if (ulabel == vlabel) {
-		if (uid == vid) {
-			result = 1.0;
-		} else {
-			result = evalInnerKernel(uid, vid) + bias;
-		}
-	} else {
-		result = evalInnerKernel(uid, vid) + bias;
-	}
-	return result;
-}
-
-template<class Kernel, class Matrix>
-void RbfKernelEvaluator<Kernel, Matrix>::evalKernel(sample_id id,
-		sample_id rangeFrom, sample_id rangeTo, fvector* result) {
+void RbfKernelEvaluator<Kernel, Matrix>::evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result) 
+{
 	eval.dist(id, rangeFrom, rangeTo, result);
 
 	fvalue* rptr = fvector_ptr(result);

@@ -18,6 +18,6 @@
 
 #include "kernel.h"
 
-GaussKernel::GaussKernel(fvalue gamma) :
-		ngamma(-gamma) {
+CGaussKernel::CGaussKernel(fvalue gamma) :
+		m_negativeGamma(-gamma) {
 }

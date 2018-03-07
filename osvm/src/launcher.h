@@ -38,10 +38,10 @@ class ApplicationLauncher {
 
 protected:
 	template<typename Matrix, typename Strategy>
-	CrossValidationSolver<GaussKernel, Matrix, Strategy>* createCrossValidator();
+	CrossValidationSolver<CGaussKernel, Matrix, Strategy>* createCrossValidator();
 
 	template<typename Matrix, typename Strategy>
-	AbstractSolver<GaussKernel, Matrix, Strategy>* createSolver();
+	AbstractSolver<CGaussKernel, Matrix, Strategy>* createSolver();
 
 	template<typename Matrix, typename Strategy>
 	GridGaussianModelSelector<Matrix, Strategy>* createModelSelector();
@@ -67,14 +67,14 @@ public:
 };
 
 template<typename Matrix, typename Strategy>
-CrossValidationSolver<GaussKernel, Matrix, Strategy>* ApplicationLauncher::createCrossValidator() {
+CrossValidationSolver<CGaussKernel, Matrix, Strategy>* ApplicationLauncher::createCrossValidator() {
 	ifstream input(conf.dataFile.c_str());
 	BaseSolverFactory<Matrix, Strategy> reader(
 			input, conf.trainingParams, conf.stopCriterion, conf.multiclass, false);
 
 	Timer timer(true);
-	CrossValidationSolver<GaussKernel, Matrix, Strategy> *solver
-			= (CrossValidationSolver<GaussKernel, Matrix, Strategy>*) reader.getCrossValidationSolver(
+	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
+			= (CrossValidationSolver<CGaussKernel, Matrix, Strategy>*) reader.getCrossValidationSolver(
 					conf.validation.innerFolds, conf.validation.outerFolds);
 	timer.stop();
 
@@ -84,12 +84,12 @@ CrossValidationSolver<GaussKernel, Matrix, Strategy>* ApplicationLauncher::creat
 }
 
 template<typename Matrix, typename Strategy>
-AbstractSolver<GaussKernel, Matrix, Strategy>* ApplicationLauncher::createSolver() {
+AbstractSolver<CGaussKernel, Matrix, Strategy>* ApplicationLauncher::createSolver() {
 	ifstream input(conf.dataFile.c_str());
 	BaseSolverFactory<Matrix, Strategy> reader(input, conf.trainingParams, conf.stopCriterion, conf.multiclass, false);
 
 	Timer timer(true);
-	AbstractSolver<GaussKernel, Matrix, Strategy> *solver = reader.getSolver();
+	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = reader.getSolver();
 	timer.stop();
 
 	logger << format("input reading time: %.2f[s]\n") % timer.getTimeElapsed();
@@ -111,7 +111,7 @@ GridGaussianModelSelector<Matrix, Strategy>* ApplicationLauncher::createModelSel
 
 template<typename Matrix, typename Strategy>
 void ApplicationLauncher::performModelSelection() {
-	CrossValidationSolver<GaussKernel, Matrix, Strategy> *solver
+	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
 	Timer timer(true);
@@ -130,7 +130,7 @@ void ApplicationLauncher::performModelSelection() {
 
 template<typename Matrix, typename Strategy>
 void ApplicationLauncher::performNestedCrossValidation() {
-	CrossValidationSolver<GaussKernel, Matrix, Strategy> *solver
+	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
 	Timer timer(true);
@@ -148,11 +148,11 @@ void ApplicationLauncher::performNestedCrossValidation() {
 
 template<typename Matrix, typename Strategy>
 void ApplicationLauncher::performCrossValidation() {
-	CrossValidationSolver<GaussKernel, Matrix, Strategy> *solver
+	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
 	Timer timer(true);
-	GaussKernel param(conf.searchRange.gammaLow);
+	CGaussKernel param(conf.searchRange.gammaLow);
 	solver->setKernelParams(conf.searchRange.cLow, param);
 	TestingResult result = solver->doCrossValidation();
 	timer.stop();
@@ -165,13 +165,13 @@ void ApplicationLauncher::performCrossValidation() {
 
 template<typename Matrix, typename Strategy>
 void ApplicationLauncher::performTraining() {
-	AbstractSolver<GaussKernel, Matrix, Strategy> *solver = createSolver<Matrix, Strategy>();
+	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = createSolver<Matrix, Strategy>();
 
 	Timer timer(true);
-	GaussKernel param(conf.searchRange.gammaLow);
+	CGaussKernel param(conf.searchRange.gammaLow);
 	solver->setKernelParams(conf.searchRange.cLow, param);
 	solver->train();
-	Classifier<GaussKernel, Matrix>* classifier = solver->getClassifier();
+	Classifier<CGaussKernel, Matrix>* classifier = solver->getClassifier();
 	timer.stop();
 
 	Matrix *samples = solver->getSamples();

@@ -231,9 +231,9 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(CachedKernelEvaluat
 template<typename Kernel, typename Matrix, typename Strategy>
 CachedKernelEvaluator<Kernel, Matrix, Strategy>* AbstractSolver<Kernel, Matrix, Strategy>::buildCache(fvalue c, Kernel &gparams) {
 	fvalue bias = (params.bias == NO) ? 0.0 : 1.0;
-	RbfKernelEvaluator<GaussKernel, Matrix> *rbf = new RbfKernelEvaluator<GaussKernel, Matrix>(
+	RbfKernelEvaluator<CGaussKernel, Matrix> *rbf = new RbfKernelEvaluator<CGaussKernel, Matrix>(
 			this->samples, this->labels, (quantity) labelNames.size(), bias, c, gparams, params.epochs, params.margin);
-	return new CachedKernelEvaluator<GaussKernel, Matrix, Strategy>(
+	return new CachedKernelEvaluator<CGaussKernel, Matrix, Strategy>(
 			rbf, &strategy, size, params.cache.size, NULL);
 }
 
