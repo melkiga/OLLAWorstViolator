@@ -55,6 +55,9 @@ struct EntryMapping {
 
 };
 
+/*
+ * Worst violating vector structure that holds the index of the current worst violator and it's error.
+ */
 struct CWorstViolator {
 
 	sample_id m_violatorID;
@@ -127,7 +130,6 @@ class CachedKernelEvaluator {
 	vector<fvalue> alphas;
 	fvectorv alphasView;
 	quantity svnumber;
-	quantity psvnumber;
 
 	fvector *kernelVector;
 
@@ -162,14 +164,8 @@ protected:
 	void initialize();
 	CacheDimension findCacheDimension(quantity maxSize, quantity problemSize);
 
-	CacheEntry& initializeEntry(sample_id v);
-	void refreshEntry(sample_id v);
+	void resizeCache(); // TODO: not sure in which case we would need this
 
-	fvector& evalKernelVector(sample_id v);
-
-	void resizeCache();
-
-	fvalue evalKernel(sample_id uid, sample_id vid);
 	void evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector *result);
 
 public:
@@ -206,9 +202,6 @@ public:
 	fvalue getBetta();
 	fvalue getEpochs();
 	fvalue getMargin();
-
-	void structureCheck();
-	void reportStatistics();
 };
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -288,59 +281,6 @@ inline void CachedKernelEvaluator<Kernel, Matrix, Strategy>::setLabel(pair<label
 template<typename Kernel, typename Matrix, typename Strategy>
 inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::getLabel(sample_id v) {
 	return evaluator->getLabel(v);
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-fvector& CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernelVector(sample_id v) {
-	evalKernel(v, svnumber, currentSize, kernelVector);
-	return *kernelVector;
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-CacheEntry& CachedKernelEvaluator<Kernel, Matrix, Strategy>::initializeEntry(sample_id v) {
-	// entry to be initialized
-	CacheEntry &released = entries[lruEntry];
-
-	// clear previous mapping
-	EntryMapping &prevMapp = mappings[released.mapping];
-	prevMapp.cacheEntry = INVALID_ENTRY_ID;
-	released.mapping = v;
-
-	// initialize current mapping
-	EntryMapping &currMapp = mappings[v];
-	currMapp.cacheEntry = lruEntry;
-
-	// scroll LRU pointer
-	lruEntry = released.next;
-	return released;
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::refreshEntry(sample_id v) {
-	CacheEntry &lru = entries[lruEntry];
-
-	entry_id currentId = mappings[v].cacheEntry;
-	if (currentId != INVALID_ENTRY_ID) {
-		if (currentId != lruEntry) {
-			CacheEntry& current = entries[currentId];
-
-			CacheEntry &prev = entries[current.prev];
-			prev.next = current.next;
-
-			CacheEntry &next = entries[current.next];
-			next.prev = current.prev;
-
-			CacheEntry &lruPrev = entries[lru.prev];
-
-			current.next = lruEntry;
-			current.prev = lru.prev;
-
-			lru.prev = currentId;
-			lruPrev.next = currentId;
-		} else {
-			lruEntry = lru.next;
-		}
-	}
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -516,7 +456,6 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::initialize() {
 	}
 
 	svnumber = 1;
-	psvnumber = 1;
 	alphasView = fvectorv_array(alphas.data(), svnumber);
 	outputView = fvectorv_array(output.data(), problemSize);
 
@@ -603,14 +542,6 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate(sample_id&
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernel(sample_id uid, sample_id vid) {
-	STATS({
-		stats.kernel.kernelEvaluations++;
-	});
-	return evaluator->evalKernel(uid, vid);
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
 inline void CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernel(sample_id id,
 		sample_id rangeFrom, sample_id rangeTo, fvector *result) {
 	STATS({
@@ -675,54 +606,6 @@ vector<sample_id>& CachedKernelEvaluator<Kernel, Matrix, Strategy>::getBackwardO
 template<typename Kernel, typename Matrix, typename Strategy>
 vector<sample_id>& CachedKernelEvaluator<Kernel, Matrix, Strategy>::getForwardOrder() {
 	return forwardOrder;
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::reportStatistics() {
-	logger << format("stats: kernel evaluations: %d\n") % stats.kernel.kernelEvaluations;
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Kernel, Matrix, Strategy>::structureCheck() {
-	try {
-		set<id> ids;
-		entry_id ptr = lruEntry;
-		for (quantity i = 0; i < cacheLines; i++) {
-			ids.insert(ptr);
-			ptr = entries[ptr].next;
-		}
-		if (ptr != lruEntry || ids.size() != cacheLines) {
-			throw runtime_error("invalid cache structure (next)");
-		}
-
-		ids.clear();
-
-		for (quantity i = 0; i < cacheLines; i++) {
-			ids.insert(ptr);
-			ptr = entries[ptr].prev;
-		}
-		if (ptr != lruEntry || ids.size() != cacheLines) {
-			throw runtime_error("invalid cache structure (prev)");
-		}
-
-		for (sample_id i = 0; i < problemSize; i++) {
-			entry_id id = mappings[i].cacheEntry;
-			if (id != INVALID_ENTRY_ID && ids.count(id) == 0) {
-				throw runtime_error("invalid mapping");
-			}
-
-			if (id != INVALID_ENTRY_ID && entries[id].mapping != i) {
-				throw runtime_error("invalid entry mapping relation");
-			}
-		}
-
-		if (fabs(fvector_sum(&alphasView.vector) - 1.0) > 0.0001) {
-			throw runtime_error("invalid alphas");
-		}
-	} catch (runtime_error const& ex) {
-		cerr << ex.what() << endl;
-		throw ex;
-	}
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
