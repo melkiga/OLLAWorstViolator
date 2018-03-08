@@ -65,19 +65,21 @@ public:
 };
 
 
-// TODO implement matrix algorithms for sparse and dense matrices
+/*
+ * Structure for holding the data (sparsely or densely) and other relevant information for kernel calculations.
+ */
 template<typename Matrix>
 class MatrixEvaluator {
 
-	Matrix* matrix;
-	fvalue* x2;
+	Matrix* matrix; // this would house the samples
+	fvalue* x2; // ||x||^2 (this would be the squared 2-norm of a sample x)
 	EvaluatorWorkspace<Matrix> workspace;
 
 protected:
-	quantity size(Matrix* matrix);
-	quantity dim(Matrix* matrix);
+	quantity getSize(Matrix* matrix);
+	quantity getDim(Matrix* matrix);
 
-	fvalue norm2(sample_id v);
+	fvalue squaredNorm(sample_id v);
 
 public:
 	MatrixEvaluator(Matrix* matrix);
@@ -99,10 +101,10 @@ template<typename Matrix>
 MatrixEvaluator<Matrix>::MatrixEvaluator(Matrix* matrix) :
 		matrix(matrix),
 		workspace(matrix) {
-	quantity length = size(matrix);
+	quantity length = getSize(matrix);
 	x2 = new fvalue[length];
 	for (sample_id id = 0; id < length; id++) {
-		x2[id] = norm2(id);
+		x2[id] = squaredNorm(id);
 	}
 }
 
@@ -120,18 +122,28 @@ void MatrixEvaluator<Matrix>::dist(sample_id id, sample_id rangeFrom, sample_id 
 	}
 }
 
+/*
+ * For samples u and v, this calculated the euclidean distance between the two.
+ * returns: ||u - v||^2: ||u||^2 + ||v||^2 - 2*(<u,v>)
+ */
 template<typename Matrix>
 fvalue MatrixEvaluator<Matrix>::dist(sample_id u, sample_id v) {
 	return x2[u] + x2[v] - 2 * dot(u, v);
 }
 
+/*
+ * Returns the number of samples of the data (aka matrix height)
+ */
 template<typename Matrix>
-inline quantity MatrixEvaluator<Matrix>::size(Matrix* matrix) {
+inline quantity MatrixEvaluator<Matrix>::getSize(Matrix* matrix) {
 	return (quantity) matrix->height;
 }
 
+/*
+* Returns the dimensionality of the data (number of attributes)
+*/
 template<typename Matrix>
-inline quantity MatrixEvaluator<Matrix>::dim(Matrix* matrix) {
+inline quantity MatrixEvaluator<Matrix>::getDim(Matrix* matrix) {
 	return (quantity) matrix->width;
 }
 

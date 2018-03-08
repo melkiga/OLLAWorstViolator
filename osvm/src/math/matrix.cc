@@ -58,13 +58,6 @@ fvalue MatrixEvaluator<dfmatrix>::dot(sample_id u, sample_id v) {
 	fvalue result;
 	fvector_dot(&workspace.urow.vector, &workspace.vrow.vector, &result);
 	return result;
-
-	// TODO remove the following code (version without workspace)
-	//	fvectorv urow = fmatrix_row(matrix, u);
-	//	fvectorv vrow = fmatrix_row(matrix, v);
-	//	fvalue result;
-	//	fvector_dot(&urow.vector, &vrow.vector, &result);
-	//	return result;
 }
 
 template<>
@@ -94,15 +87,21 @@ fvalue MatrixEvaluator<sfmatrix>::dot(sample_id u, sample_id v) {
 	return sum;
 }
 
+/*
+ * Calculates the squared norm of sample u for samples stored in dense format
+ */
 template<>
-fvalue MatrixEvaluator<dfmatrix>::norm2(sample_id u) {
+fvalue MatrixEvaluator<dfmatrix>::squaredNorm(sample_id u) {
 	sample_id realu = workspace.forwardMap[u];
 	fvectorv row = fmatrix_row(matrix->matrix, realu);
 	return pow2(fvector_norm(&row.vector));
 }
 
+/*
+* Calculates the squared norm of sample u for samples stored in sparse format
+*/
 template<>
-fvalue MatrixEvaluator<sfmatrix>::norm2(sample_id u) {
+fvalue MatrixEvaluator<sfmatrix>::squaredNorm(sample_id u) {
 	fvalue sum = 0.0;
 	id offset = matrix->offsets[u];
 	feature_id *iptr = matrix->features + offset;
