@@ -87,20 +87,6 @@ struct CacheEntry {
 
 };
 
-
-struct Stats {
-
-	struct KernelStats {
-		quantity kernelEvaluations;
-	} kernel;
-
-	Stats() {
-		kernel.kernelEvaluations = 0;
-	}
-
-};
-
-
 class SwapListener {
 
 public:
@@ -157,8 +143,6 @@ class CachedKernelEvaluator {
 	Strategy *strategy;
 
 	SwapListener *listener;
-
-	Stats stats;
 
 protected:
 	void initialize();
