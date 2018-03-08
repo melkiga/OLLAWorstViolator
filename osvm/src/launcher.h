@@ -70,7 +70,7 @@ template<typename Matrix, typename Strategy>
 CrossValidationSolver<CGaussKernel, Matrix, Strategy>* ApplicationLauncher::createCrossValidator() {
 	ifstream input(conf.dataFile.c_str());
 	BaseSolverFactory<Matrix, Strategy> reader(
-			input, conf.trainingParams, conf.stopCriterion, conf.multiclass, false);
+			input, conf.trainingParams, conf.stopCriterion);
 
 	Timer timer(true);
 	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
@@ -86,7 +86,7 @@ CrossValidationSolver<CGaussKernel, Matrix, Strategy>* ApplicationLauncher::crea
 template<typename Matrix, typename Strategy>
 AbstractSolver<CGaussKernel, Matrix, Strategy>* ApplicationLauncher::createSolver() {
 	ifstream input(conf.dataFile.c_str());
-	BaseSolverFactory<Matrix, Strategy> reader(input, conf.trainingParams, conf.stopCriterion, conf.multiclass, false);
+	BaseSolverFactory<Matrix, Strategy> reader(input, conf.trainingParams, conf.stopCriterion);
 
 	Timer timer(true);
 	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = reader.getSolver();

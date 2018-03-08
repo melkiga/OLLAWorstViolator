@@ -113,7 +113,7 @@ private:
 
 public:
 	BaseSolverFactory(istream& input, TrainParams params = TrainParams(),
-			StopCriterion strategy = YOC, MulticlassApproach multiclass = ALL_AT_ONCE, bool reduceDim = false);
+			StopCriterion strategy = YOC);
 	virtual ~BaseSolverFactory();
 
 	AbstractSolver<CGaussKernel, Matrix, Strategy>* getSolver();
@@ -125,14 +125,10 @@ public:
 template<typename Matrix, typename Strategy>
 BaseSolverFactory<Matrix, Strategy>::BaseSolverFactory(istream& input,
 		TrainParams params,
-		StopCriterion strategy,
-		MulticlassApproach multiclass,
-		bool reduceDim) :
+		StopCriterion strategy) :
 		input(input),
 		params(params),
 		strategy(strategy),
-		multiclass(multiclass),
-		reduceDim(reduceDim),
 		matrixBuilder(new FeatureMatrixBuilder<Matrix>()) {
 }
 
