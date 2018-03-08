@@ -40,7 +40,7 @@
 
 using namespace std;
 
-
+//TODO: since i deleted the universal solver class, i need to make sure that the run-options reflect that it doesnt exist anymore
 enum StopCriterion {
 	YOC
 };
@@ -106,7 +106,7 @@ private:
 
 	Matrix* preprocess(Matrix *x, label_id *y);
 
-	AbstractSolver<GaussKernel, Matrix, Strategy>* createSolver(
+	AbstractSolver<CGaussKernel, Matrix, Strategy>* createSolver(
 			MulticlassApproach type, map<label_id,string> labels,
 			Matrix* x, label_id* y, TrainParams& params,
 			StopCriterionStrategy* strategy);
@@ -116,8 +116,8 @@ public:
 			StopCriterion strategy = YOC, MulticlassApproach multiclass = ALL_AT_ONCE, bool reduceDim = false);
 	virtual ~BaseSolverFactory();
 
-	AbstractSolver<GaussKernel, Matrix, Strategy>* getSolver();
-	CrossValidationSolver<GaussKernel, Matrix, Strategy>* getCrossValidationSolver(
+	AbstractSolver<CGaussKernel, Matrix, Strategy>* getSolver();
+	CrossValidationSolver<CGaussKernel, Matrix, Strategy>* getCrossValidationSolver(
 			quantity innerFolds, quantity outerFolds);
 
 };
@@ -142,21 +142,19 @@ BaseSolverFactory<Matrix, Strategy>::~BaseSolverFactory() {
 }
 
 template<typename Matrix, typename Strategy>
-AbstractSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::createSolver(
+AbstractSolver<CGaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::createSolver(
 		MulticlassApproach type, map<label_id, string> labels,
 		Matrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy) {
-	AbstractSolver<GaussKernel, Matrix, Strategy> *solver = NULL;
+	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = NULL;
 	if (type == PAIRWISE) {
-		solver = new PairwiseSolver<GaussKernel, Matrix, Strategy>(labels, x, y, params, strategy);
-	} else {
-		solver = new UniversalSolver<GaussKernel, Matrix, Strategy>(labels, x, y, params, strategy);
+		solver = new PairwiseSolver<CGaussKernel, Matrix, Strategy>(labels, x, y, params, strategy);
 	}
 	return solver;
 }
 
 
 template<typename Matrix, typename Strategy>
-AbstractSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getSolver() {
+AbstractSolver<CGaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getSolver() {
 	SparseFormatDataSetFactory dataSetFactory(input);
 	DataSet dataSet = dataSetFactory.createDataSet();
 
@@ -172,10 +170,10 @@ AbstractSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strateg
 }
 
 template<typename Matrix, typename Strategy>
-CrossValidationSolver<GaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getCrossValidationSolver(
+CrossValidationSolver<CGaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getCrossValidationSolver(
 		quantity innerFolds, quantity outerFolds) {
-	AbstractSolver<GaussKernel, Matrix, Strategy> *solver = getSolver();
-	return new CrossValidationSolver<GaussKernel, Matrix, Strategy>(
+	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = getSolver();
+	return new CrossValidationSolver<CGaussKernel, Matrix, Strategy>(
 			solver, innerFolds, outerFolds);
 }
 

@@ -78,8 +78,6 @@ public:
 
 	virtual void setSwapListener(SwapListener *listener) = 0;
 	virtual void swapSamples(sample_id u, sample_id v) = 0;
-	virtual void shrink() = 0;
-	virtual void releaseSupportVectors(fold_id *membership, fold_id fold) = 0;
 	virtual void setCurrentSize(quantity size) = 0;
 	virtual quantity getCurrentSize() = 0;
 	virtual void reset() = 0;
@@ -117,19 +115,12 @@ protected:
 	CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache;
 
 protected:
-	//ViolatorSearch findWorstViolator();
-
-	virtual CachedKernelEvaluator<Kernel, Matrix, Strategy>* buildCache(
-			fvalue c, Kernel &gparams);
-
+	virtual CachedKernelEvaluator<Kernel, Matrix, Strategy>* buildCache(fvalue c, Kernel &gparams);
 	void trainForCache(CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache);
-
 	void refreshDistr();
 
 public:
-	AbstractSolver(map<label_id, string> labelNames, Matrix *samples,
-			label_id *labels, TrainParams &params,
-			StopCriterionStrategy *stopStrategy);
+	AbstractSolver(map<label_id, string> labelNames, Matrix *samples, label_id *labels, TrainParams &params, StopCriterionStrategy *stopStrategy);
 	virtual ~AbstractSolver();
 
 	void setKernelParams(fvalue c, Kernel &params);
@@ -138,8 +129,6 @@ public:
 
 	void setSwapListener(SwapListener *listener);
 	void swapSamples(sample_id u, sample_id v);
-	void shrink();
-	void releaseSupportVectors(fold_id *membership, fold_id fold);
 	void setCurrentSize(quantity size);
 	quantity getCurrentSize();
 	void reset();
@@ -208,40 +197,43 @@ void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
 
 
 /*
- * Begin training. 
+ * Training procedure for OLLAWV. This is basically the SGD procedure. First, we calculate the learning rate.
+ * Next, we get the gradient for the alphas and the bias. We then update the model, find the next worst violator
+ * with respect to the current decision function output. Finally, we 'bottom stack' the current worst violator (support vector)
+ * replacing it with the corresponding non-support vector.
  */
 template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(
-		CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) {
-	ViolatorSearch viol(0, 0.0);
-	fvalue C = cache->getC();
-	fvalue betta = cache->getBetta();
-	fvalue margin = cache->getMargin()*C;
-	quantity iter = 0;
-	fvalue eta = 0.0;
-	quantity max_iter = (quantity) ceil(cache->getEpochs()*currentSize);
-	fvalue lambda = 0.0;
-	fvalue LB = 0.0;
+void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) 
+{
+	CWorstViolator worstViolator(0, 0.0);
+	fvalue svmPenaltyParameterC = cache->getC();
+	fvalue useBias = cache->getBetta(); //TODO: change this to a bool
+	fvalue margin = cache->getMargin()*svmPenaltyParameterC;
+	quantity currentIteration = 0;
+	fvalue learningRate = 0.0;
+	quantity maxNumberOfIterations = (quantity) ceil(cache->getEpochs()*currentSize);
+	fvalue alphasGradient = 0.0;
+	fvalue biasGradient = 0.0;
 
 	do {
-		iter += 1;
-		eta = 2.0 / sqrt(iter);
+		currentIteration += 1;
+		learningRate = 2.0 / sqrt(currentIteration);
 
-		lambda = eta*C*cache->getLabel(viol.violator);
-		LB = (lambda*betta) / currentSize;
-		cache->performUpdate(viol.violator, lambda, LB);
-		viol = cache->findWorstViolator();
-		cache->performSvUpdate(viol.violator);
+		alphasGradient = learningRate * svmPenaltyParameterC * cache->getLabel(worstViolator.m_violatorID);
+		biasGradient = (alphasGradient * useBias) / currentSize;
+		cache->performSGDUpdate(worstViolator.m_violatorID, alphasGradient, biasGradient);
+		worstViolator = cache->findWorstViolator();
+		cache->performSvUpdate(worstViolator.m_violatorID);
 
-	} while (iter < max_iter && viol.yo < margin);
+	} while (currentIteration < maxNumberOfIterations && worstViolator.m_error < margin);
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
 CachedKernelEvaluator<Kernel, Matrix, Strategy>* AbstractSolver<Kernel, Matrix, Strategy>::buildCache(fvalue c, Kernel &gparams) {
 	fvalue bias = (params.bias == NO) ? 0.0 : 1.0;
-	RbfKernelEvaluator<GaussKernel, Matrix> *rbf = new RbfKernelEvaluator<GaussKernel, Matrix>(
+	RbfKernelEvaluator<CGaussKernel, Matrix> *rbf = new RbfKernelEvaluator<CGaussKernel, Matrix>(
 			this->samples, this->labels, (quantity) labelNames.size(), bias, c, gparams, params.epochs, params.margin);
-	return new CachedKernelEvaluator<GaussKernel, Matrix, Strategy>(
+	return new CachedKernelEvaluator<CGaussKernel, Matrix, Strategy>(
 			rbf, &strategy, size, params.cache.size, NULL);
 }
 
@@ -283,17 +275,6 @@ void AbstractSolver<Kernel, Matrix, Strategy>::swapSamples(
 template<typename Kernel, typename Matrix, typename Strategy>
 void AbstractSolver<Kernel, Matrix, Strategy>::reset() {
 	cache->reset();
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::shrink() {
-	cache->shrink();
-}
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::releaseSupportVectors(
-		fold_id *membership, fold_id fold) {
-	cache->releaseSupportVectors(membership, fold);
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>

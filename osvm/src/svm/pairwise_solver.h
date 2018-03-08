@@ -305,9 +305,9 @@ template<typename Kernel, typename Matrix, typename Strategy>
 CachedKernelEvaluator<Kernel, Matrix, Strategy>* PairwiseSolver<Kernel, Matrix, Strategy>::buildCache(
 		fvalue c, Kernel &gparams) {
 	fvalue bias = (this->params.bias == NO) ? 0.0 : 1.0;
-	RbfKernelEvaluator<GaussKernel, Matrix> *rbf = new RbfKernelEvaluator<GaussKernel, Matrix>(
+	RbfKernelEvaluator<CGaussKernel, Matrix> *rbf = new RbfKernelEvaluator<CGaussKernel, Matrix>(
 			this->samples, this->labels, 2, bias, c, gparams, this->params.epochs, this->params.margin);
-	return new CachedKernelEvaluator<GaussKernel, Matrix, Strategy>(
+	return new CachedKernelEvaluator<CGaussKernel, Matrix, Strategy>(
 			rbf, &this->strategy, this->size, this->params.cache.size, NULL);
 }
 

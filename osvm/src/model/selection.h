@@ -63,15 +63,15 @@ template<typename Matrix, typename Strategy>
 class GridGaussianModelSelector {
 
 protected:
-  TestingResult validate(CrossValidationSolver<GaussKernel, Matrix, Strategy>& solver,
+  TestingResult validate(CrossValidationSolver<CGaussKernel, Matrix, Strategy>& solver,
     fvalue c, fvalue gamma);
 
 public:
   virtual ~GridGaussianModelSelector();
 
   virtual ModelSelectionResults selectParameters(
-    CrossValidationSolver<GaussKernel, Matrix, Strategy> &solver, SearchRange &range);
-  TestingResult doNestedCrossValidation(CrossValidationSolver<GaussKernel, Matrix, Strategy> &solver,
+    CrossValidationSolver<CGaussKernel, Matrix, Strategy> &solver, SearchRange &range);
+  TestingResult doNestedCrossValidation(CrossValidationSolver<CGaussKernel, Matrix, Strategy> &solver,
     SearchRange &range);
 
 };
@@ -82,9 +82,9 @@ GridGaussianModelSelector<Matrix, Strategy>::~GridGaussianModelSelector() {
 
 template<typename Matrix, typename Strategy>
 TestingResult GridGaussianModelSelector<Matrix, Strategy>::validate(
-  CrossValidationSolver<GaussKernel, Matrix, Strategy>& solver, fvalue c, fvalue gamma) {
+  CrossValidationSolver<CGaussKernel, Matrix, Strategy>& solver, fvalue c, fvalue gamma) {
     Timer timer;
-    GaussKernel param(gamma);
+	CGaussKernel param(gamma);
     solver.setKernelParams(c, param);
 
     timer.start();
@@ -99,7 +99,7 @@ TestingResult GridGaussianModelSelector<Matrix, Strategy>::validate(
 
 template<typename Matrix, typename Strategy>
 ModelSelectionResults GridGaussianModelSelector<Matrix, Strategy>::selectParameters(
-  CrossValidationSolver<GaussKernel, Matrix, Strategy> &solver, SearchRange &range) {
+  CrossValidationSolver<CGaussKernel, Matrix, Strategy> &solver, SearchRange &range) {
     fvalue cRatio = LOG_STEP(range.cLow, range.cHigh, range.cResolution);
     fvalue gammaRatio = LOG_STEP(range.gammaLow, range.gammaHigh, range.gammaResolution);
 
@@ -126,11 +126,11 @@ ModelSelectionResults GridGaussianModelSelector<Matrix, Strategy>::selectParamet
 
 template<typename Matrix, typename Strategy>
 TestingResult GridGaussianModelSelector<Matrix, Strategy>::doNestedCrossValidation(
-  CrossValidationSolver<GaussKernel, Matrix, Strategy> &solver, SearchRange &range) {
+  CrossValidationSolver<CGaussKernel, Matrix, Strategy> &solver, SearchRange &range) {
     Timer timer;
 
     TestingResult result;
-    GaussKernel initial(range.gammaLow);
+	CGaussKernel initial(range.gammaLow);
     solver.setKernelParams(range.cLow, initial);
     for (fold_id fold = 0; fold < solver.getOuterFoldsNumber(); fold++) {
       solver.resetOuterFold(fold);
@@ -142,7 +142,7 @@ TestingResult GridGaussianModelSelector<Matrix, Strategy>::doNestedCrossValidati
       logger << format("outer fold %d model selection: time=%.2f[s], accuracy=%.2f[%%], C=%.4g, G=%.4g\n")
         % fold % timer.getTimeElapsed() % (100.0 * params.bestResult.accuracy) % params.c % params.gamma;
 
-      GaussKernel kernel(params.gamma);
+	  CGaussKernel kernel(params.gamma);
       solver.setKernelParams(params.c, kernel);
 
       timer.restart();
@@ -226,7 +226,7 @@ public:
   virtual ~PatternGaussianModelSelector();
 
   virtual ModelSelectionResults selectParameters(
-    CrossValidationSolver<GaussKernel, Matrix, Strategy> &solver,
+    CrossValidationSolver<CGaussKernel, Matrix, Strategy> &solver,
     SearchRange &range);
 
 };
@@ -298,7 +298,7 @@ TrainingCoord PatternGaussianModelSelector<Matrix, Strategy>::findStartingPoint(
 
 template<typename Matrix, typename Strategy>
 ModelSelectionResults PatternGaussianModelSelector<Matrix, Strategy>::selectParameters(
-  CrossValidationSolver<GaussKernel, Matrix, Strategy> &solver, SearchRange &range) {
+  CrossValidationSolver<CGaussKernel, Matrix, Strategy> &solver, SearchRange &range) {
     results.clear();
 
     ModelSelectionResults globalRes;

@@ -216,7 +216,6 @@
     <ClInclude Include="..\osvm\src\math\random.h" />
     <ClInclude Include="..\osvm\src\model\selection.h" />
     <ClInclude Include="..\osvm\src\osvm.h" />
-    <ClInclude Include="..\osvm\src\svm\bias.h" />
     <ClInclude Include="..\osvm\src\svm\cache.h" />
     <ClInclude Include="..\osvm\src\svm\classify.h" />
     <ClInclude Include="..\osvm\src\svm\generator.h" />
@@ -226,7 +225,6 @@
     <ClInclude Include="..\osvm\src\svm\solver.h" />
     <ClInclude Include="..\osvm\src\svm\stop.h" />
     <ClInclude Include="..\osvm\src\svm\strategy.h" />
-    <ClInclude Include="..\osvm\src\svm\universal_solver.h" />
     <ClInclude Include="..\osvm\src\svm\validation.h" />
     <ClInclude Include="..\osvm\src\svm\violation.h" />
     <ClInclude Include="..\osvm\src\time\timer.h" />
