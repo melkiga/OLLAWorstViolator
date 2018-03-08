@@ -139,9 +139,6 @@ public:
 
 	quantity getSize();
 	virtual quantity getSvNumber();
-
-	void reportStatistics();
-
 };
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -189,12 +186,6 @@ void AbstractSolver<Kernel, Matrix, Strategy>::setKernelParams(
 		cache->setKernelParams(c, gparams);
 	}
 }
-
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::reportStatistics() {
-	cache->reportStatistics();
-}
-
 
 /*
  * Training procedure for OLLAWV. This is basically the SGD procedure. First, we calculate the learning rate.
