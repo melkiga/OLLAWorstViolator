@@ -46,7 +46,6 @@ enum StopCriterion {
 };
 
 enum MulticlassApproach {
-	ALL_AT_ONCE,
 	PAIRWISE
 };
 
@@ -112,8 +111,7 @@ private:
 			StopCriterionStrategy* strategy);
 
 public:
-	BaseSolverFactory(istream& input, TrainParams params = TrainParams(),
-			StopCriterion strategy = YOC);
+	BaseSolverFactory(istream& input, TrainParams params = TrainParams(), StopCriterion strategy = YOC);
 	virtual ~BaseSolverFactory();
 
 	AbstractSolver<CGaussKernel, Matrix, Strategy>* getSolver();

@@ -72,7 +72,6 @@ public:
 	RbfKernelEvaluator(Matrix* samples, label_id* labels, quantity classNumber, fvalue bias, fvalue c, Kernel &params, fvalue epochs, fvalue margin);
 	~RbfKernelEvaluator();
 
-	void evalInnerKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result);
 	void evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result);
 
 	void swapSamples(sample_id uid, sample_id vid);
@@ -150,17 +149,6 @@ inline fvalue RbfKernelEvaluator<Kernel, Matrix>::getLabel(sample_id v) {
 template<class Kernel, class Matrix>
 inline fvalue RbfKernelEvaluator<Kernel, Matrix>::rbf(fvalue euclideanDistanceSquared) {
 	return params.m_evaluateKernel(euclideanDistanceSquared);
-}
-
-template<class Kernel, class Matrix>
-void RbfKernelEvaluator<Kernel, Matrix>::evalInnerKernel(sample_id id,
-		sample_id rangeFrom, sample_id rangeTo, fvector* result) {
-	eval.dist(id, rangeFrom, rangeTo, result);
-
-	fvalue* ptr = fvector_ptr(result);
-	for (sample_id iid = rangeFrom; iid < rangeTo; iid++) {
-		ptr[iid] = rbf(ptr[iid]);
-	}
 }
 
 template<class Kernel, class Matrix>

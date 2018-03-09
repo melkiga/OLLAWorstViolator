@@ -105,7 +105,7 @@ label_id PairwiseClassifier<Kernel, Matrix>::classify(sample_id sample) {
 	fill(votes.begin(), votes.end(), 0);
 	fill(evidence.begin(), evidence.end(), 0.0);
 
-	evaluator->evalInnerKernel(sample, 0, state->svNumber, buffer);
+	evaluator->evalKernel(sample, 0, state->svNumber, buffer);
 
 	vector<PairwiseTrainingResult>::iterator it;
 	for (it = state->models.begin(); it != state->models.end(); it++) {
