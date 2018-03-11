@@ -75,6 +75,9 @@
     <ClCompile Include="Testing\TestCases.cpp">
       <Filter>Testing</Filter>
     </ClCompile>
+    <ClCompile Include="Testing\TestHelpers.cpp">
+      <Filter>Testing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\osvm\src\configuration.h">
