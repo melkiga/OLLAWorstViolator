@@ -525,12 +525,13 @@ void CachedKernelEvaluator<Kernel, Matrix, Strategy>::performSvUpdate(sample_id&
 	alphasView.vector.size++;
 }
 
+/*
+ * Evaluate the Gaussian RBF Kernel vector with respect to sample 'id' against samples in range 'rangeFrom' to 'rangeTo'.
+ * Store the result in 'result'
+ */
 template<typename Kernel, typename Matrix, typename Strategy>
 inline void CachedKernelEvaluator<Kernel, Matrix, Strategy>::evalKernel(sample_id id,
 		sample_id rangeFrom, sample_id rangeTo, fvector *result) {
-	STATS({
-		stats.kernel.kernelEvaluations += rangeTo - rangeFrom;
-	});
 	evaluator->evalKernel(id, rangeFrom, rangeTo, result);
 }
 
