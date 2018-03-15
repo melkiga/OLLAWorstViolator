@@ -33,9 +33,6 @@ public:
 	SolverStrategy(TrainParams &params, quantity labelNumber,
 			label_id *labels, quantity sampleNumber);
 
-	id generateNextId();
-	void markGeneratedIdAsCorrect();
-	void markGeneratedIdAsFailed();
 	void resetGenerator(label_id *labels, id maxId);
 	void notifyExchange(id u, id v);
 
@@ -46,21 +43,6 @@ inline SolverStrategy<Violation, Generator>::SolverStrategy(TrainParams& params,
 		quantity labelNumber, label_id *labels, quantity sampleNumber) :
 		estimator(params),
 		generator(params, labelNumber, labels, sampleNumber) {
-}
-
-template<ViolationCriterion Violation, GeneratorType Generator>
-inline id SolverStrategy<Violation, Generator>::generateNextId() {
-	return generator.nextId();
-}
-
-template<ViolationCriterion Violation, GeneratorType Generator>
-inline void SolverStrategy<Violation, Generator>::markGeneratedIdAsCorrect() {
-	generator.markCorrect();
-}
-
-template<ViolationCriterion Violation, GeneratorType Generator>
-inline void SolverStrategy<Violation, Generator>::markGeneratedIdAsFailed() {
-	generator.markFailed();
 }
 
 template<ViolationCriterion Violation, GeneratorType Generator>

@@ -38,11 +38,8 @@ public:
 	CandidateIdGenerator(TrainParams &params, quantity labelNumber, label_id *labels, quantity sampleNumber);
 
 	id nextId();
-	void markCorrect();
-	void markFailed();
 
 	void exchange(id u, id v);
-	void reset(id maxId);
 
 };
 
@@ -77,8 +74,6 @@ public:
 	~CandidateIdGenerator();
 
 	id nextId();
-	void markCorrect();
-	void markFailed();
 
 	void exchange(id u, id v);
 	void reset(label_id *labels, id maxId);
@@ -145,22 +140,6 @@ inline id CandidateIdGenerator<DETERMINISTIC>::nextId() {
 	return nodes[heads[currentBucket]].value;
 }
 
-inline void CandidateIdGenerator<DETERMINISTIC>::markCorrect() {
-	IdNode &node = nodes[heads[currentBucket]];
-	node.succeeded++;
-
-	quantity offset = min(node.failed / node.succeeded + 1, bucketNumber - 1);
-	move(currentBucket, (currentBucket + offset) % bucketNumber);
-}
-
-inline void CandidateIdGenerator<DETERMINISTIC>::markFailed() {
-	IdNode &node = nodes[heads[currentBucket]];
-	node.failed++;
-
-	quantity offset = min(node.failed / node.succeeded + 1, bucketNumber - 1);
-	move(currentBucket, (currentBucket + offset) % bucketNumber);
-}
-
 inline void CandidateIdGenerator<DETERMINISTIC>::exchange(id u, id v) {
 	swap(nodes[u].value, nodes[v].value);
 }
@@ -198,8 +177,6 @@ public:
 	CandidateIdGenerator(TrainParams &params, quantity labelNumber, label_id *labels, quantity sampleNumber);
 
 	id nextId();
-	void markCorrect();
-	void markFailed();
 
 	void exchange(id u, id v);
 	void reset(label_id *labels, id maxId);
@@ -216,14 +193,6 @@ inline id CandidateIdGenerator<FAIR>::nextId() {
 	label_id label = distr.labelMappings[generator.nextId(distr.labelNumber)];
 	id offset = generator.nextId(distr.bufferSizes[label]);
 	return distr.buffers[label][offset];
-}
-
-inline void CandidateIdGenerator<FAIR>::markCorrect() {
-	// do nothing
-}
-
-inline void CandidateIdGenerator<FAIR>::markFailed() {
-	// do nothing
 }
 
 inline void CandidateIdGenerator<FAIR>::exchange(id u, id v) {
@@ -245,8 +214,6 @@ public:
 	CandidateIdGenerator(TrainParams &params, quantity labelNumber, label_id *labels, quantity sampleNumber);
 
 	id nextId();
-	void markCorrect();
-	void markFailed();
 
 	void exchange(id u, id v);
 	void reset(label_id *labels, id maxId);
@@ -261,14 +228,6 @@ inline CandidateIdGenerator<PLAIN>::CandidateIdGenerator(TrainParams& params,
 
 inline id CandidateIdGenerator<PLAIN>::nextId() {
 	return generator.nextId(maxId);
-}
-
-inline void CandidateIdGenerator<PLAIN>::markCorrect() {
-	// do nothing
-}
-
-inline void CandidateIdGenerator<PLAIN>::markFailed() {
-	// do nothing
 }
 
 inline void CandidateIdGenerator<PLAIN>::exchange(id u, id v) {
