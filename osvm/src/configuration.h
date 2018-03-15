@@ -49,7 +49,6 @@ using namespace boost::program_options;
 #define PR_SEL_TYPE "model-selection,m"
 #define PR_MATRIX_TYPE "matrix-type,t"
 #define PR_STOP_CRIT "stop-criterion,p"
-#define PR_OPTIMIZATION "optimization,z"
 #define PR_ID_RANDOMIZER "randomizer,s"
 #define PR_MULTICLASS "multiclass,u"
 #define PR_CACHE_SIZE "cache-size,S"
@@ -71,7 +70,6 @@ using namespace boost::program_options;
 #define PR_KEY_SEL_TYPE "model-selection"
 #define PR_KEY_MATRIX_TYPE "matrix-type"
 #define PR_KEY_STOP_CRIT "stop-criterion"
-#define PR_KEY_OPTIMIZATION "optimization"
 #define PR_KEY_ID_RANDOMIZER "randomizer"
 #define PR_KEY_MULTICLASS "multiclass"
 #define PR_KEY_CACHE_SIZE "cache-size"
@@ -88,8 +86,6 @@ using namespace boost::program_options;
 #define EPSILON_DEFAULT "default"
 
 #define STOP_CRIT_YOC "yoC"
-
-#define OPTIMIZATION_L1SVM "l1svm"
 
 #define ID_RANDOMIZER_PLAIN "simple"
 #define ID_RANDOMIZER_FAIR "fair"
@@ -136,7 +132,6 @@ struct Configuration {
 	} validation;
 
 	MatrixType matrixType;
-	ViolationCriterion optimizationProcedure;
 	StopCriterion stopCriterion;
 	MulticlassApproach multiclass;
 

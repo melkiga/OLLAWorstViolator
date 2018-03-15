@@ -226,7 +226,6 @@
     <ClInclude Include="..\osvm\src\svm\stop.h" />
     <ClInclude Include="..\osvm\src\svm\strategy.h" />
     <ClInclude Include="..\osvm\src\svm\validation.h" />
-    <ClInclude Include="..\osvm\src\svm\violation.h" />
     <ClInclude Include="..\osvm\src\time\timer.h" />
     <ClInclude Include="Testing\TestCases.h" />
     <ClInclude Include="Testing\TestHelpers.h" />

@@ -19,7 +19,6 @@
 #ifndef UPDATE_H_
 #define UPDATE_H_
 
-#include "violation.h"
 #include "generator.h"
 #include "params.h"
 

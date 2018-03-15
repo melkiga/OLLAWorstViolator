@@ -102,14 +102,6 @@ Configuration ParametersParser::getConfiguration() {
 		throw invalid_configuration(msg);
 	}
 
-	string optimization = vars[PR_KEY_OPTIMIZATION].as<string>();
-	if (OPTIMIZATION_L1SVM == optimization) {
-		conf.optimizationProcedure = L1SVM;
-	} else {
-		string msg = (format("invalid optimization criterion: '%s'") % optimization).str();
-		throw invalid_configuration(msg);
-	}
-
 	string random = vars[PR_KEY_ID_RANDOMIZER].as<string>();
 	if (ID_RANDOMIZER_PLAIN == random) {
 		conf.randomization = PLAIN;

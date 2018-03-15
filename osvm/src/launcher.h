@@ -28,12 +28,9 @@ class ApplicationLauncher {
 	void selectMatrixTypeAndRun();
 
 	template<typename Matrix>
-	void selectViolationCriterionAndRun();
-
-	template<typename Matrix, ViolationCriterion Violation>
 	void selectGeneratorTypeAndRun();
 
-	template<typename Matrix, ViolationCriterion Violation, GeneratorType Generator>
+	template<typename Matrix, GeneratorType Generator>
 	void run();
 
 protected:
@@ -193,7 +190,7 @@ void ApplicationLauncher::performTraining() {
 	delete classifier;
 }
 
-template<typename Matrix, ViolationCriterion Violation, GeneratorType Generator>
+template<typename Matrix, GeneratorType Generator>
 void ApplicationLauncher::run() {
 	if (conf.validation.outerFolds > 1) {
 		performNestedCrossValidation<Matrix, SolverStrategy<Generator> >();
@@ -210,31 +207,20 @@ void ApplicationLauncher::run() {
 	}
 }
 
-template<typename Matrix, ViolationCriterion Violation>
+template<typename Matrix>
 void ApplicationLauncher::selectGeneratorTypeAndRun() {
 	switch (conf.randomization) {
 	case PLAIN:
-		run<Matrix, Violation, PLAIN>();
+		run<Matrix, PLAIN>();
 		break;
 	case FAIR:
-		run<Matrix, Violation, FAIR>();
+		run<Matrix, FAIR>();
 		break;
 	case DETERMINISTIC:
-		run<Matrix, Violation, DETERMINISTIC>();
+		run<Matrix, DETERMINISTIC>();
 		break;
 	default:
 		throw invalid_configuration("unknown randomization type");
-	}
-}
-
-template<typename Matrix>
-void ApplicationLauncher::selectViolationCriterionAndRun() {
-	switch (conf.optimizationProcedure) {
-	case L1SVM:
-		selectGeneratorTypeAndRun<Matrix, L1SVM>();
-		break;
-	default:
-		throw invalid_configuration("unknown optimization criterion");
 	}
 }
 

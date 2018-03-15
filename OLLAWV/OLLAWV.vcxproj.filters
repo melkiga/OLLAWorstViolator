@@ -152,9 +152,6 @@
     <ClInclude Include="..\osvm\src\svm\validation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\osvm\src\svm\violation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\osvm\src\time\timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>

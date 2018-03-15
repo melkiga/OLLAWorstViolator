@@ -225,12 +225,7 @@ label_id* BaseSolverFactory<Matrix, Strategy>::getLabelVector(
 
 template<typename Matrix, typename Strategy>
 StopCriterionStrategy* BaseSolverFactory<Matrix, Strategy>::getStopCriterion() {
-	switch (strategy) {
-	case L1SVM:
-		return new L1SVMStopStrategy();
-	default:
-		return new L1SVMStopStrategy();
-	}
+	return new L1SVMStopStrategy();
 }
 
 /// <summary>preprocess: normalizes, randomizes, and reduces dimensionality.</summary>

@@ -21,10 +21,10 @@
 void ApplicationLauncher::selectMatrixTypeAndRun() {
 	switch (conf.matrixType) {
 	case SPARSE:
-		selectViolationCriterionAndRun<sfmatrix>();
+		selectGeneratorTypeAndRun<sfmatrix>();
 		break;
 	case DENSE:
-		selectViolationCriterionAndRun<dfmatrix>();
+		selectGeneratorTypeAndRun<dfmatrix>();
 		break;
 	default:
 		throw invalid_configuration("unknown matrix type");
