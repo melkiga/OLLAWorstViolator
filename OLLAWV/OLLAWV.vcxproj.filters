@@ -101,9 +101,6 @@
     <ClInclude Include="..\osvm\src\logging\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\osvm\src\math\average.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\osvm\src\math\matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>

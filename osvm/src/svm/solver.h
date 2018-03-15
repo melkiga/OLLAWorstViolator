@@ -34,7 +34,6 @@
 #include "bias.h"
 #include "params.h"
 #include "../math/random.h"
-#include "../math/average.h"
 
 #define STARTING_EPSILON 1.0
 #define EPSILON_SHRINKING_FACTOR 2.0

@@ -208,7 +208,6 @@
     <ClInclude Include="..\osvm\src\feature\feature.h" />
     <ClInclude Include="..\osvm\src\launcher.h" />
     <ClInclude Include="..\osvm\src\logging\log.h" />
-    <ClInclude Include="..\osvm\src\math\average.h" />
     <ClInclude Include="..\osvm\src\math\matrix.h" />
     <ClInclude Include="..\osvm\src\math\matrix_dense.h" />
     <ClInclude Include="..\osvm\src\math\matrix_sparse.h" />
