@@ -196,16 +196,16 @@ void ApplicationLauncher::performTraining() {
 template<typename Matrix, ViolationCriterion Violation, GeneratorType Generator>
 void ApplicationLauncher::run() {
 	if (conf.validation.outerFolds > 1) {
-		performNestedCrossValidation<Matrix, SolverStrategy<Violation, Generator> >();
+		performNestedCrossValidation<Matrix, SolverStrategy<Generator> >();
 	} else {
 		if (conf.validation.innerFolds > 1) {
 			if (conf.searchRange.cResolution > 1 || conf.searchRange.gammaResolution > 1) {
-				performModelSelection<Matrix, SolverStrategy<Violation, Generator> >();
+				performModelSelection<Matrix, SolverStrategy<Generator> >();
 			} else {
-				performCrossValidation<Matrix, SolverStrategy<Violation, Generator> >();
+				performCrossValidation<Matrix, SolverStrategy<Generator> >();
 			}
 		} else {
-			performTraining<Matrix, SolverStrategy<Violation, Generator> >();
+			performTraining<Matrix, SolverStrategy<Generator> >();
 		}
 	}
 }

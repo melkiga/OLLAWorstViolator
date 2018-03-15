@@ -23,35 +23,32 @@
 #include "generator.h"
 #include "params.h"
 
-template<ViolationCriterion Violation, GeneratorType Generator>
+template<GeneratorType Generator>
 class SolverStrategy {
 
-	ViolationEstimator<Violation> estimator;
 	CandidateIdGenerator<Generator> generator;
 
 public:
-	SolverStrategy(TrainParams &params, quantity labelNumber,
-			label_id *labels, quantity sampleNumber);
+	SolverStrategy(TrainParams &params, quantity labelNumber, label_id *labels, quantity sampleNumber);
 
 	void resetGenerator(label_id *labels, id maxId);
 	void notifyExchange(id u, id v);
 
 };
 
-template<ViolationCriterion Violation, GeneratorType Generator>
-inline SolverStrategy<Violation, Generator>::SolverStrategy(TrainParams& params,
+template<GeneratorType Generator>
+inline SolverStrategy<Generator>::SolverStrategy(TrainParams& params,
 		quantity labelNumber, label_id *labels, quantity sampleNumber) :
-		estimator(params),
 		generator(params, labelNumber, labels, sampleNumber) {
 }
 
-template<ViolationCriterion Violation, GeneratorType Generator>
-inline void SolverStrategy<Violation, Generator>::resetGenerator(label_id *labels, id maxId) {
+template<GeneratorType Generator>
+inline void SolverStrategy<Generator>::resetGenerator(label_id *labels, id maxId) {
 	generator.reset(labels, maxId);
 }
 
-template<ViolationCriterion Violation, GeneratorType Generator>
-inline void SolverStrategy<Violation, Generator>::notifyExchange(id u, id v) {
+template<GeneratorType Generator>
+inline void SolverStrategy<Generator>::notifyExchange(id u, id v) {
 	generator.exchange(u, v);
 }
 
