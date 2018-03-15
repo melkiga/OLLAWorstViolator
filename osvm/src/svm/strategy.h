@@ -22,10 +22,9 @@
 #include "generator.h"
 #include "params.h"
 
-template<GeneratorType Generator>
 class SolverStrategy {
 
-	CandidateIdGenerator<Generator> generator;
+	CandidateIdGenerator generator;
 
 public:
 	SolverStrategy(TrainParams &params, quantity labelNumber, label_id *labels, quantity sampleNumber);
@@ -35,19 +34,16 @@ public:
 
 };
 
-template<GeneratorType Generator>
-inline SolverStrategy<Generator>::SolverStrategy(TrainParams& params,
+inline SolverStrategy::SolverStrategy(TrainParams& params,
 		quantity labelNumber, label_id *labels, quantity sampleNumber) :
 		generator(params, labelNumber, labels, sampleNumber) {
 }
 
-template<GeneratorType Generator>
-inline void SolverStrategy<Generator>::resetGenerator(label_id *labels, id maxId) {
+inline void SolverStrategy::resetGenerator(label_id *labels, id maxId) {
 	generator.reset(labels, maxId);
 }
 
-template<GeneratorType Generator>
-inline void SolverStrategy<Generator>::notifyExchange(id u, id v) {
+inline void SolverStrategy::notifyExchange(id u, id v) {
 	generator.exchange(u, v);
 }
 

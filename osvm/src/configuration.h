@@ -128,8 +128,6 @@ struct Configuration {
 	MatrixType matrixType;
 	StopCriterion stopCriterion;
 	MulticlassApproach multiclass;
-
-	GeneratorType randomization;
 };
 
 class ParametersParser {

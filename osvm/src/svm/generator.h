@@ -24,23 +24,6 @@
 #include "../math/random.h"
 #include "params.h"
 
-
-enum GeneratorType {
-	FAIR
-};
-
-template<GeneratorType Type>
-class CandidateIdGenerator {
-
-public:
-	CandidateIdGenerator(TrainParams &params, quantity labelNumber, label_id *labels, quantity sampleNumber);
-
-	id nextId();
-
-	void exchange(id u, id v);
-
-};
-
 struct IdNode {
 
 	id value;
@@ -71,8 +54,7 @@ struct ClassDistribution {
 
 };
 
-template<>
-class CandidateIdGenerator<FAIR> {
+class CandidateIdGenerator {
 
 	IdGenerator generator;
 	ClassDistribution distr;
@@ -87,23 +69,23 @@ public:
 
 };
 
-inline CandidateIdGenerator<FAIR>::CandidateIdGenerator(TrainParams& params,
+inline CandidateIdGenerator::CandidateIdGenerator(TrainParams& params,
 		quantity labelNumber, label_id *labels, quantity sampleNumber) :
 		generator(Generators::create()),
 		distr(ClassDistribution(labelNumber, labels, sampleNumber)) {
 }
 
-inline id CandidateIdGenerator<FAIR>::nextId() {
+inline id CandidateIdGenerator::nextId() {
 	label_id label = distr.labelMappings[generator.nextId(distr.labelNumber)];
 	id offset = generator.nextId(distr.bufferSizes[label]);
 	return distr.buffers[label][offset];
 }
 
-inline void CandidateIdGenerator<FAIR>::exchange(id u, id v) {
+inline void CandidateIdGenerator::exchange(id u, id v) {
 	distr.exchange(u, v);
 }
 
-inline void CandidateIdGenerator<FAIR>::reset(label_id *labels, id maxId) {
+inline void CandidateIdGenerator::reset(label_id *labels, id maxId) {
 	distr.refresh(labels, maxId);
 }
 

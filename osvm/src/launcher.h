@@ -28,9 +28,6 @@ class ApplicationLauncher {
 	void selectMatrixTypeAndRun();
 
 	template<typename Matrix>
-	void selectGeneratorTypeAndRun();
-
-	template<typename Matrix, GeneratorType Generator>
 	void run();
 
 protected:
@@ -190,31 +187,20 @@ void ApplicationLauncher::performTraining() {
 	delete classifier;
 }
 
-template<typename Matrix, GeneratorType Generator>
+template<typename Matrix>
 void ApplicationLauncher::run() {
 	if (conf.validation.outerFolds > 1) {
-		performNestedCrossValidation<Matrix, SolverStrategy<Generator> >();
+		performNestedCrossValidation<Matrix, SolverStrategy >();
 	} else {
 		if (conf.validation.innerFolds > 1) {
 			if (conf.searchRange.cResolution > 1 || conf.searchRange.gammaResolution > 1) {
-				performModelSelection<Matrix, SolverStrategy<Generator> >();
+				performModelSelection<Matrix, SolverStrategy >();
 			} else {
-				performCrossValidation<Matrix, SolverStrategy<Generator> >();
+				performCrossValidation<Matrix, SolverStrategy >();
 			}
 		} else {
-			performTraining<Matrix, SolverStrategy<Generator> >();
+			performTraining<Matrix, SolverStrategy >();
 		}
-	}
-}
-
-template<typename Matrix>
-void ApplicationLauncher::selectGeneratorTypeAndRun() {
-	switch (conf.randomization) {
-	case FAIR:
-		run<Matrix, FAIR>();
-		break;
-	default:
-		throw invalid_configuration("unknown randomization type");
 	}
 }
 

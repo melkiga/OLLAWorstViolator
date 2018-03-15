@@ -102,8 +102,6 @@ Configuration ParametersParser::getConfiguration() {
 		throw invalid_configuration(msg);
 	}
 
-	conf.randomization = FAIR;
-
 	string multiclass = vars[PR_KEY_MULTICLASS].as<string>();
 	if (MULTICLASS_PAIRWISE == multiclass) {
 		conf.multiclass = PAIRWISE;
