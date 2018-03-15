@@ -49,7 +49,6 @@ using namespace boost::program_options;
 #define PR_SEL_TYPE "model-selection,m"
 #define PR_MATRIX_TYPE "matrix-type,t"
 #define PR_STOP_CRIT "stop-criterion,p"
-#define PR_ID_RANDOMIZER "randomizer,s"
 #define PR_MULTICLASS "multiclass,u"
 #define PR_CACHE_SIZE "cache-size,S"
 #define PR_BIAS_CALCULATION "bias,b"
@@ -70,7 +69,6 @@ using namespace boost::program_options;
 #define PR_KEY_SEL_TYPE "model-selection"
 #define PR_KEY_MATRIX_TYPE "matrix-type"
 #define PR_KEY_STOP_CRIT "stop-criterion"
-#define PR_KEY_ID_RANDOMIZER "randomizer"
 #define PR_KEY_MULTICLASS "multiclass"
 #define PR_KEY_CACHE_SIZE "cache-size"
 #define PR_KEY_BIAS "bias"
@@ -86,10 +84,6 @@ using namespace boost::program_options;
 #define EPSILON_DEFAULT "default"
 
 #define STOP_CRIT_YOC "yoC"
-
-#define ID_RANDOMIZER_PLAIN "simple"
-#define ID_RANDOMIZER_FAIR "fair"
-#define ID_RANDOMIZER_DETERM "determ"
 
 #define MULTICLASS_ALL_AT_ONCE "allatonce"
 #define MULTICLASS_PAIRWISE "pairwise"

@@ -102,17 +102,7 @@ Configuration ParametersParser::getConfiguration() {
 		throw invalid_configuration(msg);
 	}
 
-	string random = vars[PR_KEY_ID_RANDOMIZER].as<string>();
-	if (ID_RANDOMIZER_PLAIN == random) {
-		conf.randomization = PLAIN;
-	} else if (ID_RANDOMIZER_FAIR == random) {
-		conf.randomization = FAIR;
-	} else if (ID_RANDOMIZER_DETERM == random) {
-		conf.randomization = DETERMINISTIC;
-	} else {
-		string msg = (format("invalid randomization type: '%s'") % random).str();
-		throw invalid_configuration(msg);
-	}
+	conf.randomization = FAIR;
 
 	string multiclass = vars[PR_KEY_MULTICLASS].as<string>();
 	if (MULTICLASS_PAIRWISE == multiclass) {

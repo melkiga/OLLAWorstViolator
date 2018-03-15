@@ -210,14 +210,8 @@ void ApplicationLauncher::run() {
 template<typename Matrix>
 void ApplicationLauncher::selectGeneratorTypeAndRun() {
 	switch (conf.randomization) {
-	case PLAIN:
-		run<Matrix, PLAIN>();
-		break;
 	case FAIR:
 		run<Matrix, FAIR>();
-		break;
-	case DETERMINISTIC:
-		run<Matrix, DETERMINISTIC>();
 		break;
 	default:
 		throw invalid_configuration("unknown randomization type");
