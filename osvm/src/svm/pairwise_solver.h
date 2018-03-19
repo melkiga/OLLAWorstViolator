@@ -22,7 +22,7 @@
 #include "solver.h"
 
 
-struct PairwiseTrainingResult {
+struct PairwiseTrainingModel {
 
 	pair<label_id, label_id> trainingLabels;
 	vector<fvalue> yalphas;
@@ -30,7 +30,7 @@ struct PairwiseTrainingResult {
 	vector<sample_id> samples;
 	quantity size;
 
-	PairwiseTrainingResult(pair<label_id, label_id>& trainingLabels, quantity size) :
+	PairwiseTrainingModel(pair<label_id, label_id>& trainingLabels, quantity size) :
 			trainingLabels(trainingLabels),
 			yalphas(vector<fvalue>(size, 0.0)),
 			bias(0),
@@ -47,11 +47,11 @@ struct PairwiseTrainingResult {
 };
 
 
-struct PairwiseTrainingState {
+struct PairwiseTrainingResult {
 
-	vector<PairwiseTrainingResult> models;
-	quantity svNumber;
-	quantity labelNumber;
+	vector<PairwiseTrainingModel> models;
+  quantity maxSVCount;
+  quantity totalLabelCount;
 
 };
 
@@ -64,7 +64,7 @@ template<typename Kernel, typename Matrix>
 class PairwiseClassifier: public Classifier<Kernel, Matrix> {
 
 	RbfKernelEvaluator<Kernel, Matrix>* evaluator;
-	PairwiseTrainingState* state;
+	PairwiseTrainingResult* state;
 	fvector *buffer;
 
 	vector<quantity> votes;
@@ -72,12 +72,12 @@ class PairwiseClassifier: public Classifier<Kernel, Matrix> {
 
 protected:
 	fvalue getDecisionForModel(sample_id sample,
-			PairwiseTrainingResult* model, fvector* buffer);
+			PairwiseTrainingModel* model, fvector* buffer);
 	fvalue convertDecisionToEvidence(fvalue decision);
 
 public:
 	PairwiseClassifier(RbfKernelEvaluator<Kernel, Matrix> *evaluator,
-			PairwiseTrainingState* state, fvector *buffer);
+			PairwiseTrainingResult* state, fvector *buffer);
 	virtual ~PairwiseClassifier();
 
 	virtual label_id classify(sample_id sample);
@@ -88,12 +88,12 @@ public:
 template<typename Kernel, typename Matrix>
 PairwiseClassifier<Kernel, Matrix>::PairwiseClassifier(
 		RbfKernelEvaluator<Kernel, Matrix> *evaluator,
-		PairwiseTrainingState* state, fvector *buffer) :
+		PairwiseTrainingResult* state, fvector *buffer) :
 		evaluator(evaluator),
 		state(state),
 		buffer(buffer),
-		votes(state->labelNumber),
-		evidence(state->labelNumber){
+		votes(state->totalLabelCount),
+		evidence(state->totalLabelCount){
 }
 
 template<typename Kernel, typename Matrix>
@@ -105,11 +105,11 @@ label_id PairwiseClassifier<Kernel, Matrix>::classify(sample_id sample) {
 	fill(votes.begin(), votes.end(), 0);
 	fill(evidence.begin(), evidence.end(), 0.0);
 
-	evaluator->evalKernel(sample, 0, state->svNumber, buffer);
+	evaluator->evalKernel(sample, 0, state->maxSVCount, buffer);
 
-	vector<PairwiseTrainingResult>::iterator it;
+	vector<PairwiseTrainingModel>::iterator it;
 	for (it = state->models.begin(); it != state->models.end(); it++) {
-		PairwiseTrainingResult* result = &(*it);
+		PairwiseTrainingModel* result = &(*it);
 		fvalue dec = getDecisionForModel(sample, result, buffer);
 		label_id label = dec > 0
 				? result->trainingLabels.first
@@ -123,7 +123,7 @@ label_id PairwiseClassifier<Kernel, Matrix>::classify(sample_id sample) {
 	label_id maxLabelId = 0;
 	quantity maxVotes = 0;
 	quantity maxEvidence = (quantity) 0.0;
-	for (label_id i = 0; i < state->labelNumber; i++) {
+	for (label_id i = 0; i < state->totalLabelCount; i++) {
 		if (votes[i] > maxVotes
 			|| (votes[i] == maxVotes && evidence[i] > maxEvidence)) {
 			maxLabelId = i;
@@ -137,7 +137,7 @@ label_id PairwiseClassifier<Kernel, Matrix>::classify(sample_id sample) {
 
 template<typename Kernel, typename Matrix>
 fvalue PairwiseClassifier<Kernel, Matrix>::getDecisionForModel(sample_id sample,
-		PairwiseTrainingResult* model, fvector* buffer) {
+		PairwiseTrainingModel* model, fvector* buffer) {
 	fvalue dec = model->bias;
 	fvalue* kernels = buffer->data;
 	for (sample_id i = 0; i < model->size; i++) {
@@ -154,7 +154,7 @@ inline fvalue PairwiseClassifier<Kernel, Matrix>::convertDecisionToEvidence(
 
 template<typename Kernel, typename Matrix>
 quantity PairwiseClassifier<Kernel, Matrix>::getSvNumber() {
-	return state->svNumber;
+	return state->maxSVCount;
 }
 
 
@@ -174,7 +174,7 @@ class PairwiseSolver: public AbstractSolver<Kernel, Matrix, Strategy> {
 
 	};
 
-	PairwiseTrainingState state;
+	PairwiseTrainingResult state;
 
 	quantity reorderSamples(label_id *labels, quantity size,
 			pair<label_id, label_id>& labelPair);
@@ -204,7 +204,7 @@ PairwiseSolver<Kernel, Matrix, Strategy>::PairwiseSolver(
 		StopCriterionStrategy *stopStrategy) :
 		AbstractSolver<Kernel, Matrix, Strategy>(labelNames,
 				samples, labels, params, stopStrategy),
-		state(PairwiseTrainingState()) {
+		state(PairwiseTrainingResult()) {
 	label_id maxLabel = (label_id) labelNames.size();
 	vector<quantity> classSizes(maxLabel, 0);
 	for (sample_id sample = 0; sample < this->size; sample++) {
@@ -224,10 +224,10 @@ PairwiseSolver<Kernel, Matrix, Strategy>::PairwiseSolver(
 		for (it2 = it1 + 1; it2 < sizes.end(); it2++) {
 			pair<label_id, label_id> labels(it1->first, it2->first);
 			quantity size = it1->second + it2->second;
-			state.models.push_back(PairwiseTrainingResult(labels, size));
+			state.models.push_back(PairwiseTrainingModel(labels, size));
 		}
 	}
-	state.labelNumber = maxLabel;
+	state.totalLabelCount = maxLabel;
 }
 
 template<typename Kernel, typename Matrix, typename Strategy>
@@ -248,7 +248,7 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 			factory.createEvaluator(this->params.bias, evaluator));
 
 	quantity totalSize = this->currentSize;
-	vector<PairwiseTrainingResult>::iterator it;
+	vector<PairwiseTrainingModel>::iterator it;
 	for (it = state.models.begin(); it != state.models.end(); it++) {
 		pair<label_id, label_id> trainPair = it->trainingLabels;
 		quantity size = reorderSamples(this->labels, totalSize, trainPair);
@@ -275,7 +275,7 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 			it->samples[i] = realOffset;
 		}
 	}
-	state.svNumber = freeOffset;
+	state.maxSVCount = freeOffset;
 
 	this->setCurrentSize(totalSize);
 }
@@ -313,7 +313,7 @@ CachedKernelEvaluator<Kernel, Matrix, Strategy>* PairwiseSolver<Kernel, Matrix, 
 
 template<typename Kernel, typename Matrix, typename Strategy>
 quantity PairwiseSolver<Kernel, Matrix, Strategy>::getSvNumber() {
-	return state.svNumber;
+	return state.maxSVCount;
 }
 
 #endif
