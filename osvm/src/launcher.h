@@ -28,7 +28,7 @@ class ApplicationLauncher {
 	void selectMatrixTypeAndRun();
 
 	template<typename Matrix>
-	void run();
+	Classifier<CGaussKernel, Matrix>* run();
 
 protected:
 	template<typename Matrix, typename Strategy>
@@ -41,16 +41,16 @@ protected:
 	GridGaussianModelSelector<Matrix, Strategy>* createModelSelector();
 
 	template<typename Matrix, typename Strategy>
-	void performTraining();
+	Classifier<CGaussKernel, Matrix>* performTraining();
 
 	template<typename Matrix, typename Strategy>
-	void performCrossValidation();
+	Classifier<CGaussKernel, Matrix>* performCrossValidation();
 
 	template<typename Matrix, typename Strategy>
-	void performModelSelection();
+	Classifier<CGaussKernel, Matrix>* performModelSelection();
 
 	template<typename Matrix, typename Strategy>
-	void performNestedCrossValidation();
+	Classifier<CGaussKernel, Matrix>* performNestedCrossValidation();
 
 public:
 	ApplicationLauncher(Configuration &conf) : conf(conf) {
@@ -104,7 +104,7 @@ GridGaussianModelSelector<Matrix, Strategy>* ApplicationLauncher::createModelSel
 }
 
 template<typename Matrix, typename Strategy>
-void ApplicationLauncher::performModelSelection() {
+Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performModelSelection() {
 	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
@@ -117,13 +117,13 @@ void ApplicationLauncher::performModelSelection() {
 	logger << format("final result: time=%.2f[s], accuracy=%.2f[%%], C=%.4g, G=%.4g\n")
 			% timer.getTimeElapsed() % (100.0 * params.bestResult.accuracy)
 			% params.c % params.gamma;
-
-	delete solver;
+	
 	delete selector;
+	return solver->getClassifier();
 }
 
 template<typename Matrix, typename Strategy>
-void ApplicationLauncher::performNestedCrossValidation() {
+Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performNestedCrossValidation() {
 	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
@@ -136,12 +136,12 @@ void ApplicationLauncher::performNestedCrossValidation() {
 	logger << format("final result: time=%.2f[s], accuracy=%.2f[%%]\n")
 			% timer.getTimeElapsed() % (100.0 * res.accuracy);
 
-	delete solver;
 	delete selector;
+	return solver->getClassifier();
 }
 
 template<typename Matrix, typename Strategy>
-void ApplicationLauncher::performCrossValidation() {
+Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performCrossValidation() {
 	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
@@ -154,11 +154,11 @@ void ApplicationLauncher::performCrossValidation() {
 	logger << format("final result: time=%.2f[s], accuracy=%.2f[%%]\n")
 			% timer.getTimeElapsed() % (100.0 * result.accuracy);
 
-	delete solver;
+	return solver->getClassifier();
 }
 
 template<typename Matrix, typename Strategy>
-void ApplicationLauncher::performTraining() {
+Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performTraining() {
 	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = createSolver<Matrix, Strategy>();
 
 	Timer timer(true);
@@ -184,24 +184,26 @@ void ApplicationLauncher::performTraining() {
 			% classifier->getSvNumber();
 
 	delete solver;
-	delete classifier;
+	return classifier;
 }
 
 template<typename Matrix>
-void ApplicationLauncher::run() {
+Classifier<CGaussKernel, Matrix>* ApplicationLauncher::run() {
+	Classifier<CGaussKernel, Matrix>* classifier;
 	if (conf.validation.outerFolds > 1) {
-		performNestedCrossValidation<Matrix, SolverStrategy >();
+		classifier = performNestedCrossValidation<Matrix, SolverStrategy >();
 	} else {
 		if (conf.validation.innerFolds > 1) {
 			if (conf.searchRange.cResolution > 1 || conf.searchRange.gammaResolution > 1) {
-				performModelSelection<Matrix, SolverStrategy >();
+				classifier = performModelSelection<Matrix, SolverStrategy >();
 			} else {
-				performCrossValidation<Matrix, SolverStrategy >();
+				classifier = performCrossValidation<Matrix, SolverStrategy >();
 			}
 		} else {
-			performTraining<Matrix, SolverStrategy >();
+			classifier = performTraining<Matrix, SolverStrategy >();
 		}
 	}
+	return classifier;
 }
 
 #endif
