@@ -32,7 +32,6 @@
 
 #include "dataset.h"
 #include "../logging/log.h"
-#include "../svm/universal_solver.h"
 #include "../svm/pairwise_solver.h"
 #include "../svm/validation.h"
 #include "../svm/strategy.h"
