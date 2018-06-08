@@ -43,15 +43,15 @@
 using namespace std;
 using boost::scoped_ptr;
 
-template<typename Kernel, typename Matrix>
+template<typename Matrix>
 class Solver {
 
 public:
 	virtual ~Solver() {};
 
-	virtual void setKernelParams(fvalue c, Kernel &params) = 0;
+	virtual void setKernelParams(fvalue c, CGaussKernel &params) = 0;
 	virtual void train() = 0;
-	virtual Classifier<Kernel, Matrix>* getClassifier() = 0;
+	virtual Classifier<Matrix>* getClassifier() = 0;
 
 };
 
@@ -91,8 +91,8 @@ public:
 };
 
 
-template<typename Kernel, typename Matrix, typename Strategy>
-class AbstractSolver: public Solver<Kernel, Matrix>, public StateHolder<Matrix> {
+template<typename Matrix, typename Strategy>
+class AbstractSolver: public Solver<Matrix>, public StateHolder<Matrix> {
 
 	SwapListener *listener;
 
@@ -111,20 +111,20 @@ protected:
 
 	Strategy strategy;
 
-	CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache;
+	CachedKernelEvaluator<Matrix, Strategy> *cache;
 
 protected:
-	virtual CachedKernelEvaluator<Kernel, Matrix, Strategy>* buildCache(fvalue c, Kernel &gparams);
-	void trainForCache(CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache);
+	virtual CachedKernelEvaluator<Matrix, Strategy>* buildCache(fvalue c, CGaussKernel &gparams);
+	void trainForCache(CachedKernelEvaluator<Matrix, Strategy> *cache);
 	void refreshDistr();
 
 public:
 	AbstractSolver(map<label_id, string> labelNames, Matrix *samples, label_id *labels, TrainParams &params, StopCriterionStrategy *stopStrategy);
 	virtual ~AbstractSolver();
 
-	void setKernelParams(fvalue c, Kernel &params);
+	void setKernelParams(fvalue c, CGaussKernel &params);
 	virtual void train() = 0;
-	Classifier<Kernel, Matrix>* getClassifier() = 0;
+	Classifier<Matrix>* getClassifier() = 0;
 
 	void setSwapListener(SwapListener *listener);
 	void swapSamples(sample_id u, sample_id v);
@@ -140,8 +140,8 @@ public:
 	virtual quantity getSvNumber();
 };
 
-template<typename Kernel, typename Matrix, typename Strategy>
-AbstractSolver<Kernel, Matrix, Strategy>::AbstractSolver(
+template<typename Matrix, typename Strategy>
+AbstractSolver<Matrix, Strategy>::AbstractSolver(
 		map<label_id, string> labelNames, Matrix *samples,
 		label_id *labels, TrainParams &params,
 		StopCriterionStrategy *stopStrategy) :
@@ -161,8 +161,8 @@ AbstractSolver<Kernel, Matrix, Strategy>::AbstractSolver(
 	refreshDistr();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-AbstractSolver<Kernel, Matrix, Strategy>::~AbstractSolver() {
+template<typename Matrix, typename Strategy>
+AbstractSolver<Matrix, Strategy>::~AbstractSolver() {
 	if (cache) {
 		delete cache;
 	}
@@ -175,9 +175,9 @@ AbstractSolver<Kernel, Matrix, Strategy>::~AbstractSolver() {
  * Sets the kernel parameters for the current model. If the cache is not set,
  * initialize the cache as well.
  */
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::setKernelParams(
-		fvalue c, Kernel &gparams) {
+template<typename Matrix, typename Strategy>
+void AbstractSolver<Matrix, Strategy>::setKernelParams(
+		fvalue c, CGaussKernel &gparams) {
 	if (cache == NULL) {
 		cache = buildCache(c, gparams);
 		cache->setSwapListener(listener);
@@ -192,8 +192,8 @@ void AbstractSolver<Kernel, Matrix, Strategy>::setKernelParams(
  * with respect to the current decision function output. Finally, we 'bottom stack' the current worst violator (support vector)
  * replacing it with the corresponding non-support vector.
  */
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(CachedKernelEvaluator<Kernel, Matrix, Strategy> *cache) 
+template<typename Matrix, typename Strategy>
+void AbstractSolver<Matrix, Strategy>::trainForCache(CachedKernelEvaluator<Matrix, Strategy> *cache) 
 {
 	CWorstViolator worstViolator(0, 0.0);
 	fvalue svmPenaltyParameterC = cache->getC();
@@ -218,37 +218,37 @@ void AbstractSolver<Kernel, Matrix, Strategy>::trainForCache(CachedKernelEvaluat
 	} while (currentIteration < maxNumberOfIterations && worstViolator.m_error < margin);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-CachedKernelEvaluator<Kernel, Matrix, Strategy>* AbstractSolver<Kernel, Matrix, Strategy>::buildCache(fvalue c, Kernel &gparams) {
+template<typename Matrix, typename Strategy>
+CachedKernelEvaluator<Matrix, Strategy>* AbstractSolver<Matrix, Strategy>::buildCache(fvalue c, CGaussKernel &gparams) {
 	fvalue bias = (params.bias == NO) ? 0.0 : 1.0;
-	RbfKernelEvaluator<CGaussKernel, Matrix> *rbf = new RbfKernelEvaluator<CGaussKernel, Matrix>(
+	RbfKernelEvaluator<Matrix> *rbf = new RbfKernelEvaluator<Matrix>(
 			this->samples, this->labels, (quantity) labelNames.size(), bias, c, gparams, params.epochs, params.margin);
-	return new CachedKernelEvaluator<CGaussKernel, Matrix, Strategy>(
+	return new CachedKernelEvaluator<Matrix, Strategy>(
 			rbf, &strategy, size, params.cache.size, NULL);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-Matrix* AbstractSolver<Kernel, Matrix, Strategy>::getSamples() {
+template<typename Matrix, typename Strategy>
+Matrix* AbstractSolver<Matrix, Strategy>::getSamples() {
 	return samples;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-label_id* AbstractSolver<Kernel, Matrix, Strategy>::getLabels() {
+template<typename Matrix, typename Strategy>
+label_id* AbstractSolver<Matrix, Strategy>::getLabels() {
 	return labels;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-map<label_id, string>& AbstractSolver<Kernel, Matrix, Strategy>::getLabelNames() {
+template<typename Matrix, typename Strategy>
+map<label_id, string>& AbstractSolver<Matrix, Strategy>::getLabelNames() {
 	return labelNames;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::refreshDistr() {
+template<typename Matrix, typename Strategy>
+void AbstractSolver<Matrix, Strategy>::refreshDistr() {
 	this->strategy.resetGenerator(labels, currentSize);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::setSwapListener(
+template<typename Matrix, typename Strategy>
+void AbstractSolver<Matrix, Strategy>::setSwapListener(
 		SwapListener *listener) {
 	this->listener = listener;
 	if (cache) {
@@ -256,36 +256,36 @@ void AbstractSolver<Kernel, Matrix, Strategy>::setSwapListener(
 	}
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::swapSamples(
+template<typename Matrix, typename Strategy>
+void AbstractSolver<Matrix, Strategy>::swapSamples(
 		sample_id u, sample_id v) {
 	cache->swapSamples(u, v);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::reset() {
+template<typename Matrix, typename Strategy>
+void AbstractSolver<Matrix, Strategy>::reset() {
 	cache->reset();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void AbstractSolver<Kernel, Matrix, Strategy>::setCurrentSize(quantity size) {
+template<typename Matrix, typename Strategy>
+void AbstractSolver<Matrix, Strategy>::setCurrentSize(quantity size) {
 	currentSize = size;
 	cache->setCurrentSize(size);
 	refreshDistr();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline quantity AbstractSolver<Kernel, Matrix, Strategy>::getCurrentSize() {
+template<typename Matrix, typename Strategy>
+inline quantity AbstractSolver<Matrix, Strategy>::getCurrentSize() {
 	return currentSize;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-quantity AbstractSolver<Kernel, Matrix, Strategy>::getSize() {
+template<typename Matrix, typename Strategy>
+quantity AbstractSolver<Matrix, Strategy>::getSize() {
 	return size;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-quantity AbstractSolver<Kernel, Matrix, Strategy>::getSvNumber() {
+template<typename Matrix, typename Strategy>
+quantity AbstractSolver<Matrix, Strategy>::getSvNumber() {
 	return this->cache->getSVNumber();
 }
 

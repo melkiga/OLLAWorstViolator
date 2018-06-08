@@ -104,7 +104,7 @@ private:
 
 	Matrix* preprocess(Matrix *x, label_id *y);
 
-	AbstractSolver<CGaussKernel, Matrix, Strategy>* createSolver(
+	AbstractSolver<Matrix, Strategy>* createSolver(
 			MulticlassApproach type, map<label_id,string> labels,
 			Matrix* x, label_id* y, TrainParams& params,
 			StopCriterionStrategy* strategy);
@@ -113,8 +113,8 @@ public:
 	BaseSolverFactory(istream& input, TrainParams params = TrainParams(), StopCriterion strategy = YOC);
 	virtual ~BaseSolverFactory();
 
-	AbstractSolver<CGaussKernel, Matrix, Strategy>* getSolver();
-	CrossValidationSolver<CGaussKernel, Matrix, Strategy>* getCrossValidationSolver(
+	AbstractSolver<Matrix, Strategy>* getSolver();
+	CrossValidationSolver<Matrix, Strategy>* getCrossValidationSolver(
 			quantity innerFolds, quantity outerFolds);
 
 };
@@ -135,19 +135,19 @@ BaseSolverFactory<Matrix, Strategy>::~BaseSolverFactory() {
 }
 
 template<typename Matrix, typename Strategy>
-AbstractSolver<CGaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::createSolver(
+AbstractSolver<Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::createSolver(
 		MulticlassApproach type, map<label_id, string> labels,
 		Matrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy) {
-	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = NULL;
+	AbstractSolver<Matrix, Strategy> *solver = NULL;
 	if (type == PAIRWISE) {
-		solver = new PairwiseSolver<CGaussKernel, Matrix, Strategy>(labels, x, y, params, strategy);
+		solver = new PairwiseSolver<Matrix, Strategy>(labels, x, y, params, strategy);
 	}
 	return solver;
 }
 
 
 template<typename Matrix, typename Strategy>
-AbstractSolver<CGaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getSolver() {
+AbstractSolver<Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getSolver() {
 	SparseFormatDataSetFactory dataSetFactory(input);
 	DataSet dataSet = dataSetFactory.createDataSet();
 
@@ -163,10 +163,10 @@ AbstractSolver<CGaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strate
 }
 
 template<typename Matrix, typename Strategy>
-CrossValidationSolver<CGaussKernel, Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getCrossValidationSolver(
+CrossValidationSolver<Matrix, Strategy>* BaseSolverFactory<Matrix, Strategy>::getCrossValidationSolver(
 		quantity innerFolds, quantity outerFolds) {
-	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = getSolver();
-	return new CrossValidationSolver<CGaussKernel, Matrix, Strategy>(
+	AbstractSolver<Matrix, Strategy> *solver = getSolver();
+	return new CrossValidationSolver<Matrix, Strategy>(
 			solver, innerFolds, outerFolds);
 }
 

@@ -20,7 +20,7 @@
 #define CLASSIFY_H_
 
 
-template<typename Kernel, typename Matrix>
+template<typename Matrix>
 class Classifier {
 
 public:

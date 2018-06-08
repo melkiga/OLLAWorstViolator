@@ -65,10 +65,10 @@ inline void CrossSolverSwapListener::notify(sample_id u, sample_id v) {
 
 
 
-template<typename Kernel, typename Matrix, typename Strategy>
-class CrossValidationSolver: public Solver<Kernel, Matrix>, public DataHolder<Matrix> {
+template<typename Matrix, typename Strategy>
+class CrossValidationSolver: public Solver<Matrix>, public DataHolder<Matrix> {
 
-	AbstractSolver<Kernel, Matrix, Strategy> *solver;
+	AbstractSolver<Matrix, Strategy> *solver;
 
 	fold_id *innerFoldsMembership;
 	quantity innerFoldsNumber;
@@ -91,13 +91,13 @@ protected:
 	void sortVectors(fold_id *membership, fold_id fold, quantity num);
 
 public:
-	CrossValidationSolver(AbstractSolver<Kernel, Matrix, Strategy> *solver,
+	CrossValidationSolver(AbstractSolver<Matrix, Strategy> *solver,
 			quantity innerFolds, quantity outerFolds, bool fairFolds = true);
 	virtual ~CrossValidationSolver();
 
-	void setKernelParams(fvalue c, Kernel &params);
+	void setKernelParams(fvalue c, CGaussKernel &params);
 	void train();
-	Classifier<Kernel, Matrix>* getClassifier();
+	Classifier<Matrix>* getClassifier();
 
 	TestingResult doCrossValidation();
 	void resetOuterFold(fold_id fold);
@@ -117,9 +117,9 @@ public:
 
 };
 
-template<typename Kernel, typename Matrix, typename Strategy>
-CrossValidationSolver<Kernel, Matrix, Strategy>::CrossValidationSolver(
-		AbstractSolver<Kernel, Matrix, Strategy> *solver,
+template<typename Matrix, typename Strategy>
+CrossValidationSolver<Matrix, Strategy>::CrossValidationSolver(
+		AbstractSolver<Matrix, Strategy> *solver,
 		quantity innerFolds, quantity outerFolds, bool fairFoolds) :
 		solver(solver),
 		innerFoldsNumber(innerFolds),
@@ -190,8 +190,8 @@ CrossValidationSolver<Kernel, Matrix, Strategy>::CrossValidationSolver(
 	solver->setSwapListener(listener);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-CrossValidationSolver<Kernel, Matrix, Strategy>::~CrossValidationSolver() {
+template<typename Matrix, typename Strategy>
+CrossValidationSolver<Matrix, Strategy>::~CrossValidationSolver() {
 	delete solver;
 	delete [] innerFoldsMembership;
 	delete [] outerFoldsMembership;
@@ -199,8 +199,8 @@ CrossValidationSolver<Kernel, Matrix, Strategy>::~CrossValidationSolver() {
 	delete [] outerFoldSizes;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void CrossValidationSolver<Kernel, Matrix, Strategy>::sortVectors(
+template<typename Matrix, typename Strategy>
+void CrossValidationSolver<Matrix, Strategy>::sortVectors(
 		fold_id *membership, fold_id fold, quantity num) {
 	id train = 0;
 	id test = num - 1;
@@ -219,8 +219,8 @@ void CrossValidationSolver<Kernel, Matrix, Strategy>::sortVectors(
 	}
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void CrossValidationSolver<Kernel, Matrix, Strategy>::resetInnerFold(
+template<typename Matrix, typename Strategy>
+void CrossValidationSolver<Matrix, Strategy>::resetInnerFold(
 		fold_id fold) {
 #ifdef SUPPORT_VECTOR_REUSE
 	solver->shrink();
@@ -233,8 +233,8 @@ void CrossValidationSolver<Kernel, Matrix, Strategy>::resetInnerFold(
 	solver->setCurrentSize(innerFoldSizes[fold]);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void CrossValidationSolver<Kernel, Matrix, Strategy>::resetOuterFold(
+template<typename Matrix, typename Strategy>
+void CrossValidationSolver<Matrix, Strategy>::resetOuterFold(
 		fold_id fold) {
 	outerFold = fold;
 
@@ -252,8 +252,8 @@ void CrossValidationSolver<Kernel, Matrix, Strategy>::resetOuterFold(
 	solver->reset();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void CrossValidationSolver<Kernel, Matrix, Strategy>::trainOuter() {
+template<typename Matrix, typename Strategy>
+void CrossValidationSolver<Matrix, Strategy>::trainOuter() {
 	solver->reset();
 
 	solver->setCurrentSize(outerFoldSizes[outerFold]);
@@ -261,12 +261,12 @@ void CrossValidationSolver<Kernel, Matrix, Strategy>::trainOuter() {
 	this->train();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-TestingResult CrossValidationSolver<Kernel, Matrix, Strategy>::test(
+template<typename Matrix, typename Strategy>
+TestingResult CrossValidationSolver<Matrix, Strategy>::test(
 		sample_id from, sample_id to) {
 	label_id *labels = solver->getLabels();
 	quantity correct = 0;
-	Classifier<Kernel, Matrix> *classifier = solver->getClassifier();
+	Classifier<Matrix> *classifier = solver->getClassifier();
 	for (sample_id test = from; test < to; test++) {
 		label_id label = classifier->classify(test);
 		if (label == labels[test]) {
@@ -277,19 +277,19 @@ TestingResult CrossValidationSolver<Kernel, Matrix, Strategy>::test(
 	return TestingResult((fvalue) correct / (to - from));
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline TestingResult CrossValidationSolver<Kernel, Matrix, Strategy>::testInner(
+template<typename Matrix, typename Strategy>
+inline TestingResult CrossValidationSolver<Matrix, Strategy>::testInner(
 		fold_id fold) {
 	return test(this->innerFoldSizes[fold], this->outerFoldSizes[outerFold]);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline TestingResult CrossValidationSolver<Kernel, Matrix, Strategy>::testOuter() {
+template<typename Matrix, typename Strategy>
+inline TestingResult CrossValidationSolver<Matrix, Strategy>::testOuter() {
 	return test(this->outerFoldSizes[outerFold], solver->getSize());
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-TestingResult CrossValidationSolver<Kernel, Matrix, Strategy>::doCrossValidation() {
+template<typename Matrix, typename Strategy>
+TestingResult CrossValidationSolver<Matrix, Strategy>::doCrossValidation() {
 	TestingResult result;
 
 	Timer timer;
@@ -320,59 +320,59 @@ TestingResult CrossValidationSolver<Kernel, Matrix, Strategy>::doCrossValidation
 	return result;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-quantity CrossValidationSolver<Kernel, Matrix, Strategy>::getInnerFoldsNumber() {
+template<typename Matrix, typename Strategy>
+quantity CrossValidationSolver<Matrix, Strategy>::getInnerFoldsNumber() {
 	return innerFoldsNumber;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-quantity CrossValidationSolver<Kernel, Matrix, Strategy>::getOuterFoldsNumber() {
+template<typename Matrix, typename Strategy>
+quantity CrossValidationSolver<Matrix, Strategy>::getOuterFoldsNumber() {
 	return outerFoldsNumber;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-fold_id CrossValidationSolver<Kernel, Matrix, Strategy>::getOuterFold() {
+template<typename Matrix, typename Strategy>
+fold_id CrossValidationSolver<Matrix, Strategy>::getOuterFold() {
 	return outerFold;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-quantity CrossValidationSolver<Kernel, Matrix, Strategy>::getOuterProblemSize() {
+template<typename Matrix, typename Strategy>
+quantity CrossValidationSolver<Matrix, Strategy>::getOuterProblemSize() {
 	return outerProblemSize;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline Matrix* CrossValidationSolver<Kernel, Matrix, Strategy>::getSamples() {
+template<typename Matrix, typename Strategy>
+inline Matrix* CrossValidationSolver<Matrix, Strategy>::getSamples() {
 	return solver->getSamples();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline label_id* CrossValidationSolver<Kernel, Matrix, Strategy>::getLabels() {
+template<typename Matrix, typename Strategy>
+inline label_id* CrossValidationSolver<Matrix, Strategy>::getLabels() {
 	return solver->getLabels();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline map<label_id, string>& CrossValidationSolver<Kernel, Matrix, Strategy>::getLabelNames() {
+template<typename Matrix, typename Strategy>
+inline map<label_id, string>& CrossValidationSolver<Matrix, Strategy>::getLabelNames() {
 	return solver->getLabelNames();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline StateHolder<Matrix>& CrossValidationSolver<Kernel, Matrix, Strategy>::getStateHolder() {
+template<typename Matrix, typename Strategy>
+inline StateHolder<Matrix>& CrossValidationSolver<Matrix, Strategy>::getStateHolder() {
 	return *solver;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline void CrossValidationSolver<Kernel, Matrix, Strategy>::setKernelParams(
-		fvalue c, Kernel& params) {
+template<typename Matrix, typename Strategy>
+inline void CrossValidationSolver<Matrix, Strategy>::setKernelParams(
+		fvalue c, CGaussKernel& params) {
 	solver->setKernelParams(c, params);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline void CrossValidationSolver<Kernel, Matrix, Strategy>::train() {
+template<typename Matrix, typename Strategy>
+inline void CrossValidationSolver<Matrix, Strategy>::train() {
 	solver->train();
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-inline Classifier<Kernel, Matrix>* CrossValidationSolver<Kernel, Matrix, Strategy>::getClassifier() {
+template<typename Matrix, typename Strategy>
+inline Classifier<Matrix>* CrossValidationSolver<Matrix, Strategy>::getClassifier() {
 	return solver->getClassifier();
 }
 

@@ -60,10 +60,10 @@ struct PairwiseTrainingResult {
  * Pairwise classifier perform classification based on SVM models created by
  * pairwise solver.
  */
-template<typename Kernel, typename Matrix>
-class PairwiseClassifier: public Classifier<Kernel, Matrix> {
+template<typename Matrix>
+class PairwiseClassifier: public Classifier<Matrix> {
 
-	RbfKernelEvaluator<Kernel, Matrix>* evaluator;
+	RbfKernelEvaluator<Matrix>* evaluator;
 	PairwiseTrainingResult* state;
 	fvector *buffer;
 
@@ -76,7 +76,7 @@ protected:
 	fvalue convertDecisionToEvidence(fvalue decision);
 
 public:
-	PairwiseClassifier(RbfKernelEvaluator<Kernel, Matrix> *evaluator,
+	PairwiseClassifier(RbfKernelEvaluator<Matrix> *evaluator,
 			PairwiseTrainingResult* state, fvector *buffer);
 	virtual ~PairwiseClassifier();
 
@@ -85,9 +85,9 @@ public:
 
 };
 
-template<typename Kernel, typename Matrix>
-PairwiseClassifier<Kernel, Matrix>::PairwiseClassifier(
-		RbfKernelEvaluator<Kernel, Matrix> *evaluator,
+template<typename Matrix>
+PairwiseClassifier<Matrix>::PairwiseClassifier(
+		RbfKernelEvaluator<Matrix> *evaluator,
 		PairwiseTrainingResult* state, fvector *buffer) :
 		evaluator(evaluator),
 		state(state),
@@ -96,12 +96,12 @@ PairwiseClassifier<Kernel, Matrix>::PairwiseClassifier(
 		evidence(state->totalLabelCount){
 }
 
-template<typename Kernel, typename Matrix>
-PairwiseClassifier<Kernel, Matrix>::~PairwiseClassifier() {
+template<typename Matrix>
+PairwiseClassifier<Matrix>::~PairwiseClassifier() {
 }
 
-template<typename Kernel, typename Matrix>
-label_id PairwiseClassifier<Kernel, Matrix>::classify(sample_id sample) {
+template<typename Matrix>
+label_id PairwiseClassifier<Matrix>::classify(sample_id sample) {
 	fill(votes.begin(), votes.end(), 0);
 	fill(evidence.begin(), evidence.end(), 0.0);
 
@@ -135,8 +135,8 @@ label_id PairwiseClassifier<Kernel, Matrix>::classify(sample_id sample) {
 	return maxLabelId;
 }
 
-template<typename Kernel, typename Matrix>
-fvalue PairwiseClassifier<Kernel, Matrix>::getDecisionForModel(sample_id sample,
+template<typename Matrix>
+fvalue PairwiseClassifier<Matrix>::getDecisionForModel(sample_id sample,
 		PairwiseTrainingModel* model, fvector* buffer) {
 	fvalue dec = model->bias;
 	fvalue* kernels = buffer->data;
@@ -146,14 +146,14 @@ fvalue PairwiseClassifier<Kernel, Matrix>::getDecisionForModel(sample_id sample,
 	return dec;
 }
 
-template<typename Kernel, typename Matrix>
-inline fvalue PairwiseClassifier<Kernel, Matrix>::convertDecisionToEvidence(
+template<typename Matrix>
+inline fvalue PairwiseClassifier<Matrix>::convertDecisionToEvidence(
 		fvalue decision) {
 	return decision;
 }
 
-template<typename Kernel, typename Matrix>
-quantity PairwiseClassifier<Kernel, Matrix>::getSvNumber() {
+template<typename Matrix>
+quantity PairwiseClassifier<Matrix>::getSvNumber() {
 	return state->maxSVCount;
 }
 
@@ -162,13 +162,13 @@ quantity PairwiseClassifier<Kernel, Matrix>::getSvNumber() {
  * Pairwise solver performs SVM training by generating SVM state for all
  * two-element combinations of the class trainingLabels.
  */
-template<typename Kernel, typename Matrix, typename Strategy>
-class PairwiseSolver: public AbstractSolver<Kernel, Matrix, Strategy> {
+template<typename Matrix, typename Strategy>
+class PairwiseSolver: public AbstractSolver<Matrix, Strategy> {
 
 	template<typename K, typename V>
 	struct PairValueComparator {
 
-		bool operator()(pair<K, V> pair1, pair<K, V> pair2) {
+		bool operator()(pair<K,V> pair1, pair<K,V> pair2) {
 			return pair1.second > pair2.second;
 		}
 
@@ -180,8 +180,8 @@ class PairwiseSolver: public AbstractSolver<Kernel, Matrix, Strategy> {
 			pair<label_id, label_id>& labelPair);
 
 protected:
-	CachedKernelEvaluator<Kernel, Matrix, Strategy>* buildCache(
-			fvalue c, Kernel &gparams);
+	CachedKernelEvaluator<Matrix, Strategy>* buildCache(
+			fvalue c, CGaussKernel &gparams);
 
 public:
 	PairwiseSolver(map<label_id, string> labelNames, Matrix *samples,
@@ -190,19 +190,19 @@ public:
 	virtual ~PairwiseSolver();
 
 	void train();
-	Classifier<Kernel, Matrix>* getClassifier();
+	Classifier<Matrix>* getClassifier();
 
 	quantity getSvNumber();
 
 };
 
 
-template<typename Kernel, typename Matrix, typename Strategy>
-PairwiseSolver<Kernel, Matrix, Strategy>::PairwiseSolver(
+template<typename Matrix, typename Strategy>
+PairwiseSolver<Matrix, Strategy>::PairwiseSolver(
 		map<label_id, string> labelNames, Matrix *samples,
 		label_id *labels, TrainParams &params,
 		StopCriterionStrategy *stopStrategy) :
-		AbstractSolver<Kernel, Matrix, Strategy>(labelNames,
+		AbstractSolver<Matrix, Strategy>(labelNames,
 				samples, labels, params, stopStrategy),
 		state(PairwiseTrainingResult()) {
 	label_id maxLabel = (label_id) labelNames.size();
@@ -230,21 +230,21 @@ PairwiseSolver<Kernel, Matrix, Strategy>::PairwiseSolver(
 	state.totalLabelCount = maxLabel;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-PairwiseSolver<Kernel, Matrix, Strategy>::~PairwiseSolver() {
+template<typename Matrix, typename Strategy>
+PairwiseSolver<Matrix, Strategy>::~PairwiseSolver() {
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-Classifier<Kernel, Matrix>* PairwiseSolver<Kernel, Matrix, Strategy>::getClassifier() {
-	return new PairwiseClassifier<Kernel, Matrix>(this->cache->getEvaluator(),
+template<typename Matrix, typename Strategy>
+Classifier<Matrix>* PairwiseSolver<Matrix, Strategy>::getClassifier() {
+	return new PairwiseClassifier<Matrix>(this->cache->getEvaluator(),
 			&state, this->cache->getBuffer());
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
-	BiasEvaluatorFactory<Kernel, Matrix> factory;
-	RbfKernelEvaluator<Kernel, Matrix>* evaluator = this->cache->getEvaluator();
-	scoped_ptr<BiasEvaluationStrategy<Kernel, Matrix> > strategy(
+template<typename Matrix, typename Strategy>
+void PairwiseSolver<Matrix, Strategy>::train() {
+	BiasEvaluatorFactory<Matrix> factory;
+	RbfKernelEvaluator<Matrix>* evaluator = this->cache->getEvaluator();
+	scoped_ptr<BiasEvaluationStrategy<Matrix> > strategy(
 			factory.createEvaluator(this->params.bias, evaluator));
 
 	quantity totalSize = this->currentSize;
@@ -280,8 +280,8 @@ void PairwiseSolver<Kernel, Matrix, Strategy>::train() {
 	this->setCurrentSize(totalSize);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-quantity PairwiseSolver<Kernel, Matrix, Strategy>::reorderSamples(
+template<typename Matrix, typename Strategy>
+quantity PairwiseSolver<Matrix, Strategy>::reorderSamples(
 		label_id *labels, quantity size, pair<label_id, label_id>& labelPair) {
 	label_id first = labelPair.first;
 	label_id second = labelPair.second;
@@ -301,18 +301,18 @@ quantity PairwiseSolver<Kernel, Matrix, Strategy>::reorderSamples(
 	return train;
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-CachedKernelEvaluator<Kernel, Matrix, Strategy>* PairwiseSolver<Kernel, Matrix, Strategy>::buildCache(
-		fvalue c, Kernel &gparams) {
+template<typename Matrix, typename Strategy>
+CachedKernelEvaluator<Matrix, Strategy>* PairwiseSolver<Matrix, Strategy>::buildCache(
+		fvalue c, CGaussKernel &gparams) {
 	fvalue bias = (this->params.bias == NO) ? 0.0 : 1.0;
-	RbfKernelEvaluator<CGaussKernel, Matrix> *rbf = new RbfKernelEvaluator<CGaussKernel, Matrix>(
+	RbfKernelEvaluator<Matrix> *rbf = new RbfKernelEvaluator<Matrix>(
 			this->samples, this->labels, 2, bias, c, gparams, this->params.epochs, this->params.margin);
-	return new CachedKernelEvaluator<CGaussKernel, Matrix, Strategy>(
+	return new CachedKernelEvaluator<Matrix, Strategy>(
 			rbf, &this->strategy, this->size, this->params.cache.size, NULL);
 }
 
-template<typename Kernel, typename Matrix, typename Strategy>
-quantity PairwiseSolver<Kernel, Matrix, Strategy>::getSvNumber() {
+template<typename Matrix, typename Strategy>
+quantity PairwiseSolver<Matrix, Strategy>::getSvNumber() {
 	return state.maxSVCount;
 }
 

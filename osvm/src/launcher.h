@@ -28,29 +28,29 @@ class ApplicationLauncher {
 	void selectMatrixTypeAndRun();
 
 	template<typename Matrix>
-	Classifier<CGaussKernel, Matrix>* run();
+	Classifier<Matrix>* run();
 
 protected:
 	template<typename Matrix, typename Strategy>
-	CrossValidationSolver<CGaussKernel, Matrix, Strategy>* createCrossValidator();
+	CrossValidationSolver<Matrix, Strategy>* createCrossValidator();
 
 	template<typename Matrix, typename Strategy>
-	AbstractSolver<CGaussKernel, Matrix, Strategy>* createSolver();
+	AbstractSolver<Matrix, Strategy>* createSolver();
 
 	template<typename Matrix, typename Strategy>
 	GridGaussianModelSelector<Matrix, Strategy>* createModelSelector();
 
 	template<typename Matrix, typename Strategy>
-	Classifier<CGaussKernel, Matrix>* performTraining();
+	Classifier<Matrix>* performTraining();
 
 	template<typename Matrix, typename Strategy>
-	Classifier<CGaussKernel, Matrix>* performCrossValidation();
+	Classifier<Matrix>* performCrossValidation();
 
 	template<typename Matrix, typename Strategy>
-	Classifier<CGaussKernel, Matrix>* performModelSelection();
+	Classifier<Matrix>* performModelSelection();
 
 	template<typename Matrix, typename Strategy>
-	Classifier<CGaussKernel, Matrix>* performNestedCrossValidation();
+	Classifier<Matrix>* performNestedCrossValidation();
 
 public:
 	ApplicationLauncher(Configuration &conf) : conf(conf) {
@@ -61,14 +61,14 @@ public:
 };
 
 template<typename Matrix, typename Strategy>
-CrossValidationSolver<CGaussKernel, Matrix, Strategy>* ApplicationLauncher::createCrossValidator() {
+CrossValidationSolver<Matrix, Strategy>* ApplicationLauncher::createCrossValidator() {
 	ifstream input(conf.dataFile.c_str());
 	BaseSolverFactory<Matrix, Strategy> reader(
 			input, conf.trainingParams, conf.stopCriterion);
 
 	Timer timer(true);
-	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
-			= (CrossValidationSolver<CGaussKernel, Matrix, Strategy>*) reader.getCrossValidationSolver(
+	CrossValidationSolver<Matrix, Strategy> *solver
+			= (CrossValidationSolver<Matrix, Strategy>*) reader.getCrossValidationSolver(
 					conf.validation.innerFolds, conf.validation.outerFolds);
 	timer.stop();
 
@@ -78,12 +78,12 @@ CrossValidationSolver<CGaussKernel, Matrix, Strategy>* ApplicationLauncher::crea
 }
 
 template<typename Matrix, typename Strategy>
-AbstractSolver<CGaussKernel, Matrix, Strategy>* ApplicationLauncher::createSolver() {
+AbstractSolver<Matrix, Strategy>* ApplicationLauncher::createSolver() {
 	ifstream input(conf.dataFile.c_str());
 	BaseSolverFactory<Matrix, Strategy> reader(input, conf.trainingParams, conf.stopCriterion);
 
 	Timer timer(true);
-	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = reader.getSolver();
+	AbstractSolver<Matrix, Strategy> *solver = reader.getSolver();
 	timer.stop();
 
 	logger << format("input reading time: %.2f[s]\n") % timer.getTimeElapsed();
@@ -104,8 +104,8 @@ GridGaussianModelSelector<Matrix, Strategy>* ApplicationLauncher::createModelSel
 }
 
 template<typename Matrix, typename Strategy>
-Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performModelSelection() {
-	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
+Classifier<Matrix>* ApplicationLauncher::performModelSelection() {
+	CrossValidationSolver<Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
 	Timer timer(true);
@@ -123,8 +123,8 @@ Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performModelSelection() {
 }
 
 template<typename Matrix, typename Strategy>
-Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performNestedCrossValidation() {
-	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
+Classifier<Matrix>* ApplicationLauncher::performNestedCrossValidation() {
+	CrossValidationSolver<Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
 	Timer timer(true);
@@ -141,8 +141,8 @@ Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performNestedCrossValidat
 }
 
 template<typename Matrix, typename Strategy>
-Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performCrossValidation() {
-	CrossValidationSolver<CGaussKernel, Matrix, Strategy> *solver
+Classifier<Matrix>* ApplicationLauncher::performCrossValidation() {
+	CrossValidationSolver<Matrix, Strategy> *solver
 			= createCrossValidator<Matrix, Strategy>();
 
 	Timer timer(true);
@@ -158,14 +158,14 @@ Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performCrossValidation() 
 }
 
 template<typename Matrix, typename Strategy>
-Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performTraining() {
-	AbstractSolver<CGaussKernel, Matrix, Strategy> *solver = createSolver<Matrix, Strategy>();
+Classifier<Matrix>* ApplicationLauncher::performTraining() {
+	AbstractSolver<Matrix, Strategy> *solver = createSolver<Matrix, Strategy>();
 
 	Timer timer(true);
 	CGaussKernel param(conf.searchRange.gammaLow);
 	solver->setKernelParams(conf.searchRange.cLow, param);
 	solver->train();
-	Classifier<CGaussKernel, Matrix>* classifier = solver->getClassifier();
+	Classifier<Matrix>* classifier = solver->getClassifier();
 	timer.stop();
 
 	Matrix *samples = solver->getSamples();
@@ -188,8 +188,8 @@ Classifier<CGaussKernel, Matrix>* ApplicationLauncher::performTraining() {
 }
 
 template<typename Matrix>
-Classifier<CGaussKernel, Matrix>* ApplicationLauncher::run() {
-	Classifier<CGaussKernel, Matrix>* classifier;
+Classifier<Matrix>* ApplicationLauncher::run() {
+	Classifier<Matrix>* classifier;
 	if (conf.validation.outerFolds > 1) {
 		classifier = performNestedCrossValidation<Matrix, SolverStrategy >();
 	} else {
