@@ -48,6 +48,7 @@ Configuration ParametersParser::getConfiguration() {
 		throw invalid_configuration("input file not specified");
 	}
 
+  // SVM cross validation parameter setting
 	SearchRange range;
 	range.cResolution = vars[PR_KEY_RES].as<int>();
 	range.cLow = vars[PR_KEY_C_LOW].as<fvalue>();
@@ -59,6 +60,8 @@ Configuration ParametersParser::getConfiguration() {
 
 	quantity drawNumber = vars[PR_KEY_DRAW_NUM].as<int>();
 	quantity cacheSize = vars[PR_KEY_CACHE_SIZE].as<int>();
+
+  // Whether to use bias in our SVM model or not. The default is yes.
 	BiasType bias = YES;
 	string biasEvaluation = vars[PR_KEY_BIAS].as<string>();
 	if (BIAS_CALCULATION_NO == biasEvaluation) {
@@ -80,45 +83,14 @@ Configuration ParametersParser::getConfiguration() {
 	params.margin = margin;
 	conf.trainingParams = params;
 
-	string stopStr = vars[PR_KEY_STOP_CRIT].as<string>();
-	StopCriterion stop;
-	if (STOP_CRIT_YOC == stopStr) {
-		stop = YOC;
-	} else {
-		throw invalid_configuration("invalid stopping criterion: " + stopStr);
-	}
-	conf.stopCriterion = stop;
-
+  // cross-validation inner and outer folds
 	conf.validation.innerFolds = vars[PR_KEY_INNER_FLD].as<int>();
 	conf.validation.outerFolds = vars[PR_KEY_OUTER_FLD].as<int>();
+  // TODO: eventually we don't need this in the configuration because we always use pairwise
+	conf.multiclass = PAIRWISE;
 
-	string matrix = vars[PR_KEY_MATRIX_TYPE].as<string>();
-	if (MAT_TYPE_SPARSE == matrix) {
-		conf.matrixType = SPARSE;
-	} else if (MAT_TYPE_DENSE == matrix) {
-		conf.matrixType = DENSE;
-	} else {
-		string msg = (format("invalid matrix type: '%s'") % matrix).str();
-		throw invalid_configuration(msg);
-	}
-
-	string multiclass = vars[PR_KEY_MULTICLASS].as<string>();
-	if (MULTICLASS_PAIRWISE == multiclass) {
-		conf.multiclass = PAIRWISE;
-	} else {
-		string msg = (format("invalid multiclass approach: '%s'") % multiclass).str();
-		throw invalid_configuration(msg);
-	}
-
-	string modelSelection = vars[PR_KEY_SEL_TYPE].as<string>();
-	if (SEL_TYPE_GRID == modelSelection) {
-		conf.validation.modelSelection = GRID;
-	} else if (SEL_TYPE_PATTERN == modelSelection) {
-		conf.validation.modelSelection = PATTERN;
-	} else {
-		string msg = (format("invalid model selection type: '%s'") % modelSelection).str();
-		throw invalid_configuration(msg);
-	}
+  // TODO: we only really use pattern search
+	conf.validation.modelSelection = PATTERN;
 
 	return conf;
 }
