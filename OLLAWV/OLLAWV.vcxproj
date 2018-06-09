@@ -195,6 +195,7 @@
     <ClCompile Include="..\osvm\src\osvm.cc" />
     <ClCompile Include="..\osvm\src\svm\generator.cc" />
     <ClCompile Include="..\osvm\src\svm\kernel.cc" />
+    <ClCompile Include="..\osvm\src\svm\pairwise_solver.cc" />
     <ClCompile Include="..\osvm\src\svm\params.cc" />
     <ClCompile Include="..\osvm\src\svm\stop.cc" />
     <ClCompile Include="..\osvm\src\time\timer.cc" />

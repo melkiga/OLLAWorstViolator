@@ -20,7 +20,6 @@
 #define CLASSIFY_H_
 
 
-template<typename Matrix>
 class Classifier {
 
 public:

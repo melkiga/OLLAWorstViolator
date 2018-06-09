@@ -78,6 +78,9 @@
     <ClCompile Include="Testing\TestHelpers.cpp">
       <Filter>Testing</Filter>
     </ClCompile>
+    <ClCompile Include="..\osvm\src\svm\pairwise_solver.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\osvm\src\configuration.h">

@@ -26,14 +26,11 @@
 #define MAX_EIG_PROB_SIZE 1000
 #define DEFAULT_PCA_THRESH 0.99
 
-template<typename Matrix>
 class FeatureProcessor {
 
 public:
-	void normalize(Matrix *samples);
-	void randomize(Matrix *samples, label_id *labels);
-	void reduceDimensionality(Matrix *samples, fvalue threshold = DEFAULT_PCA_THRESH);
-
+	void normalize(sfmatrix *samples);
+	void randomize(sfmatrix *samples, label_id *labels);
 };
 
 #endif

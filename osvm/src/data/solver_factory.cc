@@ -18,28 +18,7 @@
 
 #include "solver_factory.h"
 
-template<>
-dfmatrix* FeatureMatrixBuilder<dfmatrix>::getFeatureMatrix(
-		list<map<feature_id, fvalue> >& features,
-		map<feature_id, feature_id>& mappings) {
-	fmatrix *samples = fmatrix_alloc(features.size(), mappings.size());
-	sample_id row = 0;
-
-	list<map<feature_id, fvalue> >::iterator lit;
-	for (lit = features.begin(); lit != features.end(); lit++) {
-		map<feature_id, fvalue>::iterator mit;
-		for (mit = lit->begin(); mit != lit->end(); mit++) {
-			fmatrix_set(samples, row, mappings[mit->first], mit->second);
-		}
-		row++;
-	}
-	return new DenseMatrix(samples);
-}
-
-template<>
-sfmatrix* FeatureMatrixBuilder<sfmatrix>::getFeatureMatrix(
-		list<map<feature_id, fvalue> >& features,
-		map<feature_id, feature_id>& mappings) {
+sfmatrix* FeatureMatrixBuilder::getFeatureMatrix(list<map<feature_id, fvalue> >& features, map<feature_id, feature_id>& mappings) {
 	// count total number of features
 	quantity total = 0;
 	list<map<feature_id, fvalue> >::iterator lit;

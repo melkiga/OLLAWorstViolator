@@ -107,7 +107,7 @@ struct CacheDimension {
 /*
 Holds the current model. 
 */
-template<typename Matrix, typename Strategy>
+template<typename Strategy>
 class CachedKernelEvaluator {
 
 	vector<fvalue> output;
@@ -139,7 +139,7 @@ class CachedKernelEvaluator {
 
 	entry_id lruEntry;
 
-	RbfKernelEvaluator<Matrix> *evaluator;
+	RbfKernelEvaluator *evaluator;
 	Strategy *strategy;
 
 	SwapListener *listener;
@@ -153,7 +153,7 @@ protected:
 	void evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector *result);
 
 public:
-	CachedKernelEvaluator(RbfKernelEvaluator<Matrix> *evaluator, Strategy *strategy, quantity probSize, quantity cchSize, SwapListener *listener);
+	CachedKernelEvaluator(RbfKernelEvaluator *evaluator, Strategy *strategy, quantity probSize, quantity cchSize, SwapListener *listener);
 	~CachedKernelEvaluator();
 
 	fvalue checkViolation(sample_id v);
@@ -174,7 +174,7 @@ public:
 
   CGaussKernel getParams();
 	fvalue getC();
-	RbfKernelEvaluator<Matrix>* getEvaluator();
+	RbfKernelEvaluator* getEvaluator();
 	vector<fvalue>& getAlphas();
 	fvector* getAlphasView();
 	fvector* getBuffer();
@@ -188,10 +188,8 @@ public:
 	fvalue getMargin();
 };
 
-template<typename Matrix, typename Strategy>
-CachedKernelEvaluator<Matrix, Strategy>::CachedKernelEvaluator(
-		RbfKernelEvaluator<Matrix> *evaluator, Strategy *strategy,
-		quantity probSize, quantity cchSize, SwapListener *listener) :
+template<typename Strategy>
+CachedKernelEvaluator<Strategy>::CachedKernelEvaluator(RbfKernelEvaluator *evaluator, Strategy *strategy, quantity probSize, quantity cchSize, SwapListener *listener) :
 		evaluator(evaluator),
 		strategy(strategy),
 		listener(listener) {
@@ -234,8 +232,8 @@ CachedKernelEvaluator<Matrix, Strategy>::CachedKernelEvaluator(
 	initialize();
 }
 
-template<typename Matrix, typename Strategy>
-CachedKernelEvaluator<Matrix, Strategy>::~CachedKernelEvaluator() {
+template<typename Strategy>
+CachedKernelEvaluator<Strategy>::~CachedKernelEvaluator() {
 	delete evaluator;
 	delete listener;
 	delete [] cache;
@@ -246,29 +244,29 @@ CachedKernelEvaluator<Matrix, Strategy>::~CachedKernelEvaluator() {
 	fvector_free(kernelVector);
 }
 
-template<typename Matrix, typename Strategy>
-fvalue CachedKernelEvaluator<Matrix, Strategy>::checkViolation(sample_id v) {
+template<typename Strategy>
+fvalue CachedKernelEvaluator<Strategy>::checkViolation(sample_id v) {
 	return output[v]*getLabel(v);
 }
 
 /*
 * Sets model label to be (+1 or -1) depending on which is the first training pair
 */
-template<typename Matrix, typename Strategy>
-inline void CachedKernelEvaluator<Matrix, Strategy>::setLabel(pair<label_id, label_id> trainPair) {
+template<typename Strategy>
+inline void CachedKernelEvaluator<Strategy>::setLabel(pair<label_id, label_id> trainPair) {
 	evaluator->setLabel(trainPair.second);
 }
 
 /*
  * Returns the label (+1 or -1)
  */
-template<typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Matrix, Strategy>::getLabel(sample_id v) {
+template<typename Strategy>
+inline fvalue CachedKernelEvaluator<Strategy>::getLabel(sample_id v) {
 	return evaluator->getLabel(v);
 }
 
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::resizeCache() {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::resizeCache() {
 	quantity newCacheDepth = min((quantity) (CACHE_DEPTH_INCREASE * cacheDepth), problemSize);
 	quantity newCacheLines = min(cacheSize / newCacheDepth, problemSize);
 	fvalue *newCache = new fvalue[cacheSize];
@@ -323,16 +321,16 @@ void CachedKernelEvaluator<Matrix, Strategy>::resizeCache() {
 /*
 Returns the current number of support vectors.
 */
-template<typename Matrix, typename Strategy>
-inline quantity CachedKernelEvaluator<Matrix, Strategy>::getSVNumber() {
+template<typename Strategy>
+inline quantity CachedKernelEvaluator<Strategy>::getSVNumber() {
 	return svnumber;
 }
 
 /* Returns the worst violator (index and corresponding error), 
 	i.e. the sample with the largest error, excluding the current support vectors. 
 */
-template<typename Matrix, typename Strategy>
-CWorstViolator CachedKernelEvaluator<Matrix, Strategy>::findWorstViolator() {
+template<typename Strategy>
+CWorstViolator CachedKernelEvaluator<Strategy>::findWorstViolator() {
 	fvalue currentWorstError = INT_MAX;
 	sample_id currentWorstErrorIndex = INT_MAX;
 	fvalue error = 0.0;
@@ -362,8 +360,8 @@ CWorstViolator CachedKernelEvaluator<Matrix, Strategy>::findWorstViolator() {
  * by the gradient, added to the output vector, as well as the bias update. (output = output + update*K + biasUpdate). Finally, the 
  * WV alpha is updated and the bias too.
  */
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::performSGDUpdate(sample_id worstViolator, fvalue gradient, fvalue biasGradient) {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::performSGDUpdate(sample_id worstViolator, fvalue gradient, fvalue biasGradient) {
 	// get kernel vector with respect to v
 	evalKernel(worstViolator, svnumber, currentSize, kernelVector);
 
@@ -378,8 +376,8 @@ void CachedKernelEvaluator<Matrix, Strategy>::performSGDUpdate(sample_id worstVi
 }
 
 
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::setSwapListener(SwapListener *listener) {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::setSwapListener(SwapListener *listener) {
 	this->listener = listener;
 }
 
@@ -387,8 +385,8 @@ void CachedKernelEvaluator<Matrix, Strategy>::setSwapListener(SwapListener *list
  * Swaps the cache attribute samples when a new support vector is found. The support vectors are
  * stacked at the top of each of the attribute values.
  */
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::swapSamples(sample_id u, sample_id v) {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::swapSamples(sample_id u, sample_id v) {
 	evaluator->swapSamples(u, v);
 	swap(output[u], output[v]);
 
@@ -419,8 +417,8 @@ void CachedKernelEvaluator<Matrix, Strategy>::swapSamples(sample_id u, sample_id
  * Resets the cache based on the current dimension.
  * Calls initalize when the cache dimension is found.
  */
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::reset() {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::reset() {
 	CacheDimension dim = findCacheDimension(cacheSize, problemSize);
 	cacheLines = dim.lines;
 	cacheDepth = dim.depth;
@@ -431,8 +429,8 @@ void CachedKernelEvaluator<Matrix, Strategy>::reset() {
 /* 
  * Initialize the cache. Allocates memory for the alphas, output values.
  */
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::initialize() {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::initialize() {
 	// initialize alphas and kernel values
 	for (sample_id i = 0; i < problemSize; i++) {
 		alphas[i] = 0.0;
@@ -482,8 +480,8 @@ void CachedKernelEvaluator<Matrix, Strategy>::initialize() {
 	evaluator->resetBias();
 }
 
-template<typename Matrix, typename Strategy>
-CacheDimension CachedKernelEvaluator<Matrix, Strategy>::findCacheDimension(
+template<typename Strategy>
+CacheDimension CachedKernelEvaluator<Strategy>::findCacheDimension(
 		quantity cacheSize, quantity problemSize) {
 	CacheDimension dimension;
 	if (cacheSize / problemSize < problemSize) {
@@ -499,8 +497,8 @@ CacheDimension CachedKernelEvaluator<Matrix, Strategy>::findCacheDimension(
 /*
  * Sets the current kernel parameters.
  */
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::setKernelParams(fvalue c, CGaussKernel gparams) {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::setKernelParams(fvalue c, CGaussKernel gparams) {
 	evaluator->setKernelParams(c, gparams);
 	reset();
 }
@@ -509,8 +507,8 @@ void CachedKernelEvaluator<Matrix, Strategy>::setKernelParams(fvalue c, CGaussKe
  * Update the location of the current worst-violator, aka: support vector (SV). Swap the current SV with the first non-SV,
  * update it's location (which is now svnumber). Increment the number of support vectors and the alphas view size.
  */
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::performSvUpdate(sample_id& worstViolator) {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::performSvUpdate(sample_id& worstViolator) {
 	// TODO: have a look at what's going on here.
 	if (svnumber >= cacheDepth) {
 		resizeCache();
@@ -529,82 +527,81 @@ void CachedKernelEvaluator<Matrix, Strategy>::performSvUpdate(sample_id& worstVi
  * Evaluate the Gaussian RBF Kernel vector with respect to sample 'id' against samples in range 'rangeFrom' to 'rangeTo'.
  * Store the result in 'result'
  */
-template<typename Matrix, typename Strategy>
-inline void CachedKernelEvaluator<Matrix, Strategy>::evalKernel(sample_id id,
-		sample_id rangeFrom, sample_id rangeTo, fvector *result) {
+template<typename Strategy>
+inline void CachedKernelEvaluator<Strategy>::evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector *result) {
 	evaluator->evalKernel(id, rangeFrom, rangeTo, result);
 }
 
 /*
  * Returns the current kernel parameters of the evaluator. 
  */
-template<typename Matrix, typename Strategy>
-inline CGaussKernel CachedKernelEvaluator<Matrix, Strategy>::getParams() {
+template<typename Strategy>
+inline CGaussKernel CachedKernelEvaluator<Strategy>::getParams() {
 	return evaluator->getParams();
 }
 
-template<typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Matrix, Strategy>::getC() {
+template<typename Strategy>
+inline fvalue CachedKernelEvaluator<Strategy>::getC() {
 	return evaluator->getC();
 }
 
-template<typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Matrix, Strategy>::getMargin() {
+template<typename Strategy>
+inline fvalue CachedKernelEvaluator<Strategy>::getMargin() {
 	return evaluator->getMargin();
 }
 
-template<typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Matrix, Strategy>::getEpochs() {
+template<typename Strategy>
+inline fvalue CachedKernelEvaluator<Strategy>::getEpochs() {
 	return evaluator->getEpochs();
 }
 
-template<typename Matrix, typename Strategy>
-inline fvalue CachedKernelEvaluator<Matrix, Strategy>::getBetta() {
+template<typename Strategy>
+inline fvalue CachedKernelEvaluator<Strategy>::getBetta() {
 	return evaluator->getBetta();
 }
 
-template<typename Matrix, typename Strategy>
-inline RbfKernelEvaluator<Matrix>* CachedKernelEvaluator<Matrix, Strategy>::getEvaluator() {
+template<typename Strategy>
+inline RbfKernelEvaluator* CachedKernelEvaluator<Strategy>::getEvaluator() {
 	return evaluator;
 }
 
-template<typename Matrix, typename Strategy>
-inline vector<fvalue>& CachedKernelEvaluator<Matrix, Strategy>::getAlphas() {
+template<typename Strategy>
+inline vector<fvalue>& CachedKernelEvaluator<Strategy>::getAlphas() {
 	return alphas;
 }
 
-template<typename Matrix, typename Strategy>
-inline fvector* CachedKernelEvaluator<Matrix, Strategy>::getAlphasView() {
+template<typename Strategy>
+inline fvector* CachedKernelEvaluator<Strategy>::getAlphasView() {
 	return &alphasView.vector;
 }
 
-template<typename Matrix, typename Strategy>
-inline fvector* CachedKernelEvaluator<Matrix, Strategy>::getBuffer() {
+template<typename Strategy>
+inline fvector* CachedKernelEvaluator<Strategy>::getBuffer() {
 	return &fbufferView.vector;
 }
 
-template<typename Matrix, typename Strategy>
-vector<sample_id>& CachedKernelEvaluator<Matrix, Strategy>::getBackwardOrder() {
+template<typename Strategy>
+vector<sample_id>& CachedKernelEvaluator<Strategy>::getBackwardOrder() {
 	return backwardOrder;
 }
 
-template<typename Matrix, typename Strategy>
-vector<sample_id>& CachedKernelEvaluator<Matrix, Strategy>::getForwardOrder() {
+template<typename Strategy>
+vector<sample_id>& CachedKernelEvaluator<Strategy>::getForwardOrder() {
 	return forwardOrder;
 }
 
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::updateBias(fvalue LB) {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::updateBias(fvalue LB) {
 	evaluator->updateBias(LB);
 }
 
-template<typename Matrix, typename Strategy>
-fvalue CachedKernelEvaluator<Matrix, Strategy>::getBias() {
+template<typename Strategy>
+fvalue CachedKernelEvaluator<Strategy>::getBias() {
 	return evaluator->getBias();
 }
 
-template<typename Matrix, typename Strategy>
-void CachedKernelEvaluator<Matrix, Strategy>::setCurrentSize(quantity size) {
+template<typename Strategy>
+void CachedKernelEvaluator<Strategy>::setCurrentSize(quantity size) {
 	currentSize = size;
 }
 
