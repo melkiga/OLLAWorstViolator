@@ -46,11 +46,10 @@ inline fvalue CGaussKernel::m_evaluateKernel(fvalue euclideanDistanceSquared) {
 }
 
 
-template<class Matrix>
 class RbfKernelEvaluator {
 
 private:
-	Matrix* samples;
+	sfmatrix* samples;
 	label_id* labels;
 	fvalue c;
 
@@ -64,12 +63,12 @@ private:
 
 protected:
   CGaussKernel params;
-	MatrixEvaluator<Matrix> eval;
+	MatrixEvaluator eval;
 
 	fvalue rbf(fvalue dist2);
 
 public:
-	RbfKernelEvaluator(Matrix* samples, label_id* labels, quantity classNumber, fvalue bias, fvalue c, CGaussKernel &params, fvalue epochs, fvalue margin);
+	RbfKernelEvaluator(sfmatrix* samples, label_id* labels, quantity classNumber, fvalue bias, fvalue c, CGaussKernel &params, fvalue epochs, fvalue margin);
 	~RbfKernelEvaluator();
 
 	void evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result);
@@ -90,54 +89,31 @@ public:
 	void setLabel(sample_id v);
 };
 
-template<class Matrix>
-RbfKernelEvaluator<Matrix>::RbfKernelEvaluator(Matrix* samples, label_id* labels, quantity classNumber,
-		fvalue betta, fvalue c, CGaussKernel &params, fvalue epochs, fvalue margin) :
-		samples(samples),
-		labels(labels),
-		c(c),
-		betta(betta),
-		params(params),
-		eval(samples),
-		epochs(epochs),
-		margin(margin) {
-	bias = 0.0;
-	yyNeg = -1.0 / (classNumber - 1);
-}
-
-template<class Matrix>
-RbfKernelEvaluator<Matrix>::~RbfKernelEvaluator() {
-}
-
 /*
  * Updates the current model's bias with the appropriate gradient value (learning rate * C * label / currentSize)
  */
-template<typename Matrix>
-inline void RbfKernelEvaluator<Matrix>::updateBias(fvalue biasGradient) {
+inline void RbfKernelEvaluator::updateBias(fvalue biasGradient) {
 	bias = bias + biasGradient;
 }
 
 /*
  * Reset's the evaluators bias value to 0. This is needed when creating a new pairwise model.
  */
-template<typename Matrix>
-inline void RbfKernelEvaluator<Matrix>::resetBias() {
+inline void RbfKernelEvaluator::resetBias() {
 	bias = 0.0;
 }
 
 /*
 * Sets the training pair comparison value to be the second.
 */
-template<typename Matrix>
-inline void RbfKernelEvaluator<Matrix>::setLabel(sample_id v) {
+inline void RbfKernelEvaluator::setLabel(sample_id v) {
 	yyNeg = v;
 }
 
 /*
 * Returns the label (+1 or -1)
 */
-template<typename Matrix>
-inline fvalue RbfKernelEvaluator<Matrix>::getLabel(sample_id v) {
+inline fvalue RbfKernelEvaluator::getLabel(sample_id v) {
 	fvalue vals[] = { 1.0, -1.0 }; //TODO: fix this to be the following: 2*label[v] - 1
 	fvalue label = vals[labels[v] == yyNeg];
 	return label;
@@ -146,61 +122,36 @@ inline fvalue RbfKernelEvaluator<Matrix>::getLabel(sample_id v) {
 /*
  * Calculated the Gaussian RBF kernel value given a euclidean distance squared between two samples.
  */
-template<class Matrix>
-inline fvalue RbfKernelEvaluator<Matrix>::rbf(fvalue euclideanDistanceSquared) {
+inline fvalue RbfKernelEvaluator::rbf(fvalue euclideanDistanceSquared) {
 	return params.m_evaluateKernel(euclideanDistanceSquared);
 }
 
-template<class Matrix>
-void RbfKernelEvaluator<Matrix>::evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector* result) 
-{
-	eval.dist(id, rangeFrom, rangeTo, result);
-
-	fvalue* rptr = fvector_ptr(result);
-	for (sample_id iid = rangeFrom; iid < rangeTo; iid++) {
-		rptr[iid] = rbf(rptr[iid]);
-	}
-}
-
-template<class Matrix>
-inline void RbfKernelEvaluator<Matrix>::swapSamples(sample_id uid, sample_id vid) {
+inline void RbfKernelEvaluator::swapSamples(sample_id uid, sample_id vid) {
 	swap(labels[uid], labels[vid]);
 	eval.swapSamples(uid, vid);
 }
 
-template<class Matrix>
-void RbfKernelEvaluator<Matrix>::setKernelParams(fvalue c, CGaussKernel &params) {
-	this->c = c;
-	this->params = params;
-}
-
-template<class Matrix>
-inline CGaussKernel RbfKernelEvaluator<Matrix>::getParams() {
+inline CGaussKernel RbfKernelEvaluator::getParams() {
 	return params;
 }
 
-template<class Matrix>
-inline fvalue RbfKernelEvaluator<Matrix>::getC() {
+inline fvalue RbfKernelEvaluator::getC() {
 	return c;
 }
 
-template<class Matrix>
-inline fvalue RbfKernelEvaluator<Matrix>::getBias() {
+inline fvalue RbfKernelEvaluator::getBias() {
 	return bias;
 }
 
-template<class Matrix>
-inline fvalue RbfKernelEvaluator<Matrix>::getBetta() {
+inline fvalue RbfKernelEvaluator::getBetta() {
 	return betta;
 }
 
-template<class Matrix>
-inline fvalue RbfKernelEvaluator<Matrix>::getEpochs () {
+inline fvalue RbfKernelEvaluator::getEpochs () {
 	return epochs;
 }
 
-template<class Matrix>
-inline fvalue RbfKernelEvaluator<Matrix>::getMargin() {
+inline fvalue RbfKernelEvaluator::getMargin() {
 	return margin;
 }
 
