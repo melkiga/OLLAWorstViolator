@@ -31,7 +31,6 @@
 #include "classify.h"
 #include "cache.h"
 #include "stop.h"
-#include "bias.h"
 #include "params.h"
 #include "../math/random.h"
 

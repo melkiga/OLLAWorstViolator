@@ -242,10 +242,7 @@ Classifier<Matrix>* PairwiseSolver<Matrix, Strategy>::getClassifier() {
 
 template<typename Matrix, typename Strategy>
 void PairwiseSolver<Matrix, Strategy>::train() {
-	BiasEvaluatorFactory<Matrix> factory;
 	RbfKernelEvaluator<Matrix>* evaluator = this->cache->getEvaluator();
-	scoped_ptr<BiasEvaluationStrategy<Matrix> > strategy(
-			factory.createEvaluator(this->params.bias, evaluator));
 
 	quantity totalSize = this->currentSize;
 	vector<PairwiseTrainingModel>::iterator it;
