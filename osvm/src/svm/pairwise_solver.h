@@ -69,17 +69,19 @@ class PairwiseClassifier: public Classifier {
 	vector<fvalue> evidence;
 
 protected:
-	fvalue getDecisionForModel(sample_id sample,
-			PairwiseTrainingModel* model, fvector* buffer);
+	fvalue getDecisionForModel(sample_id sample, 
+    PairwiseTrainingModel* model, fvector* buffer);
 	fvalue convertDecisionToEvidence(fvalue decision);
 
 public:
-	PairwiseClassifier(RbfKernelEvaluator *evaluator,
-			PairwiseTrainingResult* state, fvector *buffer);
+	PairwiseClassifier(RbfKernelEvaluator *evaluator, 
+    PairwiseTrainingResult* state, fvector *buffer);
 	virtual ~PairwiseClassifier();
 
 	virtual label_id classify(sample_id sample);
 	virtual quantity getSvNumber();
+
+  PairwiseTrainingResult* getState() { return state; }
 
 };
 

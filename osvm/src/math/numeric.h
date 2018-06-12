@@ -216,7 +216,7 @@ typedef id sample_id;
 typedef unsigned short short_id;
 typedef short_id feature_id;
 typedef short_id label_id;
-typedef unsigned int quantity;
+typedef unsigned int quantity;    // NOTE: This should be 'size_t'
 
 #define INVALID_ID ((id) -1)
 #define INVALID_SAMPLE_ID INVALID_ID

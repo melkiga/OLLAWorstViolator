@@ -21,24 +21,20 @@
 Classifier* ApplicationLauncher::run() {
   Classifier* classifier;
   if (conf.validation.outerFolds > 1) {
-    classifier = performNestedCrossValidation<SolverStrategy >();
+    classifier = performNestedCrossValidation<SolverStrategy>();
   }
   else {
     if (conf.validation.innerFolds > 1) {
       if (conf.searchRange.cResolution > 1 || conf.searchRange.gammaResolution > 1) {
-        classifier = performModelSelection<SolverStrategy >();
+        classifier = performModelSelection<SolverStrategy>();
       }
       else {
-        classifier = performCrossValidation<SolverStrategy >();
+        classifier = performCrossValidation<SolverStrategy>();
       }
     }
     else {
-      classifier = performTraining<SolverStrategy >();
+      classifier = performTraining<SolverStrategy>();
     }
   }
   return classifier;
-}
-
-void ApplicationLauncher::launch() {
-  run();
 }

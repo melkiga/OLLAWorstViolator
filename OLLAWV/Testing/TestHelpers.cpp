@@ -129,3 +129,30 @@ void CleanupCommandArgs(char** args, int count)
   free(args);
   args = nullptr;
 }
+
+
+// ----------------------------------------------------------------------------------------------------------------------------
+void ThrowTestException(LPCSTR fmt, ...)
+{
+  const int MAX = 1024;
+
+  char useFmt[MAX];
+  char buf[MAX];
+
+  size_t len = strnlen_s(fmt, MAX);
+  strcpy_s(useFmt, len + 1, fmt);
+  useFmt[len] = '\n';
+  useFmt[len + 1] = 0;
+
+  va_list args;
+  va_start(args, fmt);
+  vsprintf_s(buf, MAX, useFmt, args);
+  va_end(args);
+
+  // NOTE: Our own exception type might be helpful here.
+  throw std::exception(buf);
+
+  //LPCWSTR conv = Convert(buf);
+  // OutputDebugString(conv);
+  //delete conv;
+}

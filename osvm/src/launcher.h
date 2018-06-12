@@ -24,7 +24,6 @@
 class ApplicationLauncher {
 
 	Configuration &conf;
-	Classifier* run();
 
 protected:
 	template<typename Strategy>
@@ -52,7 +51,7 @@ public:
 	ApplicationLauncher(Configuration &conf) : conf(conf) {
 	}
 
-	void launch();
+  Classifier* run();
 
 };
 
