@@ -17,7 +17,7 @@
  **************************************************************************/
 
 #include "osvm.h"
-
+#define TEST_CASE_RUNNER 1
 // compile with: g++/gcc/visual studio 
 extern "C" { FILE __iob_func[3] = { *stdin,*stdout,*stderr }; }
 
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 			logger << vars;
 
 			ApplicationLauncher launcher(conf);
-			launcher.launch();
+			launcher.run();
 		} else {
 			cerr << desc;
 		}

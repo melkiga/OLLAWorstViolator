@@ -178,7 +178,6 @@ Classifier* ApplicationLauncher::performTraining() {
 			% timer.getTimeElapsed() % (100.0 * correct / total)
 			% classifier->getSvNumber();
 
-	delete solver;
 	return classifier;
 }
 
