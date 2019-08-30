@@ -513,10 +513,11 @@ void CachedKernelEvaluator<Strategy>::performSvUpdate(sample_id& worstViolator) 
 	if (svnumber >= cacheDepth) {
 		resizeCache();
 	}
-
-	// swap rows
-	swapSamples(worstViolator, svnumber);
-	worstViolator = svnumber;
+	else {
+		// swap rows
+		swapSamples(worstViolator, svnumber);
+		worstViolator = svnumber;
+	}
 
 	// adjust sv number
 	svnumber++;
