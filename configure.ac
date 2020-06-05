@@ -1,5 +1,5 @@
-AC_INIT(osvm, 0.1)
-AM_INIT_AUTOMAKE
+AC_INIT(osvm, 0.0.1)
+AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS(config.h)
 
 # checks for programs.

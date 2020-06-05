@@ -54,7 +54,7 @@ public:
 	sfmatrix* getFeatureMatrix(list<map<feature_id, fvalue> >& features, map<feature_id, feature_id>& mappings);
 };
 
-template<typename Strategy = SolverStrategy<L1SVM, FAIR> >
+template<typename Strategy = SolverStrategy >
 class BaseSolverFactory {
 
 private:
