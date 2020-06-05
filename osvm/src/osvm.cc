@@ -42,8 +42,6 @@ ostream& operator<< (ostream& os, variables_map& vars) {
 	return os;
 }
 
-#ifndef TEST_CASE_RUNNER
-
 int main(int argc, char *argv[]) {
 	string usage = (format("Usage: %s [OPTION]... [FILE]\n") % PACKAGE).str();
 	string descr = "Perform SVM training for the given data set [FILE].\n";
@@ -91,12 +89,3 @@ int main(int argc, char *argv[]) {
 
 	return 0;
 }
-#else
-
-// Redirect us to some other 'entry point'
-#include "../../OLLAWV/Testing/TestCases.h"
-int main(int argc, char *argv[]) {
-  TestCaseMain();
-}
-
-#endif
