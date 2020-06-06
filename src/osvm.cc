@@ -17,7 +17,7 @@
  **************************************************************************/
 
 #include "osvm.h"
-#define TEST_CASE_RUNNER 1
+
 // compile with: g++/gcc/visual studio 
 extern "C" { FILE __iob_func[3] = { *stdin,*stdout,*stderr }; }
 
