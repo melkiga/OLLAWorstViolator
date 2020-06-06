@@ -72,7 +72,7 @@ private:
 	label_id* getLabelVector(list<label_id>& labels);
 	StopCriterionStrategy* getStopCriterion();
 
-  sfmatrix* preprocess(sfmatrix *x, label_id *y);
+  	sfmatrix* preprocess(sfmatrix *x, label_id *y);
 
 	AbstractSolver<Strategy>* createSolver(MulticlassApproach type, map<label_id,string> labels, sfmatrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy);
 
@@ -101,9 +101,7 @@ BaseSolverFactory<Strategy>::~BaseSolverFactory() {
 template<typename Strategy>
 AbstractSolver<Strategy>* BaseSolverFactory<Strategy>::createSolver(MulticlassApproach type, map<label_id, string> labels, sfmatrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy) {
 	AbstractSolver<Strategy> *solver = NULL;
-	if (type == PAIRWISE) {
-		solver = new PairwiseSolver<Strategy>(labels, x, y, params, strategy);
-	}
+	solver = new PairwiseSolver<Strategy>(labels, x, y, params, strategy);
 	return solver;
 }
 
