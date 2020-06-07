@@ -50,7 +50,7 @@ using namespace boost::program_options;
 #define PR_BIAS_CALCULATION "bias,b"
 #define PR_EPOCH "epochs,P"
 #define PR_MARGIN "margin,M"
-#define PR_TEST_NAME "test-name, t"
+#define PR_TEST_NAME "test-name,t"
 
 #define PR_KEY_HELP "help"
 #define PR_KEY_C_LOW "c-low"
