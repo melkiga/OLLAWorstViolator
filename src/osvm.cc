@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 			cerr << desc;
 		}
 	} catch (exception& e) {
-		cerr << e.what() << "\n" << endl;
+		cerr << "\033[1;31m Error: \033[0m " << e.what() << "\n" << endl;
 		cerr << desc;
 	}
 
