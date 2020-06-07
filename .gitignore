@@ -3,6 +3,7 @@
 **.deps/
 **/autom4te.cache
 **.dirstamp
+small-data
 # User-specific files
 *.suo
 *.user
