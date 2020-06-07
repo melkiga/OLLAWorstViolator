@@ -18,7 +18,6 @@
 
 #include "configuration.h"
 
-
 invalid_configuration::invalid_configuration(string message) : message(message) {
 }
 
@@ -28,7 +27,6 @@ invalid_configuration::~invalid_configuration() throw () {
 const char* invalid_configuration::what() const throw() {
 	return message.c_str();
 }
-
 
 ParametersParser::ParametersParser(variables_map& vars) :
 		vars(vars) {
@@ -58,7 +56,7 @@ Configuration ParametersParser::getConfiguration() {
 	range.gammaHigh = vars[PR_KEY_G_HIGH].as<fvalue>();
 	conf.searchRange = range;
 
-	quantity drawNumber = vars[PR_KEY_DRAW_NUM].as<int>();
+	quantity drawNumber = 600;
 	quantity cacheSize = vars[PR_KEY_CACHE_SIZE].as<int>();
 
   // Whether to use bias in our SVM model or not. The default is yes.
@@ -91,6 +89,11 @@ Configuration ParametersParser::getConfiguration() {
 
   // TODO: we only really use pattern search
 	conf.validation.modelSelection = PATTERN;
+
+	conf.createTestCases = vars[PR_KEY_CREATE_TESTS].as<bool>();
+	if(conf.createTestCases){
+		conf.testName = vars[PR_KEY_TEST_NAME].as<string>();
+	}
 
 	return conf;
 }

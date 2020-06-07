@@ -129,5 +129,5 @@ void ApplicationLauncher::run() {
 		}
 	}
 
-	classifier->saveClassifier();
+	classifier->saveClassifier(conf.testName);
 }

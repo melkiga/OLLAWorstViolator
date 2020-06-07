@@ -82,7 +82,7 @@ public:
 
 	virtual label_id classify(sample_id sample);
 	virtual quantity getSvNumber();
-	virtual void saveClassifier();
+	virtual void saveClassifier(string testName);
 
   PairwiseTrainingResult* getState() { return state; }
 

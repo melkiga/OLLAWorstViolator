@@ -44,12 +44,13 @@ using namespace boost::program_options;
 #define PR_RES "resolution,r"
 #define PR_OUTER_FLD "outer-folds,o"
 #define PR_INNER_FLD "inner-folds,i"
-#define PR_DRAW_NUM "draw-number,d"
+#define PR_CREATE_TESTS "create-test-cases,d"
 #define PR_INPUT "input,I"
 #define PR_CACHE_SIZE "cache-size,S"
 #define PR_BIAS_CALCULATION "bias,b"
 #define PR_EPOCH "epochs,P"
 #define PR_MARGIN "margin,M"
+#define PR_TEST_NAME "test-name, t"
 
 #define PR_KEY_HELP "help"
 #define PR_KEY_C_LOW "c-low"
@@ -59,12 +60,13 @@ using namespace boost::program_options;
 #define PR_KEY_RES "resolution"
 #define PR_KEY_OUTER_FLD "outer-folds"
 #define PR_KEY_INNER_FLD "inner-folds"
-#define PR_KEY_DRAW_NUM "draw-number"
+#define PR_KEY_CREATE_TESTS "create-test-cases"
 #define PR_KEY_INPUT "input"
 #define PR_KEY_CACHE_SIZE "cache-size"
 #define PR_KEY_BIAS "bias"
 #define PR_KEY_EPOCH "epochs"
 #define PR_KEY_MARGIN "margin"
+#define PR_KEY_TEST_NAME "test-name"
 
 #define BIAS_CALCULATION_NO "nobias"
 #define BIAS_CALCULATION_YES "yesbias"
@@ -93,6 +95,8 @@ enum ModelSelectionType {
 
 struct Configuration {
 	string dataFile;
+	bool createTestCases;
+	string testName;
 
 	SearchRange searchRange;
 	TrainParams trainingParams;

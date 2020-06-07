@@ -27,7 +27,7 @@ public:
 
 	virtual label_id classify(sample_id sample) = 0;
 	virtual quantity getSvNumber() = 0;
-	virtual void saveClassifier() = 0;
+	virtual void saveClassifier(string testName) = 0;
 };
 
 #endif
