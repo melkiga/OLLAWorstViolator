@@ -27,7 +27,6 @@ public:
 	}
 
   void run();
-  void saveClassifier(Classifier* classifier);
 
 };
 

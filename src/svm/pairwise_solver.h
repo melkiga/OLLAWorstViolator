@@ -48,11 +48,10 @@ struct PairwiseTrainingModel {
 struct PairwiseTrainingResult {
 
 	vector<PairwiseTrainingModel> models;
-  quantity maxSVCount;
-  quantity totalLabelCount;
+	quantity maxSVCount;
+	quantity totalLabelCount;
 
 };
-
 
 /**
  * Pairwise classifier perform classification based on SVM models created by
@@ -79,6 +78,7 @@ public:
 
 	virtual label_id classify(sample_id sample);
 	virtual quantity getSvNumber();
+	virtual void saveClassifier();
 
   PairwiseTrainingResult* getState() { return state; }
 

@@ -67,6 +67,10 @@ quantity PairwiseClassifier::getSvNumber() {
   return state->maxSVCount;
 }
 
+void PairwiseClassifier::saveClassifier(){
+	printf("I'm saving the classifier");
+}
+
 PairwiseSolver::PairwiseSolver(
 		map<label_id, string> labelNames, sfmatrix *samples,
 		label_id *labels, TrainParams &params,
