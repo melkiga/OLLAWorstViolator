@@ -67,8 +67,52 @@ quantity PairwiseClassifier::getSvNumber() {
   return state->maxSVCount;
 }
 
+pt::ptree PairwiseClassifier::getPairwiseModels(int maxSVCount){
+	pt::ptree models;
+	int counter = 0;
+	vector<PairwiseTrainingModel>::iterator it;
+	for (it = state->models.begin(); it != state->models.end(); it++) {
+		pt::ptree state;
+		state.put("bias",it->bias);
+		state.put("size",it->size);
+		state.put("labels", "[" + to_string(it->trainingLabels.first) + ", " + to_string(it->trainingLabels.second) + "]");
+
+		vector<sample_id> samples(it->samples.begin(),it->samples.begin()+maxSVCount);
+		vector<fvalue> alphas(it->yalphas.begin(),it->yalphas.begin()+maxSVCount);
+		string alphalist = "[", samplelist = "[";
+		for(auto const& i: boost::combine(alphas,samples)){
+			fvalue alpha;
+			sample_id sample;
+			boost::tie(alpha,sample) = i;
+			alphalist += to_string(alpha) + ", ";
+			samplelist += to_string(sample) + ", ";
+		}
+		samplelist.pop_back(), samplelist.pop_back();
+		alphalist.pop_back(), alphalist.pop_back();
+		alphalist += "]", samplelist += "]";
+		state.put("alphas",alphalist), state.put("samples",samplelist);
+		// save sub-model
+		models.push_back(make_pair(to_string(counter),state));
+		counter++;
+	}
+	return models;
+}
+
 void PairwiseClassifier::saveClassifier(){
-	printf("I'm saving the classifier");
+	// initialize json property tree
+	pt::ptree root;
+
+	PairwiseTrainingResult* state = this->getState();
+	quantity maxSVCount = state->maxSVCount;
+	root.put("maxSVCount",maxSVCount);
+	
+	// get pairwise models
+	pt::ptree models = getPairwiseModels(maxSVCount);
+	
+
+	root.add_child("models",models);
+	pt::write_json(std::cout, root);
+	//pt::write_json("test/examples/example.json", root);	
 }
 
 PairwiseSolver::PairwiseSolver(

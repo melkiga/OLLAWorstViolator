@@ -31,22 +31,16 @@ AbstractSolver* ApplicationLauncher::createSolver() {
 
 GridGaussianModelSelector* ApplicationLauncher::createModelSelector() {
 	GridGaussianModelSelector *selector;
-	if (conf.validation.modelSelection == GRID) {
-		selector = new GridGaussianModelSelector();
-	} else {
-		PatternFactory factory;
-		selector = new PatternGaussianModelSelector(factory.createCross());
-	}
+	PatternFactory factory;
+	selector = new PatternGaussianModelSelector(factory.createCross());
 	return selector;
 }
 
 Classifier* ApplicationLauncher::performModelSelection() {
-	CrossValidationSolver *solver
-			= createCrossValidator();
+	CrossValidationSolver *solver = createCrossValidator();
 
 	Timer timer(true);
-	GridGaussianModelSelector *selector
-			= createModelSelector();
+	GridGaussianModelSelector *selector = createModelSelector();
 	ModelSelectionResults params = selector->selectParameters(*solver, conf.searchRange);
 	timer.stop();
 
