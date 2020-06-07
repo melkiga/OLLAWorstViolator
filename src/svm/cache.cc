@@ -58,20 +58,6 @@ fvalue CachedKernelEvaluator::checkViolation(sample_id v) {
 	return output[v]*getLabel(v);
 }
 
-/*
-* Sets model label to be (+1 or -1) depending on which is the first training pair
-*/
-inline void CachedKernelEvaluator::setLabel(pair<label_id, label_id> trainPair) {
-	evaluator->setLabel(trainPair.second);
-}
-
-/*
- * Returns the label (+1 or -1)
- */
-inline fvalue CachedKernelEvaluator::getLabel(sample_id v) {
-	return evaluator->getLabel(v);
-}
-
 void CachedKernelEvaluator::resizeCache() {
 	quantity newCacheDepth = min((quantity) (CACHE_DEPTH_INCREASE * cacheDepth), problemSize);
 	quantity newCacheLines = min(cacheSize / newCacheDepth, problemSize);
@@ -122,13 +108,6 @@ void CachedKernelEvaluator::resizeCache() {
 	delete [] cache;
 	cache = newCache;
 	cacheDepth = newCacheDepth;
-}
-
-/*
-Returns the current number of support vectors.
-*/
-inline quantity CachedKernelEvaluator::getSVNumber() {
-	return svnumber;
 }
 
 /* Returns the worst violator (index and corresponding error), 
@@ -319,62 +298,6 @@ void CachedKernelEvaluator::performSvUpdate(sample_id& worstViolator) {
 	svnumber++;
 	alphasView.vector.size++;
 }
-
-/*
- * Evaluate the Gaussian RBF Kernel vector with respect to sample 'id' against samples in range 'rangeFrom' to 'rangeTo'.
- * Store the result in 'result'
- */
-inline void CachedKernelEvaluator::evalKernel(sample_id id, sample_id rangeFrom, sample_id rangeTo, fvector *result) {
-	evaluator->evalKernel(id, rangeFrom, rangeTo, result);
-}
-
-/*
- * Returns the current kernel parameters of the evaluator. 
- */
-inline CGaussKernel CachedKernelEvaluator::getParams() {
-	return evaluator->getParams();
-}
-
-
-inline fvalue CachedKernelEvaluator::getC() {
-	return evaluator->getC();
-}
-
-
-inline fvalue CachedKernelEvaluator::getMargin() {
-	return evaluator->getMargin();
-}
-
-
-inline fvalue CachedKernelEvaluator::getEpochs() {
-	return evaluator->getEpochs();
-}
-
-
-inline fvalue CachedKernelEvaluator::getBetta() {
-	return evaluator->getBetta();
-}
-
-
-inline RbfKernelEvaluator* CachedKernelEvaluator::getEvaluator() {
-	return evaluator;
-}
-
-
-inline vector<fvalue>& CachedKernelEvaluator::getAlphas() {
-	return alphas;
-}
-
-
-inline fvector* CachedKernelEvaluator::getAlphasView() {
-	return &alphasView.vector;
-}
-
-
-inline fvector* CachedKernelEvaluator::getBuffer() {
-	return &fbufferView.vector;
-}
-
 
 vector<sample_id>& CachedKernelEvaluator::getBackwardOrder() {
 	return backwardOrder;
