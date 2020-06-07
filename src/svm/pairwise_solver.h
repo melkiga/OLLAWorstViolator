@@ -84,8 +84,6 @@ public:
 	virtual quantity getSvNumber();
 	virtual void saveClassifier();
 
-	pt::ptree getPairwiseModels(int maxSVCount);
-
   PairwiseTrainingResult* getState() { return state; }
 
 };

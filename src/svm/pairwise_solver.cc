@@ -67,8 +67,16 @@ quantity PairwiseClassifier::getSvNumber() {
   return state->maxSVCount;
 }
 
-pt::ptree PairwiseClassifier::getPairwiseModels(int maxSVCount){
-	pt::ptree models;
+void PairwiseClassifier::saveClassifier(){
+	// initialize json property tree
+	pt::ptree root;
+
+	// get pairwise models
+	quantity maxSVCount = state->maxSVCount;
+	root.put("maxSVCount",maxSVCount);
+	
+	// get pairwise models
+		pt::ptree models;
 	int counter = 0;
 	vector<PairwiseTrainingModel>::iterator it;
 	for (it = state->models.begin(); it != state->models.end(); it++) {
@@ -95,20 +103,6 @@ pt::ptree PairwiseClassifier::getPairwiseModels(int maxSVCount){
 		models.push_back(make_pair(to_string(counter),state));
 		counter++;
 	}
-	return models;
-}
-
-void PairwiseClassifier::saveClassifier(){
-	// initialize json property tree
-	pt::ptree root;
-
-	PairwiseTrainingResult* state = this->getState();
-	quantity maxSVCount = state->maxSVCount;
-	root.put("maxSVCount",maxSVCount);
-	
-	// get pairwise models
-	pt::ptree models = getPairwiseModels(maxSVCount);
-	
 
 	root.add_child("models",models);
 	pt::write_json(std::cout, root);
