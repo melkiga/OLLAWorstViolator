@@ -89,8 +89,7 @@ public:
  * Pairwise solver performs SVM training by generating SVM state for all
  * two-element combinations of the class trainingLabels.
  */
-template<typename Strategy>
-class PairwiseSolver: public AbstractSolver<Strategy> {
+class PairwiseSolver: public AbstractSolver {
 
 	template<typename K, typename V>
 	struct PairValueComparator {
@@ -107,8 +106,7 @@ class PairwiseSolver: public AbstractSolver<Strategy> {
 			pair<label_id, label_id>& labelPair);
 
 protected:
-	CachedKernelEvaluator<Strategy>* buildCache(
-			fvalue c, CGaussKernel &gparams);
+	CachedKernelEvaluator* buildCache(fvalue c, CGaussKernel &gparams);
 
 public:
 	PairwiseSolver(map<label_id, string> labelNames, sfmatrix *samples,
@@ -123,13 +121,11 @@ public:
 
 };
 
-
-template<typename Strategy>
-PairwiseSolver<Strategy>::PairwiseSolver(
+PairwiseSolver::PairwiseSolver(
 		map<label_id, string> labelNames, sfmatrix *samples,
 		label_id *labels, TrainParams &params,
 		StopCriterionStrategy *stopStrategy) :
-		AbstractSolver<Strategy>(labelNames,
+		AbstractSolver(labelNames,
 				samples, labels, params, stopStrategy),
 		state(PairwiseTrainingResult()) {
 	label_id maxLabel = (label_id) labelNames.size();
@@ -157,17 +153,17 @@ PairwiseSolver<Strategy>::PairwiseSolver(
 	state.totalLabelCount = maxLabel;
 }
 
-template<typename Strategy>
-PairwiseSolver<Strategy>::~PairwiseSolver() {
+
+PairwiseSolver::~PairwiseSolver() {
 }
 
-template<typename Strategy>
-Classifier* PairwiseSolver<Strategy>::getClassifier() {
+
+Classifier* PairwiseSolver::getClassifier() {
 	return new PairwiseClassifier(this->cache->getEvaluator(), &state, this->cache->getBuffer());
 }
 
-template<typename Strategy>
-void PairwiseSolver<Strategy>::train() {
+
+void PairwiseSolver::train() {
 	RbfKernelEvaluator* evaluator = this->cache->getEvaluator();
 
 	quantity totalSize = this->currentSize;
@@ -203,8 +199,8 @@ void PairwiseSolver<Strategy>::train() {
 	this->setCurrentSize(totalSize);
 }
 
-template<typename Strategy>
-quantity PairwiseSolver<Strategy>::reorderSamples(label_id *labels, quantity size, pair<label_id, label_id>& labelPair) {
+
+quantity PairwiseSolver::reorderSamples(label_id *labels, quantity size, pair<label_id, label_id>& labelPair) {
 	label_id first = labelPair.first;
 	label_id second = labelPair.second;
 	id train = 0;
@@ -223,15 +219,15 @@ quantity PairwiseSolver<Strategy>::reorderSamples(label_id *labels, quantity siz
 	return train;
 }
 
-template<typename Strategy>
-CachedKernelEvaluator<Strategy>* PairwiseSolver<Strategy>::buildCache(fvalue c, CGaussKernel &gparams) {
+
+CachedKernelEvaluator* PairwiseSolver::buildCache(fvalue c, CGaussKernel &gparams) {
 	fvalue bias = (this->params.bias == NO) ? 0.0 : 1.0;
 	RbfKernelEvaluator *rbf = new RbfKernelEvaluator(this->samples, this->labels, 2, bias, c, gparams, this->params.epochs, this->params.margin);
-	return new CachedKernelEvaluator<Strategy>(rbf, &this->strategy, this->size, this->params.cache.size, NULL);
+	return new CachedKernelEvaluator(rbf, &this->strategy, this->size, this->params.cache.size, NULL);
 }
 
-template<typename Strategy>
-quantity PairwiseSolver<Strategy>::getSvNumber() {
+
+quantity PairwiseSolver::getSvNumber() {
 	return state.maxSVCount;
 }
 

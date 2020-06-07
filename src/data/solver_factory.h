@@ -30,6 +30,7 @@
 #include <list>
 #include <vector>
 
+#include "../svm/strategy.h"
 #include "dataset.h"
 #include "../logging/log.h"
 #include "../svm/pairwise_solver.h"
@@ -54,7 +55,6 @@ public:
 	sfmatrix* getFeatureMatrix(list<map<feature_id, fvalue> >& features, map<feature_id, feature_id>& mappings);
 };
 
-template<typename Strategy = SolverStrategy >
 class BaseSolverFactory {
 
 private:
@@ -74,40 +74,40 @@ private:
 
   	sfmatrix* preprocess(sfmatrix *x, label_id *y);
 
-	AbstractSolver<Strategy>* createSolver(MulticlassApproach type, map<label_id,string> labels, sfmatrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy);
+	AbstractSolver* createSolver(MulticlassApproach type, map<label_id,string> labels, sfmatrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy);
 
 public:
 	BaseSolverFactory(istream& input, TrainParams params = TrainParams(), StopCriterion strategy = YOC);
 	virtual ~BaseSolverFactory();
 
-	AbstractSolver<Strategy>* getSolver();
-	CrossValidationSolver<Strategy>* getCrossValidationSolver(quantity innerFolds, quantity outerFolds);
+	AbstractSolver* getSolver();
+	CrossValidationSolver* getCrossValidationSolver(quantity innerFolds, quantity outerFolds);
 
 };
 
-template<typename Strategy>
-BaseSolverFactory<Strategy>::BaseSolverFactory(istream& input, TrainParams params, StopCriterion strategy) :
+
+BaseSolverFactory::BaseSolverFactory(istream& input, TrainParams params, StopCriterion strategy) :
 		input(input),
 		params(params),
 		strategy(strategy),
 		matrixBuilder(new FeatureMatrixBuilder()) {
 }
 
-template<typename Strategy>
-BaseSolverFactory<Strategy>::~BaseSolverFactory() {
+
+BaseSolverFactory::~BaseSolverFactory() {
 	delete matrixBuilder;
 }
 
-template<typename Strategy>
-AbstractSolver<Strategy>* BaseSolverFactory<Strategy>::createSolver(MulticlassApproach type, map<label_id, string> labels, sfmatrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy) {
-	AbstractSolver<Strategy> *solver = NULL;
-	solver = new PairwiseSolver<Strategy>(labels, x, y, params, strategy);
+
+AbstractSolver* BaseSolverFactory::createSolver(MulticlassApproach type, map<label_id, string> labels, sfmatrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy) {
+	AbstractSolver *solver = NULL;
+	solver = new PairwiseSolver(labels, x, y, params, strategy);
 	return solver;
 }
 
 
-template<typename Strategy>
-AbstractSolver<Strategy>* BaseSolverFactory<Strategy>::getSolver() {
+
+AbstractSolver* BaseSolverFactory::getSolver() {
 	SparseFormatDataSetFactory dataSetFactory(input);
 	DataSet dataSet = dataSetFactory.createDataSet();
 
@@ -122,14 +122,14 @@ AbstractSolver<Strategy>* BaseSolverFactory<Strategy>::getSolver() {
 	return createSolver(multiclass, dataSet.labelNames, x, y, params, strategy);
 }
 
-template<typename Strategy>
-CrossValidationSolver<Strategy>* BaseSolverFactory<Strategy>::getCrossValidationSolver(quantity innerFolds, quantity outerFolds) {
-	AbstractSolver<Strategy> *solver = getSolver();
-	return new CrossValidationSolver<Strategy>(solver, innerFolds, outerFolds);
+
+CrossValidationSolver* BaseSolverFactory::getCrossValidationSolver(quantity innerFolds, quantity outerFolds) {
+	AbstractSolver *solver = getSolver();
+	return new CrossValidationSolver(solver, innerFolds, outerFolds);
 }
 
-template<typename Strategy>
-map<feature_id, feature_id> BaseSolverFactory<Strategy>::findOptimalFeatureMappings(list<map<feature_id, fvalue> >& features) {
+
+map<feature_id, feature_id> BaseSolverFactory::findOptimalFeatureMappings(list<map<feature_id, fvalue> >& features) {
 	quantity dimension = 0;
 	map<feature_id, fvalue> fmax;
 	map<feature_id, fvalue> fmin;
@@ -166,8 +166,8 @@ map<feature_id, feature_id> BaseSolverFactory<Strategy>::findOptimalFeatureMappi
 	return mappings;
 }
 
-template<typename Strategy>
-label_id* BaseSolverFactory<Strategy>::getLabelVector(list<label_id>& labels) {
+
+label_id* BaseSolverFactory::getLabelVector(list<label_id>& labels) {
 	label_id *dataLabels = new label_id[labels.size()];
 	quantity id = 0;
 
@@ -178,13 +178,13 @@ label_id* BaseSolverFactory<Strategy>::getLabelVector(list<label_id>& labels) {
 	return dataLabels;
 }
 
-template<typename Strategy>
-StopCriterionStrategy* BaseSolverFactory<Strategy>::getStopCriterion() {
+
+StopCriterionStrategy* BaseSolverFactory::getStopCriterion() {
 	return new L1SVMStopStrategy();
 }
 
-template<typename Strategy>
-sfmatrix* BaseSolverFactory<Strategy>::preprocess(sfmatrix *x, label_id *y) {
+
+sfmatrix* BaseSolverFactory::preprocess(sfmatrix *x, label_id *y) {
 	FeatureProcessor proc;
 	proc.normalize(x);
 	proc.randomize(x, y);

@@ -30,6 +30,7 @@
 #include "model/selection.h"
 #include "logging/log.h"
 #include "svm/stop.h"
+#include "svm/pairwise_solver.h"
 
 using namespace std;
 using namespace boost::program_options;

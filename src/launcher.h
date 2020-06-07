@@ -1,21 +1,3 @@
-/**************************************************************************
- * This file is part of gsvm, a Support Vector Machine solver.
- * Copyright (C) 2012 Robert Strack (strackr@vcu.edu), Vojislav Kecman
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- **************************************************************************/
-
 #ifndef LAUCHER_H_
 #define LAUCHER_H_
 
@@ -26,44 +8,36 @@ class ApplicationLauncher {
 	Configuration &conf;
 
 protected:
-	template<typename Strategy>
-	CrossValidationSolver<Strategy>* createCrossValidator();
+	CrossValidationSolver* createCrossValidator();
 
-	template<typename Strategy>
-	AbstractSolver<Strategy>* createSolver();
+	AbstractSolver* createSolver();
 
-	template<typename Strategy>
-	GridGaussianModelSelector<Strategy>* createModelSelector();
+	GridGaussianModelSelector* createModelSelector();
 
-	template<typename Strategy>
 	Classifier* performTraining();
 
-	template<typename Strategy>
 	Classifier* performCrossValidation();
 
-	template<typename Strategy>
 	Classifier* performModelSelection();
 
-	template<typename Strategy>
 	Classifier* performNestedCrossValidation();
 
 public:
 	ApplicationLauncher(Configuration &conf) : conf(conf) {
 	}
 
-  Classifier* run();
+  void run();
+  void saveClassifier(Classifier* classifier);
 
 };
 
-template<typename Strategy>
-CrossValidationSolver<Strategy>* ApplicationLauncher::createCrossValidator() {
+CrossValidationSolver* ApplicationLauncher::createCrossValidator() {
 	ifstream input(conf.dataFile.c_str());
-	BaseSolverFactory<Strategy> reader(
-			input, conf.trainingParams, conf.stopCriterion);
+	BaseSolverFactory reader(input, conf.trainingParams, conf.stopCriterion);
 
 	Timer timer(true);
-	CrossValidationSolver<Strategy> *solver
-			= (CrossValidationSolver<Strategy>*) reader.getCrossValidationSolver(
+	CrossValidationSolver *solver
+			= (CrossValidationSolver*) reader.getCrossValidationSolver(
 					conf.validation.innerFolds, conf.validation.outerFolds);
 	timer.stop();
 
@@ -72,13 +46,12 @@ CrossValidationSolver<Strategy>* ApplicationLauncher::createCrossValidator() {
 	return solver;
 }
 
-template<typename Strategy>
-AbstractSolver<Strategy>* ApplicationLauncher::createSolver() {
+AbstractSolver* ApplicationLauncher::createSolver() {
 	ifstream input(conf.dataFile.c_str());
-	BaseSolverFactory<Strategy> reader(input, conf.trainingParams, conf.stopCriterion);
+	BaseSolverFactory reader(input, conf.trainingParams, conf.stopCriterion);
 
 	Timer timer(true);
-	AbstractSolver<Strategy> *solver = reader.getSolver();
+	AbstractSolver *solver = reader.getSolver();
 	timer.stop();
 
 	logger << format("input reading time: %.2f[s]\n") % timer.getTimeElapsed();
@@ -86,26 +59,24 @@ AbstractSolver<Strategy>* ApplicationLauncher::createSolver() {
 	return solver;
 }
 
-template<typename Strategy>
-GridGaussianModelSelector<Strategy>* ApplicationLauncher::createModelSelector() {
-	GridGaussianModelSelector<Strategy> *selector;
+GridGaussianModelSelector* ApplicationLauncher::createModelSelector() {
+	GridGaussianModelSelector *selector;
 	if (conf.validation.modelSelection == GRID) {
-		selector = new GridGaussianModelSelector<Strategy>();
+		selector = new GridGaussianModelSelector();
 	} else {
 		PatternFactory factory;
-		selector = new PatternGaussianModelSelector<Strategy>(factory.createCross());
+		selector = new PatternGaussianModelSelector(factory.createCross());
 	}
 	return selector;
 }
 
-template<typename Strategy>
 Classifier* ApplicationLauncher::performModelSelection() {
-	CrossValidationSolver<Strategy> *solver
-			= createCrossValidator<Strategy>();
+	CrossValidationSolver *solver
+			= createCrossValidator();
 
 	Timer timer(true);
-	GridGaussianModelSelector<Strategy> *selector
-			= createModelSelector<Strategy>();
+	GridGaussianModelSelector *selector
+			= createModelSelector();
 	ModelSelectionResults params = selector->selectParameters(*solver, conf.searchRange);
 	timer.stop();
 
@@ -117,14 +88,11 @@ Classifier* ApplicationLauncher::performModelSelection() {
 	return solver->getClassifier();
 }
 
-template<typename Strategy>
 Classifier* ApplicationLauncher::performNestedCrossValidation() {
-	CrossValidationSolver<Strategy> *solver
-			= createCrossValidator<Strategy>();
+	CrossValidationSolver *solver = createCrossValidator();
 
 	Timer timer(true);
-	GridGaussianModelSelector<Strategy> *selector
-			= createModelSelector<Strategy>();
+	GridGaussianModelSelector *selector = createModelSelector();
 	TestingResult res = selector->doNestedCrossValidation(*solver, conf.searchRange);
 	timer.stop();
 
@@ -135,10 +103,8 @@ Classifier* ApplicationLauncher::performNestedCrossValidation() {
 	return solver->getClassifier();
 }
 
-template<typename Strategy>
 Classifier* ApplicationLauncher::performCrossValidation() {
-	CrossValidationSolver<Strategy> *solver
-			= createCrossValidator<Strategy>();
+	CrossValidationSolver *solver = createCrossValidator();
 
 	Timer timer(true);
 	CGaussKernel param(conf.searchRange.gammaLow);
@@ -152,9 +118,8 @@ Classifier* ApplicationLauncher::performCrossValidation() {
 	return solver->getClassifier();
 }
 
-template<typename Strategy>
 Classifier* ApplicationLauncher::performTraining() {
-	AbstractSolver<Strategy> *solver = createSolver<Strategy>();
+	AbstractSolver *solver = createSolver();
 
 	Timer timer(true);
 	CGaussKernel param(conf.searchRange.gammaLow);

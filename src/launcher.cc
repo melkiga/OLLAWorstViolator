@@ -18,23 +18,31 @@
 
 #include "launcher.h"
 
-Classifier* ApplicationLauncher::run() {
+void ApplicationLauncher::run() {
   Classifier* classifier;
   if (conf.validation.outerFolds > 1) {
-    classifier = performNestedCrossValidation<SolverStrategy>();
+    classifier = performNestedCrossValidation();
   }
   else {
     if (conf.validation.innerFolds > 1) {
       if (conf.searchRange.cResolution > 1 || conf.searchRange.gammaResolution > 1) {
-        classifier = performModelSelection<SolverStrategy>();
+        classifier = performModelSelection();
       }
       else {
-        classifier = performCrossValidation<SolverStrategy>();
+        classifier = performCrossValidation();
       }
     }
     else {
-      classifier = performTraining<SolverStrategy>();
+      classifier = performTraining();
     }
   }
-  return classifier;
+
+  // TODO: add function for printing classifier to file
+}
+
+// TODO: fill out saving classifier here. 
+// this should be where we save the classifier to a file, but
+// because pairwise classifier is a template, i can't do it here.
+void ApplicationLauncher::saveClassifier(Classifier* classifier){
+  int numberSupportVectors = classifier->getSvNumber();
 }
