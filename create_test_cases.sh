@@ -9,7 +9,11 @@ RUN_FILE_PATH=bin/$TYPE/$EXECUTABLE_NAME
 datasets=$(ls small-data/iris small-data/sonar small-data/teach small-data/pro small-data/vote)
 
 for dataset in $datasets; do
-    $RUN_FILE_PATH -i 5 -o 5 -M 0.001 $dataset
+    IFS='/' read -ra ADDR <<< $dataset
+    for i in "${ADDR[@]}"; do
+        dataname=$i
+    done
+    $RUN_FILE_PATH -i 5 -o 5 -M 0.001 -d true -t test/examples/${dataname}_test.json $dataset
 done
 
 
