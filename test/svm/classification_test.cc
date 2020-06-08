@@ -28,17 +28,16 @@
 using namespace boost;
 using namespace testing;
 
-typedef AbstractSolver<GaussKernel, sfmatrix, SolverStrategy<MDM, FAIR> > DefaultSolver;
-typedef BaseSolverFactory<sfmatrix, SolverStrategy<MDM, FAIR> > DefaultSolverFactory;
-typedef Classifier<GaussKernel, sfmatrix> DefaultClassifier;
+typedef AbstractSolver DefaultSolver;
+typedef BaseSolverFactory DefaultSolverFactory;
+typedef Classifier DefaultClassifier;
 
 
 class ClassificationSuite: public TestWithParam<MulticlassApproach> {
 
 };
 
-INSTANTIATE_TEST_CASE_P(InstantiationName,
-		ClassificationSuite, Values(ALL_AT_ONCE, PAIRWISE));
+INSTANTIATE_TEST_CASE_P(InstantiationName, ClassificationSuite, Values(PAIRWISE));
 
 TEST_P(ClassificationSuite, ShouldPerformSimpleMulticlassClassification) {
 	// given
@@ -51,10 +50,10 @@ TEST_P(ClassificationSuite, ShouldPerformSimpleMulticlassClassification) {
 			"class3 1:1 2:-1";
 
 	TrainParams params;
-	GaussKernel kernel(1.0);
+	CGaussKernel kernel(1.0);
 	fvalue c = 1;
 
-	StopCriterion stopCrit = ADJMNORM;
+	StopCriterion stopCrit = YOC;
 	MulticlassApproach multiApproach = GetParam();
 
 	istringstream input(desc);

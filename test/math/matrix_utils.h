@@ -36,20 +36,18 @@
 #include "../../src/data/dataset.h"
 #include "../../src/data/solver_factory.h"
 
-template<typename Matrix>
 class SimpleMatrixFactory {
 
 public:
-	Matrix* create(string& desc);
+	SparseMatrix* create(string& desc);
 
 };
 
-template<typename Matrix>
-Matrix* SimpleMatrixFactory<Matrix>::create(string& desc) {
+SparseMatrix* SimpleMatrixFactory::create(string& desc) {
 	istringstream stream(desc);
 	SparseFormatDataSetFactory factory(stream);
 	DataSet dataSet = factory.createDataSet();
-	FeatureMatrixBuilder<Matrix> matrixBuilder;
+	FeatureMatrixBuilder matrixBuilder;
 	return matrixBuilder.getFeatureMatrix(dataSet.features);
 }
 

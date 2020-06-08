@@ -75,7 +75,7 @@ TEST(DataSetFactorySuite, ShouldCreateCorrectSparseMatrix) {
 
 	istringstream stream(desc);
 	SparseFormatDataSetFactory factory(stream);
-	FeatureMatrixBuilder<sfmatrix> builder;
+	FeatureMatrixBuilder builder;
 
 	map<feature_id, feature_id> mappings;
 	mappings[1] = 0;

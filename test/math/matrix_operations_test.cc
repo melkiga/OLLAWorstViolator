@@ -35,19 +35,19 @@ template<typename Matrix>
 class MatrixOperationsSuite: public Test {
 
 public:
-	SimpleMatrixFactory<Matrix> sfmFactory;
+	SimpleMatrixFactory sfmFactory;
 
 };
 
-typedef Types<sfmatrix, dfmatrix> MatrixTypes;
+typedef Types<sfmatrix> MatrixTypes;
 TYPED_TEST_CASE(MatrixOperationsSuite, MatrixTypes);
 
 TYPED_TEST(MatrixOperationsSuite, ShouldEvaluateDotProductForOneSample) {
 	// given
 	string desc = "label 1:0.5";
 
-	scoped_ptr<TypeParam> matrix(this->sfmFactory.create(desc));
-	MatrixEvaluator<TypeParam> evaluator(matrix.get());
+	scoped_ptr<SparseMatrix> matrix(this->sfmFactory.create(desc));
+	MatrixEvaluator evaluator(matrix.get());
 
 	// when
 	fvalue dot = evaluator.dot(0, 0);
@@ -62,8 +62,8 @@ TYPED_TEST(MatrixOperationsSuite, ShouldEvaluateDotProductForTwoSamples) {
 			"label1 1:0.5\n"
 			"label2 1:0.2";
 
-	scoped_ptr<TypeParam> matrix(this->sfmFactory.create(desc));
-	MatrixEvaluator<TypeParam> evaluator(matrix.get());
+	scoped_ptr<SparseMatrix> matrix(this->sfmFactory.create(desc));
+	MatrixEvaluator evaluator(matrix.get());
 
 	// when
 	fvalue dot10 = evaluator.dot(1, 0);
@@ -78,8 +78,8 @@ TYPED_TEST(MatrixOperationsSuite, ShouldEvaluateSelfDistance) {
 	// given
 	string desc = "label 1:-1.5";
 
-	scoped_ptr<TypeParam> matrix(this->sfmFactory.create(desc));
-	MatrixEvaluator<TypeParam> evaluator(matrix.get());
+	scoped_ptr<SparseMatrix> matrix(this->sfmFactory.create(desc));
+	MatrixEvaluator evaluator(matrix.get());
 
 	// when
 	fvalue dist = evaluator.dist(0, 0);
@@ -95,8 +95,8 @@ TYPED_TEST(MatrixOperationsSuite, ShouldSwapTwoSamples) {
 			"label1 1:0.7\n"
 			"label2 1:0.2";
 
-	scoped_ptr<TypeParam> matrix(this->sfmFactory.create(desc));
-	MatrixEvaluator<TypeParam> evaluator(matrix.get());
+	scoped_ptr<SparseMatrix> matrix(this->sfmFactory.create(desc));
+	MatrixEvaluator evaluator(matrix.get());
 
 	// when
 	fvalue norm00Before = evaluator.dot(0, 0);
@@ -121,8 +121,8 @@ TYPED_TEST(MatrixOperationsSuite, ShouldCalculateMultipleDist) {
 			"label1 1:0.6 2:0.4";
 
 	fvector* buffer = fvector_alloc(3);
-	scoped_ptr<TypeParam> matrix(this->sfmFactory.create(desc));
-	MatrixEvaluator<TypeParam> evaluator(matrix.get());
+	scoped_ptr<SparseMatrix> matrix(this->sfmFactory.create(desc));
+	MatrixEvaluator evaluator(matrix.get());
 
 	// when
 	evaluator.dist(2, 0, 2, buffer);
@@ -145,8 +145,8 @@ TYPED_TEST(MatrixOperationsSuite, ShouldCalculateMultipleDistWithMappings) {
 	sample_id mappings[] = {0, 2, 1};
 
 	fvector* buffer = fvector_alloc(3);
-	scoped_ptr<TypeParam> matrix(this->sfmFactory.create(desc));
-	MatrixEvaluator<TypeParam> evaluator(matrix.get());
+	scoped_ptr<SparseMatrix> matrix(this->sfmFactory.create(desc));
+	MatrixEvaluator evaluator(matrix.get());
 
 	// when
 	evaluator.dist(0, 1, 3, mappings, buffer);
