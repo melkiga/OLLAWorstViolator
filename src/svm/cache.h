@@ -21,7 +21,7 @@
 
 #include <set>
 
-#include "svm/strategy.h"
+#include "strategy.h"
 #include "kernel.h"
 #include "../math/random.h"
 

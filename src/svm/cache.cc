@@ -1,4 +1,4 @@
-#include "svm/cache.h"
+#include "cache.h"
 
 CachedKernelEvaluator::CachedKernelEvaluator(RbfKernelEvaluator *evaluator, SolverStrategy *strategy, quantity probSize, quantity cchSize, SwapListener *listener) :
 		evaluator(evaluator),
