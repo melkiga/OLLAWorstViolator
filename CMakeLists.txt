@@ -67,21 +67,9 @@ find_package(GSL REQUIRED)
 if (NOT GSL_FOUND)
     message(FATAL_ERROR "NOTICE: This demo requires GSL and will not be compiled.")
 endif()
-
 # include dirs + libraries
 target_include_directories(osvm PRIVATE ${GSL_INCLUDE_DIRS})
 target_link_libraries(osvm ${GSL_LIBRARIES})
 
 ##############################################
-# enable testing
-enable_testing()
-
-# get all source files & add them to executable
-message("Finding source and header files...")
-file(GLOB_RECURSE TST_SRC_FILES ${PROJECT_SOURCE_DIR}/test/*.cc )
-file(GLOB_RECURSE TST_HDR_FILES ${PROJECT_SOURCE_DIR}/test/*.h )
-
-# create executable
-message("Creating osvm test executable...")
-add_executable(osvm_tests ${TST_SRC_FILES} ${TST_HDR_FILES})
-
+enable_testing() 
