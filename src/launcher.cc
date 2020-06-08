@@ -129,5 +129,9 @@ void ApplicationLauncher::run() {
 		}
 	}
 
-	classifier->saveClassifier(conf.testName);
+	// create test cases if user specified
+	if(conf.createTestCases){
+		classifier->saveClassifier(conf.testName);
+	}
+	
 }
