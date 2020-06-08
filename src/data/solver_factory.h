@@ -35,7 +35,6 @@
 #include "../logging/log.h"
 #include "../svm/pairwise_solver.h"
 #include "../svm/validation.h"
-#include "../svm/strategy.h"
 #include "../feature/feature.h"
 
 using namespace std;
