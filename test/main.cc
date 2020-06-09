@@ -1,14 +1,27 @@
 #include <vector>
+#include <string>
+#include <iostream>
+#include <filesystem>
 
-#define BOOST_TEST_MODULE example_test_suite
+#define BOOST_TEST_MODULE application_tester
 #include <boost/test/unit_test.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/range/combine.hpp>
+#include <boost/tuple/tuple.hpp>
 
-#include "../src/math/numeric.h"
+using namespace std;
+namespace pt = boost::property_tree;
 
 int add( int i, int j ) { return i+j; }
 
+void test_json_read(string filename){
+  pt::ptree root;
+  pt::read_json(filename,root);
+  pt::write_json(std::cout, root);
+}
+
 BOOST_AUTO_TEST_CASE(my_test) {
-    fvalue x = 10.0;
     // seven ways to detect and report the same error:
     BOOST_CHECK( add( 2,2 ) == 4 );        // #1 continues on error
 
@@ -26,4 +39,7 @@ BOOST_AUTO_TEST_CASE(my_test) {
                          "add(..) result: " << add( 2,2 ) );
 
     BOOST_CHECK_EQUAL( add( 2,2 ), 4 );	  // #7 continues on error
+
+    string filename = "test/examples/example.json";
+    test_json_read(filename);
 }

@@ -76,7 +76,7 @@ void PairwiseClassifier::saveClassifier(string testName){
 	root.put("maxSVCount",maxSVCount);
 	
 	// get pairwise models
-		pt::ptree models;
+	pt::ptree models;
 	int counter = 0;
 	vector<PairwiseTrainingModel>::iterator it;
 	for (it = state->models.begin(); it != state->models.end(); it++) {

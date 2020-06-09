@@ -73,20 +73,20 @@ target_link_libraries(osvm ${GSL_LIBRARIES})
 ENABLE_TESTING()
 
 # creates the executable
-add_executable(tests ./test/main.cpp)
-# indicates the include paths
-target_include_directories(tests PRIVATE ${BOOST_INCLUDE_DIRS})
-target_link_libraries(tests ${Boost_LIBRARIES})
-target_include_directories(tests PRIVATE ${GSL_INCLUDE_DIRS})
-target_link_libraries(tests ${GSL_LIBRARIES})
-target_include_directories(tests PRIVATE ${SOURCE_DIR})
-
-# declares a test with our executable
-add_test(NAME my_test COMMAND tests)
-
+file(GLOB_RECURSE TST_SRC_FILES ${CMAKE_SOURCE_DIR}/test/*.cc )
+add_executable(tests ${TST_SRC_FILES})
 set_target_properties(tests
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${INSTALL_LIB_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${INSTALL_LIB_DIR}"
     RUNTIME_OUTPUT_DIRECTORY "${INSTALL_BIN_DIR}"
 )
+# indicates the include paths
+target_include_directories(tests PRIVATE ${Boost_INCLUDE_DIRS})
+target_link_libraries(tests ${Boost_LIBRARIES})
+target_include_directories(tests PRIVATE ${GSL_INCLUDE_DIRS})
+target_link_libraries(tests ${GSL_LIBRARIES})
+target_include_directories(tests PRIVATE ${SOURCE_DIR})
+
+# declares a test with our executable
+add_test(NAME application_tester COMMAND tests)
