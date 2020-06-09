@@ -20,7 +20,8 @@ using namespace std;
 namespace pt = boost::property_tree;
 namespace fs = std::filesystem;
 
-bool testJSONRead(string filename);
+ostream& operator<<(ostream& os, pt::ptree tree);
+pt::ptree test_json_read(string filename);
 void initOptions();
 
 

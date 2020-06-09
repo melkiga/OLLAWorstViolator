@@ -1,21 +1,20 @@
 #include "osvm_test.h"
 
+// program options (command line args)
 string usage = (format("Usage: %s [OPTION]... [FILE]\n") % PACKAGE).str();
 string descr = "Perform SVM training for the given data set [FILE].\n";
 string options = "Available options";
 options_description inputOptions(usage + descr + options);
 
-bool test_json_read(string filename){
+// read ground truth classifier output from json file
+pt::ptree test_json_read(string filename){
   pt::ptree root;
-  pt::ptree rootest;
   pt::read_json(filename,root);
-  pt::read_json(filename,rootest);
-  //pt::write_json(std::cout, root);
-  return (root==rootest) ;
+  return root;
 }
 
+// Get the options ready.
 void initOptions(){
-  // Get the options ready.
   inputOptions.add_options()
     (PR_HELP, "produce help message")
 		(PR_C_LOW, value<fvalue>()->default_value(0.001), "C value (lower bound)")
@@ -35,11 +34,12 @@ void initOptions(){
 }
 
 BOOST_AUTO_TEST_CASE(my_test) {
-    string filename = "test/examples/example.json";
-    BOOST_CHECK_EQUAL( test_json_read( filename ), true );
+    string path = "test/examples/"; //TODO: this should be a cmdline arg
+    string filename = path + "example.json";
+    pt::ptree root;
+    pt::read_json(filename,root);
+    BOOST_TEST( test_json_read( filename) == root );
 
-    // string path = "test/examples/"; //TODO: this should be a cmdline arg
-    // for (const auto & entry : fs::directory_iterator(path))
-    //     cout << entry.path() << endl;
-    // test_json_read(filename);
+    for (const auto & entry : fs::directory_iterator(path))
+        cout << entry.path() << endl;
 }
