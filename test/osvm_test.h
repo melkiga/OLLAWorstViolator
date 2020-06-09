@@ -1,3 +1,6 @@
+#ifndef OSVM_TEST_H_
+#define OSVM_TEST_H_
+
 #define BOOST_TEST_MODULE application_tester
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -8,10 +11,17 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include <filesystem>
+
+#include "../src/configuration.h"
 
 using namespace std;
 
 namespace pt = boost::property_tree;
 namespace fs = std::filesystem;
+
+bool testJSONRead(string filename);
+void initOptions();
+
+
+#endif

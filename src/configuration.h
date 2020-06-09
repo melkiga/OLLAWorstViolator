@@ -34,6 +34,7 @@
 using namespace std;
 using namespace boost::program_options;
 
+#define PACKAGE "osvm"
 
 #define PR_HELP "help,h"
 #define PR_C_LOW "c-low,c"

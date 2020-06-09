@@ -22,6 +22,4 @@
 #include "configuration.h"
 #include "launcher.h"
 
-#define PACKAGE "osvm"
-
 #endif
