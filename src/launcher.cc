@@ -131,7 +131,8 @@ void ApplicationLauncher::run() {
 
 	// create test cases if user specified
 	if(conf.createTestCases){
-		classifier->saveClassifier(conf.testName);
+		pt::ptree root = classifier->saveClassifier();
+		pt::write_json(conf.testName, root);	
 	}
 	
 }

@@ -23,8 +23,6 @@
 #include <boost/range/combine.hpp>
 #include <boost/tuple/tuple.hpp>
 
-// Short alias for this namespace
-namespace pt = boost::property_tree;
 struct PairwiseTrainingModel {
 
 	pair<label_id, label_id> trainingLabels;
@@ -82,7 +80,7 @@ public:
 
 	virtual label_id classify(sample_id sample);
 	virtual quantity getSvNumber();
-	virtual void saveClassifier(string testName);
+	virtual pt::ptree saveClassifier();
 
   PairwiseTrainingResult* getState() { return state; }
 

@@ -26,8 +26,6 @@
 #include <vector>
 
 #include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include "strategy.h"
 #include "kernel.h"

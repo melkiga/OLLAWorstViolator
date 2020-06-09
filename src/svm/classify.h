@@ -19,6 +19,11 @@
 #ifndef CLASSIFY_H_
 #define CLASSIFY_H_
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
+// Short alias for this namespace
+namespace pt = boost::property_tree;
 
 class Classifier {
 
@@ -27,7 +32,7 @@ public:
 
 	virtual label_id classify(sample_id sample) = 0;
 	virtual quantity getSvNumber() = 0;
-	virtual void saveClassifier(string testName) = 0;
+	virtual pt::ptree saveClassifier() = 0;
 };
 
 #endif
