@@ -110,7 +110,7 @@ Classifier* ApplicationLauncher::performTraining() {
 	return classifier;
 }
 
-void ApplicationLauncher::run() {
+pt::ptree ApplicationLauncher::run() {
 	Classifier* classifier;
 	if (conf.validation.outerFolds > 1) {
 		classifier = performNestedCrossValidation();
@@ -129,20 +129,19 @@ void ApplicationLauncher::run() {
 		}
 	}
 
-	// create test cases if user specified
-	if(conf.createTestCases){
-		pt::ptree root;
-		// save configuration
-		pt::ptree config;
-		config.put(PR_INNER_FLD,conf.validation.innerFolds);
-		config.put(PR_OUTER_FLD,conf.validation.outerFolds);
-		config.put(PR_MARGIN, conf.trainingParams.margin);
-		config.put(PR_EPOCH, conf.trainingParams.epochs);
-		config.put(PR_INPUT, conf.dataFile);
-		root.add_child("config",config);
-		pt::ptree classif = classifier->saveClassifier();
-		root.add_child("classifier",classif);
-		pt::write_json(conf.testName, root);	
-	}
+	// return json classifier
+	pt::ptree root;
+	// save configuration
+	pt::ptree config;
+	config.put(PR_INNER_FLD,conf.validation.innerFolds);
+	config.put(PR_OUTER_FLD,conf.validation.outerFolds);
+	config.put(PR_MARGIN, conf.trainingParams.margin);
+	config.put(PR_EPOCH, conf.trainingParams.epochs);
+	config.put(PR_INPUT, conf.dataFile);
+	config.put(PR_TEST_NAME, conf.testName);
+	root.add_child("config",config);
+	pt::ptree classif = classifier->saveClassifier();
+	root.add_child("classifier",classif);
 	
+	return root;
 }

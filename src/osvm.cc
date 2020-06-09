@@ -79,7 +79,12 @@ int main(int argc, char *argv[]) {
 			logger << vars;
 
 			ApplicationLauncher launcher(conf);
-			launcher.run();
+			pt::ptree model_tree = launcher.run();
+
+			// create test cases if user specified
+			if(conf.createTestCases){
+				pt::write_json(conf.testName, model_tree);	
+			}
 		} else {
 			cerr << desc;
 		}
