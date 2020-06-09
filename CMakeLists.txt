@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.13...3.16 FATAL_ERROR)
 project(osvm VERSION 0.0.1 LANGUAGES CXX)
 message("Project Name: " ${PROJECT_NAME} ", Version: " ${PROJECT_VERSION})
 
+set(CMAKE_CXX_STANDARD 17)
+
 # set variables
 set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src") # full path to src
 set(INSTALL_BIN_DIR "${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}")
