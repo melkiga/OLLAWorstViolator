@@ -8,21 +8,13 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/range/combine.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/foreach.hpp>
 
-#include <vector>
-#include <string>
-#include <filesystem>
+#include "test_helpers.h"
 
-#include "../src/configuration.h"
 
-using namespace std;
-
-namespace pt = boost::property_tree;
-namespace fs = std::filesystem;
 
 ostream& operator<<(ostream& os, pt::ptree tree);
 pt::ptree test_json_read(string filename);
-void initOptions();
-
 
 #endif
