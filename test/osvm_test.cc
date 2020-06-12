@@ -66,21 +66,32 @@ BOOST_AUTO_TEST_CASE(my_test) {
       cout << arguments[i] << ' ';
 	cout << "\n";
 
-	BOOST_TEST( test_json_read( filename) == root );
+	//BOOST_TEST( test_json_read( filename) == root );
+	pt::ptree model_tree;
 
 	initOptions();
 	// run program
 	positional_options_description opt;
 	opt.add(PR_KEY_INPUT, -1);
-
+	
 	variables_map vars;
 	store(command_line_parser(arguments).options(inputOptions).positional(opt).run(), vars);
 	notify(vars);
 
-    
-	ParametersParser parser(vars);
-	Configuration conf = parser.getConfiguration();
+	if (!vars.count(PR_KEY_HELP)) {
+		ParametersParser parser(vars);
+		Configuration conf = parser.getConfiguration();
+
+		ApplicationLauncher launcher(conf);
+		model_tree = launcher.run();
+		pt::write_json(cout,model_tree.get_child("classifier"));
+		pt::write_json("testing.json", model_tree.get_child("classifier"));	
+
+		BOOST_TEST(model == model_tree.get_child("classifier"));
+	} else {
+		cerr << descr;
+	}
 	
-    for (const auto & entry : fs::directory_iterator(path))
-        cout << entry.path() << endl;
+    // for (const auto & entry : fs::directory_iterator(path))
+    //     cout << entry.path() << endl;
 }

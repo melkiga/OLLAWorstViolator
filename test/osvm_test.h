@@ -15,6 +15,7 @@
 #include <filesystem>
 
 #include "../src/configuration.h"
+#include "../src/launcher.h"
 
 #define MAX_SIZE 255
 
