@@ -1,0 +1,110 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile (Debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--no-warn-unused-cli",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE",
+                "-DCMAKE_BUILD_TYPE:STRING=Debug",
+                "-DCMAKE_C_COMPILER:FILEPATH=/bin/gcc-9",
+                "-DCMAKE_CXX_COMPILER:FILEPATH=/bin/g++-9",
+                "-H/home/melkiga/Documents/code/OLLAWorstViolator",
+                "-B/home/melkiga/Documents/code/OLLAWorstViolator/build",
+                "-G",
+                "'Unix Makefiles'"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Build (Debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "/home/melkiga/Documents/code/OLLAWorstViolator/build",
+                     "--config", "Debug",
+                     "--target", "debug"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Compile (Debug)"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Compile (Release)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--no-warn-unused-cli",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE",
+                "-DCMAKE_BUILD_TYPE:STRING=Release",
+                "-DCMAKE_C_COMPILER:FILEPATH=/bin/gcc-9",
+                "-DCMAKE_CXX_COMPILER:FILEPATH=/bin/g++-9",
+                "-H/home/melkiga/Documents/code/OLLAWorstViolator",
+                "-B/home/melkiga/Documents/code/OLLAWorstViolator/build",
+                "-G",
+                "'Unix Makefiles'"
+            ],
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "Build (Release)",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "/home/melkiga/Documents/code/OLLAWorstViolator/build",
+                     "--config", "Release",
+                     "--target", "release"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Compile (Release)"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Compile (Test)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--no-warn-unused-cli",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE",
+                "-DCMAKE_BUILD_TYPE:STRING=Debug",
+                "-DCMAKE_C_COMPILER:FILEPATH=/bin/gcc-9",
+                "-DCMAKE_CXX_COMPILER:FILEPATH=/bin/g++-9",
+                "-H/home/melkiga/Documents/code/OLLAWorstViolator",
+                "-B/home/melkiga/Documents/code/OLLAWorstViolator/build",
+                "-G",
+                "'Unix Makefiles'"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Build (Test)",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "/home/melkiga/Documents/code/OLLAWorstViolator/build",
+                     "--config", "Debug",
+                     "--target", "osvm_unit_tests"],
+            "group": "build",
+            "dependsOn": [
+                "Compile (Test)"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
