@@ -35,21 +35,19 @@ pt::ptree test_json_read(string filename){
   return root;
 }
 
-//TODO add test case for command line args options
 // https://www.boost.org/doc/libs/1_73_0/libs/test/doc/html/boost_test/runtime_config/custom_command_line_arguments.html
-
 BOOST_AUTO_TEST_CASE(my_test) {
-    string path = "test/examples/"; //TODO: this should be a cmdline arg
+    string path = "test/examples/";
     string filename = path + "example.json";
 
     // parse json file
+	BOOST_TEST_MESSAGE( "Parsing JSON file :" << filename );
 	pt::ptree root;
     pt::read_json(filename,root);
 
 	// get configuration for ground truth
 	pt::ptree config = root.get_child("config");
 	pt::ptree model = root.get_child("classifier");
-	pt::write_json(cout,config);
 
 	// create command line arguments
 	vector<string> arguments;
@@ -84,7 +82,6 @@ BOOST_AUTO_TEST_CASE(my_test) {
 
 		ApplicationLauncher launcher(conf);
 		model_tree = launcher.run();
-		pt::write_json(cout,model_tree.get_child("classifier"));
 		pt::write_json("testing.json", model_tree.get_child("classifier"));	
 
 		BOOST_TEST(model == model_tree.get_child("classifier"));
