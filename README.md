@@ -35,13 +35,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Authors
 
-- **Gabriella Melki** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+- **Gabriella Melki**
 
 See also the list of [contributors](https://github.com/melkiga/OLLAWorstViolator/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Acknowledgments
 
