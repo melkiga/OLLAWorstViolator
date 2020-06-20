@@ -248,7 +248,6 @@ ModelManifest.xml
 
 # GABBIE
 .DS_Store
-*.json
 *.Po
 *.Tpo
 *.m4
