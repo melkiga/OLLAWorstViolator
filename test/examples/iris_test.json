@@ -5,7 +5,8 @@
         "margin,M": "0.001",
         "epochs,P": "0.5",
         "input,I": "small-data\/iris",
-        "test-name,t": "test\/examples\/iris_test.json"
+        "test-name,t": "test\/examples\/iris_test.json",
+        "create-test-cases,d": "true"
     },
     "classifier": {
         "maxSVCount": "13",

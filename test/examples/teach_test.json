@@ -5,7 +5,8 @@
         "margin,M": "0.001",
         "epochs,P": "0.5",
         "input,I": "small-data\/teach",
-        "test-name,t": "test\/examples\/teach_test.json"
+        "test-name,t": "test\/examples\/teach_test.json",
+        "create-test-cases,d": "true"
     },
     "classifier": {
         "maxSVCount": "80",
