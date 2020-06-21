@@ -30,7 +30,19 @@ These instructions will get you a copy of the project up and running on your loc
 
 - **CMake** [install](https://cmake.org/download/)
 - **Boost** [install](https://www.boost.org/users/download/)
+  
+  ```bash
+  libboost-dev/focal,now 1.71.0.0ubuntu2 amd64 [installed,automatic]
+  libboost-dev/focal 1.71.0.0ubuntu2 i386
+  ```
+
 - **GSL** [install](https://www.gnu.org/software/gsl/)
+  
+  ```bash
+  libgsl-dev/focal,now 2.5+dfsg-6build1 amd64 [installed]
+  libgsl-dev/focal 2.5+dfsg-6build1 i386
+  ```
+
 - **VSCode** [install](https://code.visualstudio.com/docs/cpp/config-linux)
   - Extension C/C++ - `ms-vscode.cpptools`
   - Extension CMake - `ms-vscode.cmake-tools`
