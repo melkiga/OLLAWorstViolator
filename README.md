@@ -26,12 +26,70 @@ To address the limitations presented by current popular SVM solvers, we develope
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. The project uses VSCode as it's IDE and CMake for building and running.
 
+### Installs
+
 - **CMake** [install](https://cmake.org/download/)
 - **Boost** [install](https://www.boost.org/users/download/)
 - **GSL** [install](https://www.gnu.org/software/gsl/)
 - **VSCode** [install](https://code.visualstudio.com/docs/cpp/config-linux)
   - Extension C/C++ - `ms-vscode.cpptools`
   - Extension CMake - `ms-vscode.cmake-tools`
+
+### Configure
+
+[Configure](https://code.visualstudio.com/docs/cpp/c-cpp-properties-schema-reference) `VSCode` with your preferred C++ IDE settings.
+
+## Setup
+
+1. Clone this repository.
+2. Build `Ctrl+Shift+B` or use the `VSCode CMake` extension.
+   1. Be sure to select your config. These are already set up in the Launch.json file or CMakeLists.txt
+3. Debug, Run, or Test
+   1. Debug: `F5`
+   2. Run: enter the following in the terminal
+
+```bash
+bin/Release/osvm -i 5 -o 5 /path/to/data # Run
+test/bin/Debug/osvm_unit_tests -i 5 -i 5 -d true -t /path/to/output/json /path/to/data # Test
+```
+
+## Project Details
+
+```bash
+.
+├── bin                   # Debug/osvm and Release/osvm executables
+├── build                 # cmake dir
+├── src                   # source code files
+│   ├── data
+│   ├── feature
+│   ├── logging
+│   ├── math
+│   ├── model
+│   ├── svm
+│   ├── time
+│   ├── configuration.cc
+│   ├── configuration.h
+│   ├── launcher.cc
+│   ├── launcher.h
+│   ├── osvm.cc           # main file
+│   └── osvm.h
+├── test                  # boost unit tests
+│   ├── bin               # Debug/osvm and Release/osvm test executables
+│   ├── examples          # json files with true example outputs
+│   ├── CMakeLists.txt    # test cmake config
+│   ├── osvm_test.cc      # main test file
+│   └── osvm_test.h
+├── .vscode               # vscode configurations
+│   ├── c_cpp_properties.json # c++ configurations (edit to your liking)
+│   ├── launch.json       # launch/attach configurations for debugging
+│   ├── settings.json     # general vscode settings 
+│   └── tasks.json        # build instructions for each release (debug,release,test)
+├── CMakeLists.txt        # cmake config for main project
+├── .gitattributes
+├── .gitignore
+├── IssueTemplate.md
+└── README.md
+```
 
 ## Authors
 
