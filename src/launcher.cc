@@ -112,12 +112,6 @@ Classifier* ApplicationLauncher::performTraining() {
 
 pt::ptree ApplicationLauncher::run() {
 
-	#ifdef ENABLE_LOGGING
-	//do nothing
-	#else
-		cout.setstate(ios_base::failbit);
-	#endif
-
 	Classifier* classifier;
 	if (conf.validation.outerFolds > 1) {
 		classifier = performNestedCrossValidation();

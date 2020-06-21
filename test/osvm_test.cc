@@ -1,6 +1,6 @@
 #include "osvm_test.h"
 
-// TODO: add time 
+// TODO: #3 add time 
 
 // program options (command line args)
 string usage = (format("Usage: %s [OPTION]... [FILE]\n") % PACKAGE).str();
