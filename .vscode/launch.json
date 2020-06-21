@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/test/bin/Debug/osvm_unit_tests",
-            "args": ["-i", "5", "-o", "5", "-d", "true", "-t", "test/examples/example.json", "small-data/iris"],
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "externalConsole": false,
