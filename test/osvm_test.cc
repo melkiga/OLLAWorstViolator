@@ -38,7 +38,7 @@ pt::ptree test_json_read(string filename){
 // https://www.boost.org/doc/libs/1_73_0/libs/test/doc/html/boost_test/runtime_config/custom_command_line_arguments.html
 BOOST_AUTO_TEST_CASE(my_test) {
     string path = "test/examples/";
-    string filename = path + "example.json";
+    string filename = path + "iris_test.json";
 
     // parse json file
 	BOOST_TEST_MESSAGE( "Parsing JSON file :" << filename );
