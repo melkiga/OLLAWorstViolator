@@ -90,6 +90,50 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Build (Test)",
+            "linux": {
+                "type": "shell",
+                "command": "cmake",
+                "args": [
+                    "--build",
+                    "${workspaceFolder}/build",
+                    "--config",
+                    "Release",
+                    "--target",
+                    "osvm_unit_tests"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "problemMatcher": [
+                    "$gcc"
+                ]
+            },
+            "windows": {
+                "command": "cmake",
+                "args": [
+                    "--build",
+                    "${workspaceFolder}\\build",
+                    "--config",
+                    "Release",
+                    "--target",
+                    "osvm_unit_tests"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "problemMatcher": [
+                    "$msCompile"
+                ]
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 } 
