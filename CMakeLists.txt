@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13...3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1...3.16 FATAL_ERROR)
 project(osvm VERSION 0.0.1 LANGUAGES CXX)
 message("Project Name: " ${PROJECT_NAME} ", Version: " ${PROJECT_VERSION})
 
