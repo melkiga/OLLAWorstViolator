@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.1...3.16 FATAL_ERROR)
 project(osvm VERSION 0.0.1 LANGUAGES CXX)
+enable_testing()
 message("Project Name: " ${PROJECT_NAME} ", Version: " ${PROJECT_VERSION})
 
 # set install directories
@@ -36,23 +37,26 @@ add_custom_target(release
     COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR} 
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target osvm
     COMMENT "Creating the executable in the release mode.")
-
 ##############################################
 # Declare dependencies
 # BOOST
-find_package(Boost COMPONENTS program_options unit_test_framework REQUIRED)
+find_package(Boost 1.73 COMPONENTS program_options unit_test_framework REQUIRED)
 
 # set some environment variables
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
+
 # include dirs + libraries
-target_include_directories(osvm PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(osvm ${Boost_LIBRARIES})
+if(Boost_FOUND)
+    target_include_directories(osvm PRIVATE ${Boost_INCLUDE_DIRS})
+    target_link_libraries(osvm ${Boost_LIBRARIES})
+endif()
 
 # GSL
 find_package(GSL REQUIRED)
-# include dirs + libraries
-target_include_directories(osvm PRIVATE ${GSL_INCLUDE_DIRS})
-target_link_libraries(osvm ${GSL_LIBRARIES})
+if(GSL_FOUND)
+    target_link_libraries(osvm GSL::gsl GSL::gslcblas)
+endif()
+
 
