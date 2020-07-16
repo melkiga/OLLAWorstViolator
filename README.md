@@ -60,7 +60,8 @@ These instructions will get you a copy of the project up and running on your loc
     - `.\vcpkg integrate install`
     - `.\vcpkg install gsl gsl:x64-windows`
     - Add environment variable `GSL_ROOT` with value: `C:path\to\vcpkg\packages\gsl_x64-windows`
-  
+    - For more information on *vcpkg* visit: https://vcpkg.readthedocs.io/en/latest/
+
   - **Linux**:
 
     ```bash
