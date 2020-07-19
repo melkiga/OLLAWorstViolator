@@ -159,18 +159,18 @@ TestingResult CrossValidationSolver::doCrossValidation() {
 		solver->train();
 		timer.stop();
 
-		logger << format("inner fold %d/%d training: time=%.2f[s], sv=%d/%d\n")
-				% outerFold % innerFold % timer.getTimeElapsed()
-				% solver->getSvNumber() % solver->getCurrentSize();
+		//logger << format("inner fold %d/%d training: time=%.2f[s], sv=%d/%d\n")
+		//		% outerFold % innerFold % timer.getTimeElapsed()
+		//		% solver->getSvNumber() % solver->getCurrentSize();
 
 		timer.restart();
 		TestingResult foldResult = test(
 				this->innerFoldSizes[innerFold], this->outerFoldSizes[outerFold]);
 		timer.stop();
 
-		logger << format("inner fold %d/%d testing: time=%.2f[s], accuracy=%.2f[%%]\n")
-				% outerFold % innerFold
-				% timer.getTimeElapsed() % (100.0 * foldResult.accuracy);
+		//logger << format("inner fold %d/%d testing: time=%.2f[s], accuracy=%.2f[%%]\n")
+		//		% outerFold % innerFold
+		//		% timer.getTimeElapsed() % (100.0 * foldResult.accuracy);
 
 		result.accuracy += foldResult.accuracy / innerFoldsNumber;
 	}

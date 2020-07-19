@@ -11,7 +11,7 @@ CrossValidationSolver* ApplicationLauncher::createCrossValidator() {
 					conf.validation.innerFolds, conf.validation.outerFolds);
 	timer.stop();
 
-	logger << format("input reading time: %.2f[s]\n") % timer.getTimeElapsed();
+	//logger << format("input reading time: %.2f[s]\n") % timer.getTimeElapsed();
 	input.close();
 	return solver;
 }
@@ -24,7 +24,7 @@ AbstractSolver* ApplicationLauncher::createSolver() {
 	AbstractSolver *solver = reader.getSolver();
 	timer.stop();
 
-	logger << format("input reading time: %.2f[s]\n") % timer.getTimeElapsed();
+	//logger << format("input reading time: %.2f[s]\n") % timer.getTimeElapsed();
 	input.close();
 	return solver;
 }
@@ -44,9 +44,9 @@ Classifier* ApplicationLauncher::performModelSelection() {
 	ModelSelectionResults params = selector->selectParameters(*solver, conf.searchRange);
 	timer.stop();
 
-	logger << format("final result: time=%.2f[s], accuracy=%.2f[%%], C=%.4g, G=%.4g\n")
-			% timer.getTimeElapsed() % (100.0 * params.bestResult.accuracy)
-			% params.c % params.gamma;
+	//logger << format("final result: time=%.2f[s], accuracy=%.2f[%%], C=%.4g, G=%.4g\n")
+	//		% timer.getTimeElapsed() % (100.0 * params.bestResult.accuracy)
+	//		% params.c % params.gamma;
 	
 	delete selector;
 	return solver->getClassifier();
@@ -60,8 +60,8 @@ Classifier* ApplicationLauncher::performNestedCrossValidation() {
 	TestingResult res = selector->doNestedCrossValidation(*solver, conf.searchRange);
 	timer.stop();
 
-	logger << format("final result: time=%.2f[s], accuracy=%.2f[%%]\n")
-			% timer.getTimeElapsed() % (100.0 * res.accuracy);
+	//logger << format("final result: time=%.2f[s], accuracy=%.2f[%%]\n")
+	//		% timer.getTimeElapsed() % (100.0 * res.accuracy);
 
 	delete selector;
 	return solver->getClassifier();
@@ -76,8 +76,8 @@ Classifier* ApplicationLauncher::performCrossValidation() {
 	TestingResult result = solver->doCrossValidation();
 	timer.stop();
 
-	logger << format("final result: time=%.2f[s], accuracy=%.2f[%%]\n")
-			% timer.getTimeElapsed() % (100.0 * result.accuracy);
+	//logger << format("final result: time=%.2f[s], accuracy=%.2f[%%]\n")
+	//		% timer.getTimeElapsed() % (100.0 * result.accuracy);
 
 	return solver->getClassifier();
 }
@@ -103,9 +103,9 @@ Classifier* ApplicationLauncher::performTraining() {
 		}
 	}
 
-	logger << format("final result: time=%.2f[s], accuracy=%.2f[%%], sv=%d\n")
-			% timer.getTimeElapsed() % (100.0 * correct / total)
-			% classifier->getSvNumber();
+	//logger << format("final result: time=%.2f[s], accuracy=%.2f[%%], sv=%d\n")
+	//		% timer.getTimeElapsed() % (100.0 * correct / total)
+	//		% classifier->getSvNumber();
 
 	return classifier;
 }

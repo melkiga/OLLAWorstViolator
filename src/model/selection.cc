@@ -55,8 +55,8 @@ TestingResult GridGaussianModelSelector::validate(
     TestingResult result = solver.doCrossValidation();
     timer.stop();
 
-    logger << format("outer fold %d CV: time=%.2f[s], accuracy=%.2f[%%], C=%.4g, G=%.4g\n")
-      % solver.getOuterFold() % timer.getTimeElapsed() % (100.0 * result.accuracy) % c % gamma;
+    //logger << format("outer fold %d CV: time=%.2f[s], accuracy=%.2f[%%], C=%.4g, G=%.4g\n")
+    //  % solver.getOuterFold() % timer.getTimeElapsed() % (100.0 * result.accuracy) % c % gamma;
 
     return result;
 }
@@ -103,8 +103,8 @@ TestingResult GridGaussianModelSelector::doNestedCrossValidation(
       ModelSelectionResults params = selectParameters(solver, range);
       timer.stop();
 
-      logger << format("outer fold %d model selection: time=%.2f[s], accuracy=%.2f[%%], C=%.4g, G=%.4g\n")
-        % fold % timer.getTimeElapsed() % (100.0 * params.bestResult.accuracy) % params.c % params.gamma;
+      //logger << format("outer fold %d model selection: time=%.2f[s], accuracy=%.2f[%%], C=%.4g, G=%.4g\n")
+      //  % fold % timer.getTimeElapsed() % (100.0 * params.bestResult.accuracy) % params.c % params.gamma;
 
 	    CGaussKernel kernel(params.gamma);
       solver.setKernelParams(params.c, kernel);
@@ -114,15 +114,15 @@ TestingResult GridGaussianModelSelector::doNestedCrossValidation(
       timer.stop();
 
       StateHolder &stateHolder = solver.getStateHolder();
-      logger << format("outer fold %d final training: time=%.2f[s], sv=%d/%d\n")
-        % fold % timer.getTimeElapsed() % stateHolder.getSvNumber() % solver.getOuterProblemSize();
+      //logger << format("outer fold %d final training: time=%.2f[s], sv=%d/%d\n")
+      //  % fold % timer.getTimeElapsed() % stateHolder.getSvNumber() % solver.getOuterProblemSize();
 
       timer.restart();
       TestingResult current = solver.testOuter();
       timer.stop();
 
-      logger << format("outer fold %d final testing: time=%.2f[s], accuracy=%.2f[%%]\n")
-        % fold % timer.getTimeElapsed() % (100.0 * current.accuracy);
+      //logger << format("outer fold %d final testing: time=%.2f[s], accuracy=%.2f[%%]\n")
+      //  % fold % timer.getTimeElapsed() % (100.0 * current.accuracy);
 
       result.accuracy += current.accuracy / solver.getOuterFoldsNumber();
     }

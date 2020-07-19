@@ -125,7 +125,7 @@ map<feature_id, feature_id> BaseSolverFactory::findOptimalFeatureMappings(list<m
 	}
 
 	double density = 100.0 * featureNum / (features.size() * mappings.size());
-	logger << format("data density: %.2f[%%]") % density << endl;
+	//logger << format("data density: %.2f[%%]") % density << endl;
 	return mappings;
 }
 
