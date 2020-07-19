@@ -256,28 +256,5 @@ ModelSelectionResults PatternGaussianModelSelector::selectParameters(
       }
       trnCoords = findStartingPoint(range);
     }
-    //printTrainingMatrix(range);
     return globalRes;
-}
-
-
-void PatternGaussianModelSelector::printTrainingMatrix(SearchRange &range) {
-    cout << "training matrix size: " << results.size() << endl;
-    map<TrainingCoord, TestingResult>::iterator it;
-    int table[range.cResolution][range.gammaResolution];
-    for (quantity i = 0; i < range.cResolution; i++) {
-      for (quantity j = 0; j < range.gammaResolution; j++) {
-        table[i][j] = 0;
-      }
-    }
-    for (it = results.begin(); it != results.end(); it++) {
-      TrainingCoord coord = it->first;
-      table[coord.c][coord.gamma] = 1;
-    }
-    for (quantity i = 0; i < range.cResolution; i++) {
-      for (quantity j = 0; j < range.gammaResolution; j++) {
-        cout << (table[i][j] ? 'x' : '.');
-      }
-      cout << endl;
-    }
 }

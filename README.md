@@ -29,23 +29,45 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installs
 
 - **CMake** [install](https://cmake.org/download/)
-- **Boost** [install](https://www.boost.org/users/download/)
-  
-  ```bash
-  libboost-dev/focal,now 1.71.0.0ubuntu2 amd64 [installed,automatic]
-  libboost-dev/focal 1.71.0.0ubuntu2 i386
-  ```
-
-- **GSL** [install](https://www.gnu.org/software/gsl/)
-  
-  ```bash
-  libgsl-dev/focal,now 2.5+dfsg-6build1 amd64 [installed]
-  libgsl-dev/focal 2.5+dfsg-6build1 i386
-  ```
-
 - **VSCode** [install](https://code.visualstudio.com/docs/cpp/config-linux)
   - Extension C/C++ - `ms-vscode.cpptools`
   - Extension CMake - `ms-vscode.cmake-tools`
+- **Boost** [install](https://www.boost.org/users/download/)
+  - **Windows** [getting-started](https://www.boost.org/doc/libs/1_73_0/more/getting_started/windows.html#boost-root-directory) | [cmake-test](https://www.boost.org/doc/libs/1_73_0/libs/test/doc/html/boost_test/adv_scenarios/build_utf.html)
+    1. Download and extract Boost
+    2. Add the following path to your environment variables `C:\Boost`
+    3. Navigate to the newly extracted Boost folder within your terminal/cmd
+    4. Run the following:
+
+        ```cmd
+        bootstrap.bat
+        .\b2 address-model=32 architecture=x86 --build-type=complete --with-program_options --with-test toolset=msvc link=shared install 
+        ```
+
+  - **Linux**
+
+      ```bash
+      libboost-dev/focal,now 1.71.0.0ubuntu2 amd64 [installed,automatic]
+      libboost-dev/focal 1.71.0.0ubuntu2 i386
+      ```
+
+- **GSL** [windows](https://solarianprogrammer.com/2020/01/26/getting-started-gsl-gnu-scientific-library-windows-macos-linux/) | [linux](https://www.gnu.org/software/gsl/)
+
+  - **Windows**:
+    - `git clone https://github.com/microsoft/vcpkg.git`
+    - `cd vcpkg`
+    - `.\bootstrap-vcpkg.bat`
+    - `.\vcpkg integrate install`
+    - `.\vcpkg install gsl gsl:x64-windows`
+    - Add environment variable `GSL_ROOT` with value: `C:path\to\vcpkg\packages\gsl_x64-windows`
+    - For more information on *vcpkg* visit: https://vcpkg.readthedocs.io/en/latest/
+
+  - **Linux**:
+
+    ```bash
+    libgsl-dev/focal,now 2.5+dfsg-6build1 amd64 [installed]
+    libgsl-dev/focal 2.5+dfsg-6build1 i386
+    ```
 
 ### Configure
 

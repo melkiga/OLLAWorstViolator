@@ -121,8 +121,6 @@ protected:
   TrainingCoord findStartingPoint(SearchRange &range);
   quantity evaluateDistance(offset c, offset gamma, SearchRange &range);
 
-  void printTrainingMatrix(SearchRange &range);
-
 public:
   PatternGaussianModelSelector(Pattern *pattern);
   virtual ~PatternGaussianModelSelector();

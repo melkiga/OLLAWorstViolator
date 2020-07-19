@@ -245,6 +245,8 @@ ModelManifest.xml
 .fake/
 
 # GABBIE
+.vscode/c_cpp*
+.vscode/settings.json
 .DS_Store
 *.Po
 *.Tpo
