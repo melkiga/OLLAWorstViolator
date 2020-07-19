@@ -9,3 +9,4 @@ fi
 rm -rf build
 rm -rf bin
 rm -rf googletest
+rm -rf test/bin
