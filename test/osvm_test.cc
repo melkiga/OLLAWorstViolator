@@ -37,58 +37,70 @@ pt::ptree test_json_read(string filename){
 
 // https://www.boost.org/doc/libs/1_73_0/libs/test/doc/html/boost_test/runtime_config/custom_command_line_arguments.html
 BOOST_AUTO_TEST_CASE(my_test) {
-    string path = "test/examples/";
-    string filename = path + "example.json";
-
-    // parse json file
-	BOOST_TEST_MESSAGE( "Parsing JSON file :" << filename );
-	pt::ptree root;
-    pt::read_json(filename,root);
-
-	// get configuration for ground truth
-	pt::ptree config = root.get_child("config");
-	pt::ptree model = root.get_child("classifier");
-
-	// create command line arguments
-	vector<string> arguments;
-	BOOST_FOREACH(const pt::ptree::value_type &v, config){
-		const string option(v.first.data());
-		string value = v.second.data();
-		if(option.back() == 'I'){
-			value = v.second.data();
-		}
-		arguments.push_back((string)"-"+option.back());
-		arguments.push_back(value);
-	}
-   	for(int i=0; i < arguments.size(); i++)
-      cout << arguments[i] << ' ';
-	cout << "\n";
-
-	//BOOST_TEST( test_json_read( filename) == root );
-	pt::ptree model_tree;
-
+    string path = "test/examples/"; // TODO: #5 add this as env variable
+	
+	// initialize cmd options
 	initOptions();
-	// run program
 	positional_options_description opt;
 	opt.add(PR_KEY_INPUT, -1);
-	
 	variables_map vars;
-	store(command_line_parser(arguments).options(inputOptions).positional(opt).run(), vars);
-	notify(vars);
 
-	if (!vars.count(PR_KEY_HELP)) {
-		ParametersParser parser(vars);
-		Configuration conf = parser.getConfiguration();
+	for (const auto & entry : fs::directory_iterator(path)){
+    	string filename = entry.path();	
+		cout << filename << "\n";
 
-		ApplicationLauncher launcher(conf);
-		model_tree = launcher.run();
-		pt::write_json("testing.json", model_tree.get_child("classifier"));	
+		// parse json file
+		BOOST_TEST_MESSAGE( "Parsing JSON file :" << filename );
+		pt::ptree root;
+    	pt::read_json(filename,root);
 
-		BOOST_TEST(model == model_tree.get_child("classifier"));
-	} else {
-		cerr << descr;
+		// get configuration for ground truth
+		pt::ptree config = root.get_child("config");
+		pt::ptree model = root.get_child("classifier");
+
+		// create command line arguments
+		vector<string> arguments;
+		BOOST_FOREACH(const pt::ptree::value_type &v, config){
+			const string option(v.first.data());
+			string value = v.second.data();
+			if(option.back() == 'I'){
+				value = v.second.data();
+			}
+			arguments.push_back((string)"-"+option.back());
+			arguments.push_back(value);
+		}
+		for(int i=0; i < arguments.size(); i++){
+			cout << arguments[i] << ' ';
+		}
+		cout << "\n";
+
+		store(command_line_parser(arguments).options(inputOptions).positional(opt).run(), vars);
+		notify(vars);
+		
+
+		// run program
+		if (!vars.count(PR_KEY_HELP)) {
+			ParametersParser parser(vars);
+			Configuration conf = parser.getConfiguration();
+
+			ApplicationLauncher launcher(conf);
+			pt::ptree model_tree = launcher.run();
+			pt::write_json(cout,model_tree.get_child("classifier"));
+			// run test
+			BOOST_TEST(model == model_tree.get_child("classifier"));
+
+		} else {
+			cerr << descr;
+		}
 	}
+        
+
+    
 	
-    // for (const auto & entry : fs::directory_iterator(path))
-    //     cout << entry.path() << endl;
+
+	
+
+	
+
+	
 }

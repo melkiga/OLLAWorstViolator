@@ -5,8 +5,7 @@
         "margin,M": "0.001",
         "epochs,P": "0.5",
         "input,I": "small-data\/sonar",
-        "test-name,t": "test\/examples\/sonar_test.json",
-        "create-test-cases,d": "true"
+        "test-name,t": "test\/examples\/sonar_test.json"
     },
     "classifier": {
         "maxSVCount": "41",
