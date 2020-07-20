@@ -112,7 +112,7 @@ Classifier* ApplicationLauncher::performTraining() {
 
 pt::ptree ApplicationLauncher::run() {
 
-	Classifier* classifier;
+	Classifier* classifier = NULL;
 	if (conf.validation.outerFolds > 1) {
 		classifier = performNestedCrossValidation();
 	}
@@ -129,7 +129,7 @@ pt::ptree ApplicationLauncher::run() {
 			classifier = performTraining();
 		}
 	}
-
+	cout << classifier->getSvNumber() << endl;
 	// return json classifier
 	pt::ptree root;
 	// save configuration
@@ -141,8 +141,12 @@ pt::ptree ApplicationLauncher::run() {
 	config.put(PR_INPUT, conf.dataFile);
 	config.put(PR_TEST_NAME, conf.testName);
 	root.add_child("config",config);
-	pt::ptree classif = classifier->saveClassifier();
+	pt::ptree classif;
+	pt::write_json(cout, classif);
+	classifier->saveClassifier(classif);
+	pt::write_json(cout, classif);
 	root.add_child("classifier",classif);
 	
+	delete classifier;
 	return root;
 }
