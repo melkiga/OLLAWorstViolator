@@ -32,7 +32,7 @@ public:
 
 	virtual label_id classify(sample_id sample) = 0;
 	virtual quantity getSvNumber() = 0;
-	virtual pt::ptree saveClassifier() = 0;
+	virtual void saveClassifier(pt::ptree& root) = 0;
 };
 
 #endif

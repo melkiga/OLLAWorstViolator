@@ -67,10 +67,7 @@ quantity PairwiseClassifier::getSvNumber() {
   return state->maxSVCount;
 }
 
-pt::ptree PairwiseClassifier::saveClassifier(){
-	// initialize json property tree
-	pt::ptree root;
-
+void PairwiseClassifier::saveClassifier(pt::ptree& root){
 	// get pairwise models
 	quantity maxSVCount = state->maxSVCount;
 	root.put("maxSVCount",maxSVCount);
@@ -105,8 +102,6 @@ pt::ptree PairwiseClassifier::saveClassifier(){
 	}
 
 	root.add_child("models",models);
-
-	return root;
 }
 
 PairwiseSolver::PairwiseSolver(

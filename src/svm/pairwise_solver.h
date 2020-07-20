@@ -80,7 +80,7 @@ public:
 
 	virtual label_id classify(sample_id sample);
 	virtual quantity getSvNumber();
-	virtual pt::ptree saveClassifier();
+	virtual void saveClassifier(pt::ptree& root);
 
   PairwiseTrainingResult* getState() { return state; }
 

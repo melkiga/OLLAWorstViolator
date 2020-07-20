@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 	positional_options_description opt;
 	opt.add(PR_KEY_INPUT, -1);
 
-	try {
+	try {	
 		variables_map vars;
 		store(command_line_parser(argc, argv).options(desc).positional(opt).run(), vars);
 		notify(vars);
@@ -76,10 +76,12 @@ int main(int argc, char *argv[]) {
 			ParametersParser parser(vars);
 			Configuration conf = parser.getConfiguration();
 
-			logger << vars;
+			// logger << vars;
 
 			ApplicationLauncher launcher(conf);
 			pt::ptree model_tree = launcher.run();
+
+			pt::ptree model_tree_two = launcher.run();
 
 			// create test cases if user specified
 			if(conf.createTestCases){
