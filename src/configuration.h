@@ -32,7 +32,8 @@
 #include "svm/stop.h"
 
 using namespace std;
-using namespace boost::program_options;
+namespace bopt = boost::program_options;
+
 
 #define PACKAGE "osvm"
 
@@ -114,10 +115,10 @@ struct Configuration {
 
 class ParametersParser {
 	
-	variables_map& vars;
+	bopt::variables_map& vars;
 
 public:
-	ParametersParser(variables_map& vars);
+	ParametersParser(bopt::variables_map& vars);
 	
 	Configuration getConfiguration();
 };

@@ -21,8 +21,8 @@
 // compile with: g++/gcc/visual studio 
 extern "C" { FILE __iob_func[3] = { *stdin,*stdout,*stderr }; }
 
-ostream& operator<< (ostream& os, variables_map& vars) {
-	map<string, variable_value>::iterator it;
+ostream& operator<< (ostream& os, bopt::variables_map& vars) {
+	map<string, bopt::variable_value>::iterator it;
 	for (it = vars.begin(); it != vars.end(); it++) {
 		if (typeid(string) == it->second.value().type()) {
 			os << format("%-20s%s\n") % it->first % it->second.as<string>();
@@ -46,31 +46,31 @@ int main(int argc, char *argv[]) {
 	string usage = (format("Usage: %s [OPTION]... [FILE]\n") % PACKAGE).str();
 	string descr = "Perform SVM training for the given data set [FILE].\n";
 	string options = "Available options";
-	options_description desc(usage + descr + options);
+	bopt::options_description desc(usage + descr + options);
 	desc.add_options()
 		(PR_HELP, "produce help message")
-		(PR_C_LOW, value<fvalue>()->default_value(0.001), "C value (lower bound)")
-		(PR_C_HIGH, value<fvalue>()->default_value(10000.0), "C value (upper bound)")
-		(PR_G_LOW, value<fvalue>()->default_value(0.0009765625), "gamma value (lower bound)")
-		(PR_G_HIGH, value<fvalue>()->default_value(16.0), "gamma value (upper bound)")
-		(PR_RES, value<int>()->default_value(8), "resolution (for C and gamma)")
-		(PR_OUTER_FLD, value<int>()->default_value(1), "outer folds")
-		(PR_INNER_FLD, value<int>()->default_value(10), "inner folds")
-		(PR_BIAS_CALCULATION, value<string>()->default_value(BIAS_CALCULATION_YES), "bias evaluation strategy (yes, no)")
-		(PR_CREATE_TESTS, value<bool>()->default_value(false), "create test cases")
-		(PR_TEST_NAME, value<string>()->default_value("test/examples/example.json"), "test case file name (JSON)")
-		(PR_CACHE_SIZE, value<int>()->default_value(DEFAULT_CACHE_SIZE), "cache size (in MB)")
-		(PR_EPOCH, value<fvalue>()->default_value(0.5), "epochs number")
-		(PR_MARGIN, value<fvalue>()->default_value(0.1), "margin")
-		(PR_INPUT, value<string>(), "input file");
+		(PR_C_LOW, bopt::value<fvalue>()->default_value(0.001), "C value (lower bound)")
+		(PR_C_HIGH, bopt::value<fvalue>()->default_value(10000.0), "C value (upper bound)")
+		(PR_G_LOW, bopt::value<fvalue>()->default_value(0.0009765625), "gamma value (lower bound)")
+		(PR_G_HIGH, bopt::value<fvalue>()->default_value(16.0), "gamma value (upper bound)")
+		(PR_RES, bopt::value<int>()->default_value(8), "resolution (for C and gamma)")
+		(PR_OUTER_FLD, bopt::value<int>()->default_value(1), "outer folds")
+		(PR_INNER_FLD, bopt::value<int>()->default_value(10), "inner folds")
+		(PR_BIAS_CALCULATION, bopt::value<string>()->default_value(BIAS_CALCULATION_YES), "bias evaluation strategy (yes, no)")
+		(PR_CREATE_TESTS, bopt::value<bool>()->default_value(false), "create test cases")
+		(PR_TEST_NAME, bopt::value<string>()->default_value("test/examples/example.json"), "test case file name (JSON)")
+		(PR_CACHE_SIZE, bopt::value<int>()->default_value(DEFAULT_CACHE_SIZE), "cache size (in MB)")
+		(PR_EPOCH, bopt::value<fvalue>()->default_value(0.5), "epochs number")
+		(PR_MARGIN, bopt::value<fvalue>()->default_value(0.1), "margin")
+		(PR_INPUT, bopt::value<string>(), "input file");
 
-	positional_options_description opt;
+	bopt::positional_options_description opt;
 	opt.add(PR_KEY_INPUT, -1);
 
 	try {	
-		variables_map vars;
-		store(command_line_parser(argc, argv).options(desc).positional(opt).run(), vars);
-		notify(vars);
+		bopt::variables_map vars;
+		bopt::store(bopt::command_line_parser(argc, argv).options(desc).positional(opt).run(), vars);
+		bopt::notify(vars);
 
 		if (!vars.count(PR_KEY_HELP)) {
 			ParametersParser parser(vars);
@@ -79,9 +79,17 @@ int main(int argc, char *argv[]) {
 			// logger << vars;
 
 			ApplicationLauncher launcher(conf);
-			pt::ptree model_tree = launcher.run();
+			pt::ptree model_tree;
+			model_tree.put_child("config", pt::ptree());
+			model_tree.put_child("classifier", pt::ptree());
+			launcher.run(model_tree);
+			pt::write_json(cout, model_tree.get_child("classifier"));
 
-			pt::ptree model_tree_two = launcher.run();
+			pt::ptree model_tree_two;
+			model_tree_two.put_child("config", pt::ptree());
+			model_tree_two.put_child("classifier", pt::ptree());
+			launcher.run(model_tree_two);
+			pt::write_json(cout, model_tree_two.get_child("classifier"));
 
 			// create test cases if user specified
 			if(conf.createTestCases){

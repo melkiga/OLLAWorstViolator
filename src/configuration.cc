@@ -28,7 +28,7 @@ const char* invalid_configuration::what() const throw() {
 	return message.c_str();
 }
 
-ParametersParser::ParametersParser(variables_map& vars) :
+ParametersParser::ParametersParser(bopt::variables_map& vars) :
 		vars(vars) {
 }
 
