@@ -64,12 +64,13 @@ BOOST_DATA_TEST_CASE(test_one, bdata::make(test_example_filenames), array_elemen
 	// get test run configuration and resulting classifier
 	pt::ptree config = root.get_child("config");
 	pt::ptree model = root.get_child("classifier");
-	pt::write_json(cout,model);
 	
 	// parsing test config from json
 	vector<string> arguments;
 	parse_test_config(arguments, config);
 	cout << "Test example arguments: " << arguments << endl;
+	BOOST_TEST_MESSAGE("Test Example Model :");
+	pt::write_json(cout,model);
 	
 	// start run setup
 	bopt::variables_map vars;
@@ -87,4 +88,47 @@ BOOST_DATA_TEST_CASE(test_one, bdata::make(test_example_filenames), array_elemen
 	
 	// test output with test example
 	BOOST_TEST(model == model_tree.get_child("classifier"));
+}
+
+BOOST_AUTO_TEST_CASE( test_multiple_runs )
+{
+  	// get path to test example output
+	string example_full_path = TEST_EXAMPLE_PATH + string("iris_test.json");
+	
+	// parse example json file
+	pt::ptree root;
+	pt::read_json(example_full_path,root);
+	
+	// get test run configuration and resulting classifier
+	pt::ptree config = root.get_child("config");
+	pt::ptree model = root.get_child("classifier");
+	
+	// parsing test config from json
+	vector<string> arguments;
+	parse_test_config(arguments, config);
+	cout << "Test example arguments: " << arguments << endl;
+
+	// start run setup
+	bopt::variables_map vars;
+	initOptions(arguments, vars);
+	ParametersParser parser(vars);
+	Configuration conf = parser.getConfiguration();
+
+	// run application
+	ApplicationLauncher launcher(conf);
+	pt::ptree model_tree;
+	model_tree.put_child("config", pt::ptree());
+	model_tree.put_child("classifier", pt::ptree());
+	launcher.run(model_tree);
+	pt::write_json(cout,model_tree.get_child("classifier"));
+
+	// second run
+	pt::ptree model_tree_two;
+	model_tree_two.put_child("config", pt::ptree());
+	model_tree_two.put_child("classifier", pt::ptree());
+	launcher.run(model_tree_two);
+	pt::write_json(cout,model_tree_two.get_child("classifier"));
+
+	// test output with test example
+	BOOST_TEST(model_tree.get_child("classifier") == model_tree_two.get_child("classifier"));
 }
