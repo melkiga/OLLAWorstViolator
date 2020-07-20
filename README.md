@@ -41,14 +41,22 @@ These instructions will get you a copy of the project up and running on your loc
 
         ```cmd
         bootstrap.bat
-        .\b2 address-model=32 architecture=x86 --build-type=complete --with-program_options --with-test toolset=msvc link=shared install 
+        .\b2 address-model=32 architecture=x86 --build-type=complete --with-program_options --with-test --with-log toolset=msvc link=shared install
         ```
 
   - **Linux**
 
       ```bash
-      libboost-dev/focal,now 1.71.0.0ubuntu2 amd64 [installed,automatic]
-      libboost-dev/focal 1.71.0.0ubuntu2 i386
+      wget https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.gz
+      tar -xvzf boost_1_73_0.tar.gz
+      cd boost_1_73_0
+      ./bootstrap.sh
+      sudo ./b2 --toolset=gcc --build-type=complete --layout=versioned --with-program_options --with-test --with-log --with-date_time link=shared install
+      vim ~/.bashrc
+      # add the following and save the file
+      export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+      # restart the terminal
+      rm -rf boost_1_73_0.tar.gz
       ```
 
 - **GSL** [windows](https://solarianprogrammer.com/2020/01/26/getting-started-gsl-gnu-scientific-library-windows-macos-linux/) | [linux](https://www.gnu.org/software/gsl/)
@@ -60,7 +68,7 @@ These instructions will get you a copy of the project up and running on your loc
     - `.\vcpkg integrate install`
     - `.\vcpkg install gsl gsl:x64-windows`
     - Add environment variable `GSL_ROOT` with value: `C:path\to\vcpkg\packages\gsl_x64-windows`
-    - For more information on *vcpkg* visit: https://vcpkg.readthedocs.io/en/latest/
+    - For more information on *vcpkg* visit [here](https://vcpkg.readthedocs.io/en/latest/).
 
   - **Linux**:
 
