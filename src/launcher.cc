@@ -110,7 +110,7 @@ Classifier* ApplicationLauncher::performTraining() {
 	return classifier;
 }
 
-pt::ptree ApplicationLauncher::run() {
+void ApplicationLauncher::run(pt::ptree& root) {
 
 	Classifier* classifier = NULL;
 	if (conf.validation.outerFolds > 1) {
@@ -129,24 +129,17 @@ pt::ptree ApplicationLauncher::run() {
 			classifier = performTraining();
 		}
 	}
-	cout << classifier->getSvNumber() << endl;
-	// return json classifier
-	pt::ptree root;
+
 	// save configuration
-	pt::ptree config;
+	pt::ptree& config = root.get_child("config");
 	config.put(PR_INNER_FLD,conf.validation.innerFolds);
 	config.put(PR_OUTER_FLD,conf.validation.outerFolds);
 	config.put(PR_MARGIN, conf.trainingParams.margin);
 	config.put(PR_EPOCH, conf.trainingParams.epochs);
 	config.put(PR_INPUT, conf.dataFile);
 	config.put(PR_TEST_NAME, conf.testName);
-	root.add_child("config",config);
-	pt::ptree classif;
-	pt::write_json(cout, classif);
+	pt::ptree& classif = root.get_child("classifier");
 	classifier->saveClassifier(classif);
-	pt::write_json(cout, classif);
-	root.add_child("classifier",classif);
 	
 	delete classifier;
-	return root;
 }

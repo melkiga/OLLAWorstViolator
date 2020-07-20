@@ -18,7 +18,7 @@ set(OSVM_SOURCES ${OSVM_SRC_FILES}
                  ${PROJECT_SOURCE_DIR}/src/configuration.cc )
 
 # dependencies
-find_package(Boost 1.73 COMPONENTS program_options unit_test_framework REQUIRED)
+find_package(Boost 1.73 COMPONENTS program_options unit_test_framework log REQUIRED)
 # set some environment variables
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)

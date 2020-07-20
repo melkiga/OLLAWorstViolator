@@ -40,12 +40,14 @@ add_custom_target(release
 ##############################################
 # Declare dependencies
 # BOOST
-find_package(Boost 1.73 COMPONENTS program_options unit_test_framework REQUIRED)
+find_package(Boost 1.73 COMPONENTS program_options unit_test_framework log REQUIRED)
 
 # set some environment variables
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
+
+set(Boost_INCLUDE_DIRS "/usr/local/include/boost-1_73/")
 
 # include dirs + libraries
 if(Boost_FOUND)

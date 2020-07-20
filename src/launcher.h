@@ -26,7 +26,7 @@ public:
 	ApplicationLauncher(Configuration &conf) : conf(conf) {
 	}
 
-  pt::ptree run();
+  void run(pt::ptree& model);
 
 };
 
