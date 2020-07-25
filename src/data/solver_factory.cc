@@ -65,7 +65,7 @@ BaseSolverFactory::~BaseSolverFactory() {
 	delete matrixBuilder;
 }
 
-
+//TODO: remove multiclass
 AbstractSolver* BaseSolverFactory::createSolver(MulticlassApproach type, map<label_id, string> labels, sfmatrix* x, label_id* y, TrainParams& params, StopCriterionStrategy* strategy) {
 	AbstractSolver *solver = NULL;
 	solver = new PairwiseSolver(labels, x, y, params, strategy);

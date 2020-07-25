@@ -94,7 +94,7 @@ public:
 
 	void setKernelParams(fvalue c, CGaussKernel &params);
 	void train();
-	Classifier* getClassifier();
+	PairwiseClassifier getClassifier();
 
 	TestingResult doCrossValidation();
 	void resetOuterFold(fold_id fold);
@@ -153,7 +153,7 @@ inline void CrossValidationSolver::train() {
 }
 
 
-inline Classifier* CrossValidationSolver::getClassifier() {
+inline PairwiseClassifier CrossValidationSolver::getClassifier() {
 	return solver->getClassifier();
 }
 

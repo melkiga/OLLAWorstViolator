@@ -62,9 +62,11 @@ Classifier* ApplicationLauncher::performNestedCrossValidation() {
 
 	//logger << format("final result: time=%.2f[s], accuracy=%.2f[%%]\n")
 	//		% timer.getTimeElapsed() % (100.0 * res.accuracy);
-
+	//model = solver->getClassifier();
+	std::shared_ptr<Classifier> o = std::make_shared<Classifier>(solver->getClassifier());
 	delete selector;
-	return solver->getClassifier();
+	delete solver;
+	return o.get();
 }
 
 Classifier* ApplicationLauncher::performCrossValidation() {

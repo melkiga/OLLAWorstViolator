@@ -30,6 +30,7 @@
 #include "strategy.h"
 #include "kernel.h"
 #include "classify.h"
+#include "pairwise_solver.h"
 #include "cache.h"
 #include "stop.h"
 #include "params.h"
@@ -50,7 +51,7 @@ public:
 
 	virtual void setKernelParams(fvalue c, CGaussKernel &params) = 0;
 	virtual void train() = 0;
-	virtual Classifier* getClassifier() = 0;
+	virtual PairwiseClassifier getClassifier() = 0;
 
 };
 
@@ -119,7 +120,7 @@ public:
 
 	void setKernelParams(fvalue c, CGaussKernel &params);
 	virtual void train() = 0;
-	Classifier* getClassifier() = 0;
+	PairwiseClassifier getClassifier() = 0;
 
 	void setSwapListener(SwapListener *listener);
 	void swapSamples(sample_id u, sample_id v);

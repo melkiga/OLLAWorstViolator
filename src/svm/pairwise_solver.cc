@@ -70,17 +70,17 @@ quantity PairwiseClassifier::getSvNumber() {
 void PairwiseClassifier::saveClassifier(pt::ptree& root){
 	// get pairwise models
 	quantity maxSVCount = state->maxSVCount;
-	root.put("maxSVCount",maxSVCount);
+	root.put("maxSVCount", maxSVCount);
 	
 	// get pairwise models
 	pt::ptree models;
 	int counter = 0;
 	vector<PairwiseTrainingModel>::iterator it;
 	for (it = state->models.begin(); it != state->models.end(); it++) {
-		pt::ptree state;
-		state.put("bias",it->bias);
-		state.put("size",it->size);
-		state.put("labels", "[" + to_string(it->trainingLabels.first) + ", " + to_string(it->trainingLabels.second) + "]");
+		pt::ptree model_state;
+		model_state.put("bias",it->bias);
+		model_state.put("size",it->size);
+		model_state.put("labels", "[" + to_string(it->trainingLabels.first) + ", " + to_string(it->trainingLabels.second) + "]");
 
 		vector<sample_id> samples(it->samples.begin(),it->samples.begin()+maxSVCount);
 		vector<fvalue> alphas(it->yalphas.begin(),it->yalphas.begin()+maxSVCount);
@@ -95,9 +95,9 @@ void PairwiseClassifier::saveClassifier(pt::ptree& root){
 		samplelist.pop_back(), samplelist.pop_back();
 		alphalist.pop_back(), alphalist.pop_back();
 		alphalist += "]", samplelist += "]";
-		state.put("alphas",alphalist), state.put("samples",samplelist);
+		model_state.put("alphas",alphalist), model_state.put("samples",samplelist);
 		// save sub-model
-		models.push_back(make_pair(to_string(counter),state));
+		models.push_back(make_pair(to_string(counter),model_state));
 		counter++;
 	}
 
@@ -141,8 +141,8 @@ PairwiseSolver::~PairwiseSolver() {
 }
 
 
-Classifier* PairwiseSolver::getClassifier() {
-	return new PairwiseClassifier(this->cache->getEvaluator(), &state, this->cache->getBuffer());
+PairwiseClassifier PairwiseSolver::getClassifier() {
+	return PairwiseClassifier(this->cache->getEvaluator(), &state, this->cache->getBuffer());
 }
 
 

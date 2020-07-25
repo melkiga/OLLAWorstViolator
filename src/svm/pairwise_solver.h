@@ -116,7 +116,7 @@ public:
 	virtual ~PairwiseSolver();
 
 	void train();
-	Classifier* getClassifier();
+	PairwiseClassifier getClassifier();
 
 	quantity getSvNumber();
 
